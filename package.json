@@ -11,7 +11,9 @@
     "url": "git+https://github.com/GuyWhoCode/CampusFinder.git"
   },
   "author": "GuyWhoCodes",
-  "contributors": ["IanWearsHat"],
+  "contributors": [
+    "IanWearsHat"
+  ],
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/GuyWhoCode/CampusFinder/issues"
