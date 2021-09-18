@@ -10,7 +10,8 @@ TBD.
 
 ## Dependencies
 - Node JS
-- Firebase
-- MongoDB
-- dotenv
+- MongoDB 
+- dotenv 
 - Express
+- ESLint
+- Firebase (Not included with repository)

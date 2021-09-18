@@ -6,9 +6,9 @@ const server = app.listen(3000, function() {
     // Enter command in Terminal on Windows: npx nodemon server.js
 });
 
-app.use(express.static(__dirname + "/website"));
+app.use(express.static(__dirname));
 app.get("/", function(request, response) {
-    response.sendFile(__dirname + "/main.html");
+    response.sendFile(__dirname + "/website/main.html");
 });
 // Express.js setup to initialize different routes of the webpage.
 

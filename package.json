@@ -12,7 +12,9 @@
     "url": "git+https://github.com/GuyWhoCode/CampusFinder.git"
   },
   "contributors": [
-    "GuyWhoCode", "IanWearsHat", "Jetlock26"
+    "GuyWhoCode",
+    "IanWearsHat",
+    "Jetlock26"
   ],
   "license": "ISC",
   "homepage": "https://github.com/GuyWhoCode/CampusFinder#readme",
@@ -20,8 +22,9 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "firebase": "^9.0.1",
-    "mongodb": "^4.1.1",
-    "nodemon": "^2.0.12"
+    "mongodb": "^4.1.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^7.32.0"
+  }
 }
