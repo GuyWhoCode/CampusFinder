@@ -5,11 +5,31 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin View</title>
-    <link rel="stylesheet" href="/style.css"/>
+    <link rel="stylesheet" href="./style.css"/>
 </head>
 <body>
     <h1>This is where all the Changes and Configurations will be made.</h1>
+    <form id="searchTeacher">
+        <input list="teacherNames" id="teacherAutocomplete" placeholder="Enter WHS teacher name">
+    </form>
+    <datalist id="teacherNames"></datalist>
+    <br>
+    <h1 id="selection"></h1>
+
+
+    <img id="previewImg" width="30%" height="30%">
+    <section id="imageUpload">
+        <form id="formInput">
+            <label class="startLabel">Upload Picture #</label>
+            <section class="startRowLabel" id="picUploadLabel">
+                <input type="file" id="robotPicture" class="startInput"/>
+            </section>
+            <input type="submit" id="submitStartForm" class="actionButton">
+        </form>
+    </section>
+
     <a href="/website/main.html">Go back to main page</a>
-    <script src="/adminScript.js"></script>
+    <script src="./adminScript.js"></script>
+    <script src="./picLib.js"></script>
 </body>
 </html>

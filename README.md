@@ -15,3 +15,7 @@ TBD.
 - Express
 - ESLint
 - Firebase (Not included with repository)
+
+## Dev Dependencies
+- ESLint
+- Nodemon
