@@ -5,7 +5,8 @@
             "room": 3204,
             "extn": 7739,
             "dept": ["English"],
-            "conf": [1]
+            "conf": [1],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989595/9af9689a-dfd9-11e9-b751-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Angell, Jaime",
@@ -16,7 +17,8 @@
             ],
             "conf": [
                 3
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989547/9af93bf4-dfd9-11e9-8a1d-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Anaya, Mimi",
@@ -27,7 +29,8 @@
             ],
             "conf": [
                 4
-            ]
+            ],
+            "image": null
         },
         {
             "name": "Banim, Vince",
@@ -40,7 +43,8 @@
             "conf": [
                 3,
                 0
-            ]
+            ],
+            "image": null
         },
         {
             "name": "Barr, Mike",
@@ -51,7 +55,8 @@
             ],
             "conf": [
                 3
-            ]
+            ],
+            "image": null
         },
         {
             "name": "Belcher, Jason",
@@ -65,7 +70,8 @@
             "conf": [
                 1,
                 5
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/2178092/165bd31a-1a17-11eb-94a9-127393973643/optimizations/2048"
         },
         {
             "name": "Birmingham, Michelle",
@@ -77,7 +83,8 @@
             "conf": [
                 4,
                 6
-            ]
+            ],
+            "image": null
         },
         {
             "name": "Burt, Donna",
@@ -88,7 +95,8 @@
             ],
             "conf": [
                 3
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989548/9af93cf8-dfd9-11e9-9bea-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Butler, Todd",
@@ -99,10 +107,11 @@
             ],
             "conf": [
                 5
-            ]
+            ],
+            "image": null
         },
         {
-            "name": "Cantrell, Ashley",
+            "name": "Cantrelle, Ashley",
             "room": 2117,
             "extn": 7727,
             "dept": [
@@ -110,7 +119,8 @@
             ],
             "conf": [
                 3
-            ]
+            ],
+            "image": null
         },
         {
             "name": "Carman, Peter",
@@ -122,7 +132,8 @@
             "conf": [
                 1,
                 6
-            ]
+            ],
+            "image": null
         },
         {
             "name": "Cerda, Becky",
@@ -133,7 +144,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989580/9af95a62-dfd9-11e9-8d37-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Chambers, Nikki",
@@ -144,7 +156,8 @@
             ],
             "conf": [
                 4
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989561/9af94892-dfd9-11e9-922d-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Charlin-Wade, Kathryn",
@@ -155,7 +168,8 @@
             ],
             "conf": [
                 4
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989610/9af97650-dfd9-11e9-8168-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Cheung, Carsten",
@@ -166,7 +180,8 @@
             ],
             "conf": [
                 7843
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989602/9af96ee4-dfd9-11e9-98c0-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Cheung, Jessica",
@@ -177,7 +192,8 @@
             ],
             "conf": [
                 1
-            ]
+            ],
+            "image": null
         },
         {
             "name": "Chou, Joseph",
@@ -189,7 +205,8 @@
             ],
             "conf": [
                 2
-            ]
+            ],
+            "image": null
         },
         {
             "name": "Collins, Jeff",
@@ -200,7 +217,8 @@
             ],
             "conf": [
                 4
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989636/9af98dac-dfd9-11e9-a949-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Comparsi, Vince",
@@ -212,7 +230,8 @@
             ],
             "conf": [
                 5
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989582/9af95c60-dfd9-11e9-a440-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Cueva, Juan",
@@ -224,7 +243,8 @@
             ],
             "conf": [
                 5
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989566/9af94d7e-dfd9-11e9-8419-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Cunningham, Margaret",
@@ -235,7 +255,8 @@
             ],
             "conf": [
                 1
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989567/9af94e64-dfd9-11e9-96b4-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Dowdle, Bryan",
@@ -246,7 +267,8 @@
             ],
             "conf": [
                 1
-            ]
+            ],
+            "image": null
         },
         {
             "name": "Druten, Jason",
@@ -259,7 +281,8 @@
             ],
             "conf": [
                 5
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989552/9af940a4-dfd9-11e9-884b-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Dugard, Rosario",
@@ -270,7 +293,8 @@
             ],
             "conf": [
                 2
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989590/9af963cc-dfd9-11e9-a916-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Dulaney, Meg",
@@ -281,7 +305,8 @@
             ],
             "conf": [
                 4
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989586/9af9605c-dfd9-11e9-9b7f-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Elwood, Stefanie",
@@ -292,7 +317,8 @@
             ],
             "conf": [
                 5
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989658/9af9a1d4-dfd9-11e9-84eb-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Eriksen, Sue",
@@ -303,7 +329,8 @@
                 "Drill Team",
                 "Leadership"
             ],
-            "conf": []
+            "conf": [],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989224/7b8ea242-dfaf-11e9-9ca7-0a312aeb55d8/optimizations/2048"
         },
         {
             "name": "Evans, Christy",
@@ -314,7 +341,8 @@
             ],
             "conf": [
                 1
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989551/9af93fc8-dfd9-11e9-ac72-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Flaxman, Mary",
@@ -325,7 +353,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989557/9af94504-dfd9-11e9-9321-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Forman, Jason",
@@ -337,7 +366,8 @@
             "conf": [
                 5,
                 6
-            ]
+            ],
+            "image": null
         },
         {
             "name": "Fraser, Julie",
@@ -348,7 +378,8 @@
             ],
             "conf": [
                 2
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989579/9af95986-dfd9-11e9-ad64-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Gereau, Don",
@@ -365,7 +396,8 @@
                     4,
                     5
                 ]
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989550/9af93ee2-dfd9-11e9-9bba-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Hall, Holly",
@@ -374,7 +406,8 @@
             "dept": [
                 "CTE"
             ],
-            "conf": []
+            "conf": [],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989578/9af958aa-dfd9-11e9-bb19-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Haney, Jennifer",
@@ -387,7 +420,8 @@
             ],
             "conf": [
                 5
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989556/9af9441e-dfd9-11e9-93fa-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Hastings, Natalie",
@@ -400,7 +434,8 @@
             ],
             "conf": [
                 4
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989608/9af97434-dfd9-11e9-8740-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Hettinger, Drew",
@@ -412,7 +447,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989583/9af95d46-dfd9-11e9-ba35-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Hettinger, Erika",
@@ -422,7 +458,8 @@
                 "Math",
                 "Academic Decathlon"
             ],
-            "conf": []
+            "conf": [],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989613/9af978ee-dfd9-11e9-820f-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Hignight, Dede",
@@ -433,7 +470,8 @@
             ],
             "conf": [
                 2
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989515/dda2de6e-dfd5-11e9-9241-0a312aeb55d8/optimizations/2048"
         },
         {
             "name": "Holt, Greg",
@@ -445,7 +483,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989576/9af95666-dfd9-11e9-bdb9-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Imbarus, Aura",
@@ -456,7 +495,8 @@
             ],
             "conf": [
                 3
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989597/9af96a8e-dfd9-11e9-a733-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Janicki, Julie",
@@ -467,7 +507,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989600/9af96d22-dfd9-11e9-b4d1-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Jin, Jason",
@@ -477,7 +518,8 @@
                 "Math",
                 "G. Tennis"
             ],
-            "conf": []
+            "conf": [],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989619/9af97e2a-dfd9-11e9-8d4f-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Kahlon, Gurbir",
@@ -488,7 +530,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989624/9af982b2-dfd9-11e9-94c9-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Kim, Daisy",
@@ -499,7 +542,8 @@
             ],
             "conf": [
                 3
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989517/dda2e0f8-dfd5-11e9-bf31-0a312aeb55d8/optimizations/2048"
         },
         {
             "name": "Kim, Geanie",
@@ -508,7 +552,8 @@
             "dept": [
                 "Math"
             ],
-            "conf": []
+            "conf": [],
+            "image": null
         },
         {
             "name": "Kim, Jasmine",
@@ -519,7 +564,8 @@
             ],
             "conf": [
                 2
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989607/9af97358-dfd9-11e9-8809-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Kim, Joyce",
@@ -530,7 +576,8 @@
             ],
             "conf": [
                 3
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989604/9af9709c-dfd9-11e9-a099-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Kim, Marcia",
@@ -541,7 +588,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989657/9af9a094-dfd9-11e9-af6b-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Kurashige, Gary",
@@ -552,7 +600,8 @@
             ],
             "conf": [
                 4
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989587/9af96138-dfd9-11e9-9172-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Lee, Karyn",
@@ -563,7 +612,8 @@
             ],
             "conf": [
                 4
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989594/9af967be-dfd9-11e9-97d1-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Lopez, Hilda",
@@ -574,7 +624,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989588/9af96214-dfd9-11e9-8f6d-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Machado, Elizabeth",
@@ -585,7 +636,8 @@
             ],
             "conf": [
                 4
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989616/9af97b82-dfd9-11e9-91d5-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Matsumoto, Maiya",
@@ -596,7 +648,8 @@
             ],
             "conf": [
                 3
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989620/9af97f06-dfd9-11e9-a81c-0a68a479c138/optimizations/2048"
         },
         {
             "name": "McBean, Alexander",
@@ -608,7 +661,8 @@
             "conf": [
                 1,
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989544/9af934ec-dfd9-11e9-b3c5-0a68a479c138/optimizations/2048"
         },
         {
             "name": "McCulloch-Torres, Lindy",
@@ -619,7 +673,8 @@
             ],
             "conf": [
                 4
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989637/9af98e88-dfd9-11e9-8000-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Nguyen, Le Thu",
@@ -630,7 +685,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989545/9af9396a-dfd9-11e9-889a-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Orabuena, Christy",
@@ -645,7 +701,8 @@
                 5,
                 6,
                 7
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989585/9af95ef4-dfd9-11e9-af4e-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Oshiro, Todd",
@@ -657,7 +714,8 @@
             ],
             "conf": [
                 5
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989591/9af964d0-dfd9-11e9-b6f3-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Pesusich, Mark",
@@ -668,7 +726,8 @@
             ],
             "conf": [
                 1
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989584/9af95e22-dfd9-11e9-a0a1-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Phelps, Bernard",
@@ -679,14 +738,16 @@
             ],
             "conf": [
                 2
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989569/9af9501c-dfd9-11e9-8de2-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Puccio, Mary Lou",
             "room": "Library",
             "extn": 7720,
             "dept": [],
-            "conf": []
+            "conf": [],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989601/9af96df4-dfd9-11e9-aa12-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Reyes, Pete",
@@ -697,7 +758,8 @@
             ],
             "conf": [
                 4
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989660/9af9a382-dfd9-11e9-b0a3-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Rivera, Laura",
@@ -708,7 +770,8 @@
             ],
             "conf": [
                 5
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989618/9af97d4e-dfd9-11e9-98b4-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Rodriguez-Milla, Jennifer",
@@ -721,7 +784,8 @@
             "conf": [
                 5,
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989617/9af97c5e-dfd9-11e9-8170-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Rollins, Matt",
@@ -733,7 +797,8 @@
             "conf": [
                 3,
                 4
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989572/9af952ce-dfd9-11e9-b070-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Rooney, Shannon",
@@ -744,7 +809,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": null
         },
         {
             "name": "Rugnetta, Anthony",
@@ -755,7 +821,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989554/9af94266-dfd9-11e9-8ba9-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Rulon, Lisabeth",
@@ -767,7 +834,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989553/9af94180-dfd9-11e9-96b6-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Sagastume, Ambar",
@@ -778,7 +846,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989615/9af97aa6-dfd9-11e9-8bc0-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Schindler, David",
@@ -790,7 +859,8 @@
             "conf": [
                 1,
                 5
-            ]
+            ],
+            "image":  null
         },
         {
             "name": "Secura, Mary",
@@ -801,7 +871,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989598/9af96b6a-dfd9-11e9-880e-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Sprague, Tracy",
@@ -813,7 +884,8 @@
             ],
             "conf": [
                 1
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989560/9af947b6-dfd9-11e9-950d-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Villaneda, Carina",
@@ -824,7 +896,8 @@
             ],
             "conf": [
                 2
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989606/9af97268-dfd9-11e9-aa00-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Vorhis, Terri",
@@ -835,7 +908,8 @@
             ],
             "conf": [
                 1
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989701/ce06c4fc-dfe4-11e9-9593-12e3182c2b4c/optimizations/2048"
         },
         {
             "name": "Wang, Regina",
@@ -846,7 +920,8 @@
             ],
             "conf": [
                 5
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989589/9af962f0-dfd9-11e9-8acb-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Weber, Nick",
@@ -857,7 +932,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989639/9af99054-dfd9-11e9-bb35-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Welch, Junius",
@@ -868,7 +944,8 @@
             ],
             "conf": [
                 1
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989603/9af96fc0-dfd9-11e9-ac30-0a68a479c138/optimizations/2048"
         },
         {
             "name": "White, Melanie",
@@ -880,7 +957,8 @@
             ],
             "conf": [
                 4
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989571/9af951f2-dfd9-11e9-bd8d-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Williams, Chad",
@@ -891,7 +969,8 @@
             ],
             "conf": [
                 5
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989546/9af93ad2-dfd9-11e9-8b26-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Won, Annie",
@@ -902,7 +981,8 @@
             ],
             "conf": [
                 2
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989628/9af98690-dfd9-11e9-8379-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Yang, Eunice",
@@ -911,7 +991,8 @@
             "dept": [
                 "Math"
             ],
-            "conf": []
+            "conf": [],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989614/9af979ca-dfd9-11e9-acdc-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Yang, Peggy",
@@ -922,7 +1003,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989622/9af980d2-dfd9-11e9-819e-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Yano, Eiji",
@@ -931,7 +1013,8 @@
             "dept": [
                 "Japanese"
             ],
-            "conf": []
+            "conf": [],
+            "image": null
         },
         {
             "name": "Yoshida, Kacie",
@@ -942,7 +1025,8 @@
             ],
             "conf": [
                 6
-            ]
+            ],
+            "image": null
         },
         {
             "name": "Ogata, Jaclyn",
@@ -951,7 +1035,8 @@
             "dept": [
                 "School to Career"
             ],
-            "conf": []
+            "conf": [],
+            "image": null
         },
         {
             "name": "Chinn, Jenifer",
@@ -960,7 +1045,8 @@
             "dept": [
                 "Vocational Assessment"
             ],
-            "conf": []
+            "conf": [],
+            "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989652/9af99c20-dfd9-11e9-8bc4-0a68a479c138/optimizations/2048"
         },
         {
             "name": "Ogaz, Ruby",
@@ -969,7 +1055,8 @@
             "dept": [
                 "Assist"
             ],
-            "conf": []
+            "conf": [],
+            "image": null
         }
     ]
 }
