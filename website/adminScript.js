@@ -1063,7 +1063,7 @@ let teacherNames = document.getElementById("teacherAutocomplete")
 
 teachers.map(val => {
     let name = document.createElement("option")
-    name.value = `${val.name}`
+    name.value = `${val.name} (${val.room})`
     document.getElementById("teacherNames").appendChild(name)
 })
 document.getElementById("searchTeacher").addEventListener("submit", (event) => {
