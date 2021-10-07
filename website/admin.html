@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin View</title>
-    <link rel="stylesheet" href="./style.css"/>
+    <link rel="stylesheet" href="./adminStyle.css"/>
 </head>
 <body>
     <h1>This is where all the Changes and Configurations will be made.</h1>
@@ -14,9 +14,15 @@
     </form>
     <datalist id="teacherNames"></datalist>
     <br>
-    <h1 id="selection"></h1>
-
-
+    
+    <div id="infoBoxPreview">
+        <img id="teacherImg">
+        <!-- <img id = "teacherImg" src="https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989636/9af98dac-dfd9-11e9-a949-0a68a479c138/optimizations/2048">  -->
+        <h1 id="selection" class="noMargin"></h1>
+        <h1 id="roomNumber" class="noMargin"></h1>
+        <h1 id="department" class="noMargin"></h1>
+    </div>
+    
     <img id="previewImg" width="30%" height="30%">
     <section id="imageUpload">
         <form id="formInput">

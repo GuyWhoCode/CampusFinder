@@ -953,7 +953,7 @@ let teachers =
         "extn": 7758,
         "dept": [
             "English",
-            "West SIgnals & Capitaneus"
+            "West Signals & Capitaneus"
         ],
         "conf": [
             4
@@ -1059,14 +1059,29 @@ let teachers =
         "image": null
     }
 ]
-let teacherNames = document.getElementById("teacherAutocomplete")
+let teacherNamesList = document.getElementById("teacherAutocomplete")
+let searchBar = document.getElementById("searchTeacher")
+
+const findTeacherInfo = teacherName => {
+    let teacherInfo = ""
+    teachers.map(val => val.name === teacherName ? (teacherInfo = val) : undefined)
+    return teacherInfo
+}
+const flipName = name => name.split(",").reverse().join(" ").trim()
 
 teachers.map(val => {
     let name = document.createElement("option")
     name.value = `${val.name} (${val.room})`
     document.getElementById("teacherNames").appendChild(name)
 })
-document.getElementById("searchTeacher").addEventListener("submit", (event) => {
+searchBar.addEventListener("submit", (event) => {
     event.preventDefault()
-    document.getElementById("selection").innerHTML = teacherNames.value
+    let teacherName = teacherNamesList.value.split("(")[0].trim()
+    let teacherInfo = findTeacherInfo(teacherName)
+    document.getElementById("selection").innerHTML = flipName(teacherName)
+    document.getElementById("roomNumber").innerHTML = "Room " + teacherInfo.room 
+    document.getElementById("department").innerHTML = "Teaches " + teacherInfo.dept 
+    document.getElementById("teacherImg").src = teacherInfo.image
+    teacherNamesList.value = ""
 })
+

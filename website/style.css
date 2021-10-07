@@ -3,3 +3,28 @@ body {
     padding: 0;
     font-family: 'Roboto', sans-serif;
 }
+#navbar {
+    display: flex;
+    list-style-type: none;
+    flex-direction: row-reverse;
+    margin: 0;
+    padding: 0;
+    background-color: var(--blue);
+    font-size: 5vmin;
+    margin-bottom: 1%;
+}
+li {
+    display: inline;
+    width: 5em;
+}
+li a {
+    text-align: center;
+    /* padding: 0px; */
+    padding-left: 3%;
+    text-decoration: none;
+    /* word-wrap: break-word;
+    word-break: break-word; */
+}
+li:hover {
+    opacity: 0.5;
+}

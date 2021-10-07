@@ -14,6 +14,7 @@ TBD.
 - dotenv 
 - Express
 - ESLint
+- Socket.io
 - Firebase (Not included with repository)
 
 ## Dev Dependencies
