@@ -21,48 +21,24 @@ app.use(express.static(__dirname + "/website"));
 app.get("/", function(request, response) {
     response.sendFile(__dirname + "/website/main.html");
 });
-// Express.js setup to initialize different routes of the webpage.
 
-let {initializeApp} = require("firebase/app")
-
-const firebase = initializeApp(firebaseConfig)
-let {GoogleAuthProvider, getAuth, signInWithRedirect, getRedirectResult} = require("firebase/auth")
-const provider = new GoogleAuthProvider()
-const auth = getAuth()
-
-const socket = require("socket.io")(server)
-socket.on('connection', io => {
-    console.log("I have a connection to the website!")
-    io.on("loginRedirect", () => {
-        signInWithRedirect(auth, provider)
-        console.log("I have logined to something!")
-        // Redirects user to a new tab where Firebase prompts them to sign it with a Google Account
-    })
-})
-
-getRedirectResult(auth)
-.then((result) => {
-    // This gives you a Google Access Token. You can use it to access Google APIs.
-    const credential = GoogleAuthProvider.credentialFromResult(result)
-    const token = credential.accessToken
-
-    // The signed-in user info.
-    const user = result.user
-}).catch((error) => {
-    // Handle Errors here.
-    const errorCode = error.code
-    const errorMessage = error.message
-    // The email of the user's account used.
-    const email = error.email
-    // The AuthCredential type that was used.
-    const credential = GoogleAuthProvider.credentialFromError(error)
+app.get("/home", function(request, response) {
+    response.sendFile(__dirname + "/website/main.html");
 });
 
+app.get("/admin", function(request, response) {
+    response.sendFile(__dirname + "/website/admin.html");
+});
 
-// var admin = require("firebase-admin")
-// var serviceAccount = require("path/to/serviceAccountKey.json");
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount)
-// });
-// Need to test:
-// https://firebase.google.com/docs/admin/setup?authuser=0
+// Express.js setup to initialize different routes of the webpage.
+// const fileReader = require("graceful-fs")
+// let teacherData = fileReader.readFileSync("./faculty.json", "utf8")
+// console.log(JSON.parse(teacherData).teachers.map(val => console.log(val.name)))
+
+// const socket = require("socket.io")(server)
+// socket.on('connection', io => {
+//     console.log("I have a connection to the website!")
+//     io.on("loginRedirect", () => {
+//         console.log("I have logined to something!")
+//     })
+// })

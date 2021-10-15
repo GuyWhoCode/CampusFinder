@@ -13,9 +13,10 @@ TBD.
 - MongoDB 
 - dotenv 
 - Express
-- ESLint
+- Graceful-fs
 - Socket.io
-- Firebase (Not included with repository)
+- Firebase
+
 
 ## Dev Dependencies
 - ESLint

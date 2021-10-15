@@ -28,3 +28,25 @@ li a {
 li:hover {
     opacity: 0.5;
 }
+#userPFP {
+    border-radius: 50%;
+    max-width: 21%;
+}
+#userContainer {
+    display: flex;
+    justify-content: center;
+    /* padding-left: 5%;
+    padding-right: 10%; */
+    width: 20%;
+    height: auto;
+    text-align: center;
+    align-items: center;
+}
+#username {
+    font-size: 3vmin;
+    padding-left: 3%;
+    padding-right: 3%;
+}
+#userContainer:hover {
+    opacity: 1;
+}
