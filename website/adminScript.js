@@ -1084,4 +1084,6 @@ searchBar.addEventListener("submit", (event) => {
     document.getElementById("teacherImg").src = teacherInfo.image
     teacherNamesList.value = ""
 })
-
+document.getElementById("home").addEventListener("click", () => {
+    window.location = "/home"
+})

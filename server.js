@@ -3,13 +3,7 @@
 // const uri = process.env.uri;
 // const dbClient = new mongoClient(uri)
 
-// dbClient.connect(async () => {
-//     console.log("Connected to database!")
-//     let guideDB = dbClient.db("campusInfo").collection("campus")
-//     guideDB.insertOne({
-//         "test1": 3
-//     })
-// })
+
 const express = require("express");
 const app = express();
 const server = app.listen(3000, function() {
@@ -30,15 +24,42 @@ app.get("/admin", function(request, response) {
     response.sendFile(__dirname + "/website/admin.html");
 });
 
+app.get("/about", function(request, response) {
+    response.sendFile(__dirname + "/website/about.html");
+});
 // Express.js setup to initialize different routes of the webpage.
 // const fileReader = require("graceful-fs")
 // let teacherData = fileReader.readFileSync("./faculty.json", "utf8")
 // console.log(JSON.parse(teacherData).teachers.map(val => console.log(val.name)))
+// dbClient.connect(async () => {
+//     console.log("Connected to database!")
+//     let campusDB = dbClient.db("campusInfo").collection("campus")
 
-// const socket = require("socket.io")(server)
-// socket.on('connection', io => {
-//     console.log("I have a connection to the website!")
-//     io.on("loginRedirect", () => {
-//         console.log("I have logined to something!")
-//     })
 // })
+
+const socket = require("socket.io")(server)
+socket.on('connection', io => {
+    console.log("I have a connection to the website!")
+    io.on("userLogin", (userInfo) => {
+        // sessionStorage.setItem("username", user.displayName)
+        // sessionStorage.setItem("email", user.email)
+        // sessionStorage.setItem("userPic", user.photoURL)
+        // campusDB.insertOne({
+        //     "userName": "",
+        //     "email": "",
+        //     "url": "happy.gif",
+        //     "admin": true,
+        //     "darkModeOn": true,
+        //     "periods": {
+        //         "1": "Teacher--Room",
+        //         "2": "Teacher--Room",
+        //         "3": "Teacher--Room",
+        //         "4": "Teacher--Room",
+        //         "5": "Teacher--Room",
+        //         "6": "Teacher--Room",
+        //     }
+        // })
+        // Check to see if the user has already been created, if not, create a new user
+
+    })
+})

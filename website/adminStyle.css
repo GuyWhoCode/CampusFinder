@@ -1,6 +1,9 @@
 body {
     margin: 0;
     padding: 0;
+    background-color: #303030;
+    font-family: 'Roboto', sans-serif;
+    color: #FFFFFF;
 }
 .noMargin {
     margin: 0;
@@ -8,12 +11,13 @@ body {
 }
 #infoBoxPreview {
     display: grid;
-    background-color: lightblue;
+    background-color: #464647;
     border-radius: 5%;
-    margin-right: 25%;
+    margin-right: 50%;
     text-align: center;
     grid-template-columns: repeat(3, 33%);
     grid-template-rows: repeat(4, auto);
+    color: #E6E6E6;
 }
 #teacherImg {
     border-radius: 50%;

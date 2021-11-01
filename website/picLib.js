@@ -21,13 +21,6 @@ const getPic = () => {
 	return previewImg.src
 }
 
-// const generateNewPicEntry = (name, pic) => {
-// 	let returnObj = {}
-// 	returnObj.teamName = name
-// 	returnObj.pic = pic
-// 	return returnObj
-// }
-
 const clearPicSubmission = () => {
 	previewImg.src = ""
 	robotPicture.value = ""

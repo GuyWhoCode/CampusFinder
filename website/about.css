@@ -1,0 +1,28 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+.founders {
+    background-position: center center;
+    width: 20vw;
+    overflow: hidden;
+    background-size: cover;
+    float: right;
+    border-radius: 40%;
+}
+#founderTwoPFP {
+    grid-area: 1 / 2;
+    margin: 0;
+}
+#description {
+    margin: 5%;
+}
+section {
+    display: grid;
+    grid-template-columns: 23vw auto;
+    grid-template-rows: auto auto;
+}
+#founderTwo {
+    grid-template-columns: auto 23vw;
+    grid-template-rows: auto auto;
+}

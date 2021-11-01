@@ -2,6 +2,8 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Roboto', sans-serif;
+    background-color: #303030;
+    color: #FFFFFF;
 }
 #navbar {
     display: flex;
@@ -9,44 +11,55 @@ body {
     flex-direction: row-reverse;
     margin: 0;
     padding: 0;
-    background-color: var(--blue);
+    background-color: #554826;
     font-size: 5vmin;
     margin-bottom: 1%;
 }
-li {
+ul li {
     display: inline;
-    width: 5em;
+    width: 6em;
+    text-align: center;
 }
 li a {
-    text-align: center;
-    /* padding: 0px; */
-    padding-left: 3%;
+    margin-right: 3%;
     text-decoration: none;
-    /* word-wrap: break-word;
-    word-break: break-word; */
 }
 li:hover {
-    opacity: 0.5;
+    background-color: #e9d283;
+    color: white;
 }
 #userPFP {
     border-radius: 50%;
-    max-width: 21%;
+    max-width: 15%;
 }
 #userContainer {
     display: flex;
     justify-content: center;
-    /* padding-left: 5%;
-    padding-right: 10%; */
-    width: 20%;
+    /* width: 10%; */
     height: auto;
     text-align: center;
     align-items: center;
+    margin-left: 0;
+    white-space: nowrap;
 }
 #username {
-    font-size: 3vmin;
+    font-size: 4vmin;
     padding-left: 3%;
     padding-right: 3%;
+    margin: 0;
 }
-#userContainer:hover {
-    opacity: 1;
+
+#darkMode {
+    width: 7em;
+    display: flex;
+    margin: 0;
+    height: 1.5em;
+    justify-content: center;
+    align-content: center;
+}
+#darkModeIcon {
+    align-self: center;
+    justify-self: center;
+    padding-bottom: 2%;
+    padding-right: 2%;
 }
