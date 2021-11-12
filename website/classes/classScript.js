@@ -1061,10 +1061,13 @@ let teachers =
 ]
 let teacherNamesList = document.getElementById("teacherAutocomplete")
 let searchBar = document.getElementById("searchTeacher")
+let classListElm = document.getElementById("classList")
+let deletedClasses = []
 
 const findTeacherInfo = teacherName => {
     let teacherInfo = ""
     teachers.map(val => val.name === teacherName ? (teacherInfo = val) : undefined)
+    // Linear search algorithm of going through all teacher names
     return teacherInfo
 }
 const flipName = name => name.split(",").reverse().join(" ").trim()
@@ -1075,17 +1078,82 @@ teachers.map(val => {
     document.getElementById("teacherNames").appendChild(name)
 })
 
+const deleteClassELm = classElm => {
+    deletedClasses.push(Object.values(classElm.childNodes).filter(val => val.nodeName === "P")[0].innerHTML) 
+    classElm.remove()
+    // Stores the name of the removed class and then deletes the element
+}
 
-searchBar.addEventListener("submit", (event) => {
-    event.preventDefault()
-    let teacherName = teacherNamesList.value.split("(")[0].trim()
-    let teacherInfo = findTeacherInfo(teacherName)
-    document.getElementById("selection").innerHTML = flipName(teacherName)
-    document.getElementById("roomNumber").innerHTML = "Room " + teacherInfo.room 
-    document.getElementById("department").innerHTML = "Teaches " + teacherInfo.dept 
-    document.getElementById("teacherImg").src = teacherInfo.image
-    teacherNamesList.value = ""
-})
-document.getElementById("home").addEventListener("click", () => {
-    window.location = "/home"
+Object.values(document.getElementsByClassName("classSelector")).map(val => val.childNodes[9].addEventListener("click", () => {deleteClassELm(val)}))
+// Adds button click to delete class image 
+
+const undoDelete = className => {
+    let classSelector = document.createElement("div")
+    classSelector.className = "classSelector"
+
+    let periodName = document.createElement("p")
+    periodName.className = 'period'
+    periodName.innerHTML = className
+    classSelector.appendChild(periodName)
+
+    let searchTeacher = document.createElement("form")
+    searchTeacher.id = "searchTeacher"
+
+    let teacherAutocomplete = document.createElement("input")
+    teacherAutocomplete.list = "teacherNames"
+    teacherAutocomplete.id = "teacherAutocomplete"
+    teacherAutocomplete.placeholder = "Enter WHS teacher name"
+    teacherAutocomplete.autofocus = true
+    searchTeacher.appendChild(teacherAutocomplete)
+    classSelector.appendChild(searchTeacher)
+
+    let teacherName = document.createElement('datalist')
+    teacherName.id = "teacherName"
+    classSelector.appendChild(teacherName)
+
+    let submitClass = document.createElement('button')
+    submitClass.className = "submitClass premadeBlue"
+    submitClass.innerHTML = "Submit Class"
+    classSelector.appendChild(submitClass)
+
+    let deleteButton = document.createElement('img')
+    deleteButton.src = "./minus.png"
+    deleteButton.className = "deleteClass"
+    deleteButton.addEventListener("click", () => {deleteClassELm(classSelector)})
+    classSelector.appendChild(deleteButton)
+
+    return classSelector
+    // Creates a class selector element with the following components: Period name, form with text input, drop-down menu, submit button, and Delete Class button
+}
+
+
+const insertNewClass = elm => {
+    let classElms = Object.values(classListElm.childNodes).filter(val => val.nodeName !== "#text")
+    // Removes extraneous text node values when first taking child nodes of pre-written code in HTML file
+    let classPeriods = classElms.map(val => parseInt(Object.values(val.childNodes).filter(val => val.nodeName === "P")[0].innerHTML.split(" ")[1]))
+    // Filters out 
+    let periodNumber = parseInt(elm.split(" ")[1])
+
+    if (periodNumber === 0) {
+        classListElm.insertBefore(undoDelete(elm), classListElm.childNodes[0])
+        // Insert element at the first node element in the element
+    } else if (periodNumber === 6) {
+        classListElm.appendChild(undoDelete(elm))
+        // Insert element at the last node element in the element
+    }
+    
+    classPeriods.map((val, index) => 
+        index + 1 !== classPeriods.length 
+            ? 
+            val < periodNumber && classPeriods[index+1] > periodNumber ?  classListElm.insertBefore(undoDelete(elm), classElms[index+1]) : undefined
+            // If the value before is less than the period number and the value after is greater than the period number, insert the period number there.
+            // The index is one greater than calculated to compensate for weird behavior of inserting 1 index before intended index.
+            : undefined).filter(val => val !== undefined)[0]
+        // Precaution to prevent index out of array error   
+}
+
+document.getElementById("undoButton").addEventListener("click", () => {
+    insertNewClass(deletedClasses[deletedClasses.length-1])
+    deletedClasses.splice(deletedClasses.length-1, 1)
+    // Deletes class from list to prevent multiple unnecessary undoes
 })

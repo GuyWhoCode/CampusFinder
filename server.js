@@ -25,7 +25,7 @@ app.get("/admin", function(request, response) {
 });
 
 app.get("/about", function(request, response) {
-    response.sendFile(__dirname + "/website/about.html");
+    response.sendFile(__dirname + "/website/about/about.html");
 });
 // Express.js setup to initialize different routes of the webpage.
 // const fileReader = require("graceful-fs")
