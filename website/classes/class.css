@@ -3,7 +3,7 @@ body {
     padding: 0;
     font-family: 'Roboto', sans-serif;
     text-align: center;
-    overflow:hidden;
+    overflow: hidden;
 }
 h1 {
     margin: 0;
@@ -26,7 +26,7 @@ h1 {
     margin-bottom: 2%;
     /* https://css-tricks.com/viewport-sized-typography/ */
 }
-#searchTeacher {
+.searchTeacher {
     grid-area: 2 / 1;
     display: flex;
     margin-left: 3%;
@@ -37,7 +37,7 @@ h1 {
     text-align: start;
     margin-left: 3%;
 }
-#teacherAutocomplete {
+.teacherAutocomplete {
     width: 90%;
     height: 3vh;
 }
@@ -54,13 +54,15 @@ h1 {
     border: none;
 }
 #confirmationScreen {
+    display: flex;
     grid-area: 1 / 2;
-    background-color: lightgray;
+    background-color: #dbdbdb;
     width: 30vw;
     justify-self: end;
     margin-right: 5%;
     height: 80vh;
-    font-size: 2em;
+    flex-direction: column;
+    border-radius: 5%;
 }
 #toolBar {
     display: grid;
@@ -73,7 +75,35 @@ h1 {
     justify-self: flex-start;
     margin-left: 15%;
 }
-
+#saveAllClasses {
+    width: 75%;
+    align-self: flex-end;
+    margin-right: 3%;
+    font-size: 1em;
+}
+#confirmTitle {
+    font-size: 2em;
+}
+.confirmPeriod {
+    width: 97%;
+    margin: 0;
+    font-size: 1.5em;
+    text-align: start;
+    padding-left: 3%;
+}
+.confirmPeriod:nth-child(even) {
+    background-color: #c2c2c2;
+}
+.confirmTeacher {
+    width: 97%;
+    margin: 0;
+    font-size: 1em;
+    text-align: end;
+    padding-right: 3%;
+}
+.confirmTeacher:nth-child(odd) {
+    background-color: #c2c2c2;
+}
 
 .premadeBlue {
 	box-shadow:inset 0px 1px 0px 0px #bbdaf7;

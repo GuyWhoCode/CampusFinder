@@ -1062,24 +1062,30 @@ let teachers =
 let teacherNamesList = document.getElementById("teacherAutocomplete")
 let searchBar = document.getElementById("searchTeacher")
 let classListElm = document.getElementById("classList")
+let confirmationScreen = document.getElementById("confirmationScreen")
 let deletedClasses = []
 
 const findTeacherInfo = teacherName => {
     let teacherInfo = ""
     teachers.map(val => val.name === teacherName ? (teacherInfo = val) : undefined)
-    // Linear search algorithm of going through all teacher names
+    // Linear search algorithm of going through all teacher names until the teacher name matches with the query teacher name
     return teacherInfo
 }
-const flipName = name => name.split(",").reverse().join(" ").trim()
 
-teachers.map(val => {
-    let name = document.createElement("option")
-    name.value = `${val.name} (${val.room})`
-    document.getElementById("teacherNames").appendChild(name)
+Object.values(document.getElementsByClassName("classSelector")).map((elm, index) => {
+    teachers.map(val => {
+        let name = document.createElement("option")
+        name.value = `${val.name} (${val.room})`
+        document.getElementById("teacherNames" + index).appendChild(name)
+    })
 })
+
 
 const deleteClassELm = classElm => {
     deletedClasses.push(Object.values(classElm.childNodes).filter(val => val.nodeName === "P")[0].innerHTML) 
+    Object.values(document.getElementsByClassName("confirmTeacher " + deletedClasses[deletedClasses.length-1].split(" ").join("")))[0].remove()
+    Object.values(document.getElementsByClassName("confirmPeriod " + deletedClasses[deletedClasses.length-1].split(" ").join("")))[0].remove()
+    // Removes element from confirmation list -- TODO add way to delete brs (maybe count elements?)
     classElm.remove()
     // Stores the name of the removed class and then deletes the element
 }
@@ -1088,6 +1094,7 @@ Object.values(document.getElementsByClassName("classSelector")).map(val => val.c
 // Adds button click to delete class image 
 
 const undoDelete = className => {
+    // Sample className: Period 1
     let classSelector = document.createElement("div")
     classSelector.className = "classSelector"
 
@@ -1097,18 +1104,25 @@ const undoDelete = className => {
     classSelector.appendChild(periodName)
 
     let searchTeacher = document.createElement("form")
-    searchTeacher.id = "searchTeacher"
+    searchTeacher.className = "searchTeacher"
 
     let teacherAutocomplete = document.createElement("input")
-    teacherAutocomplete.list = "teacherNames"
-    teacherAutocomplete.id = "teacherAutocomplete"
+    teacherAutocomplete.setAttribute("list", "teacherNames" + className.split(" ")[1])
+    // List is not originally a native attribute that can be set with dot notation. Set attribute manually.
+    teacherAutocomplete.id = className
+    teacherAutocomplete.className = "teacherAutocomplete"
     teacherAutocomplete.placeholder = "Enter WHS teacher name"
     teacherAutocomplete.autofocus = true
     searchTeacher.appendChild(teacherAutocomplete)
     classSelector.appendChild(searchTeacher)
 
     let teacherName = document.createElement('datalist')
-    teacherName.id = "teacherName"
+    teacherName.id = "teacherNames" + className.split(" ")[1]
+    teachers.map(val => {
+        let name = document.createElement("option")
+        name.value = `${val.name} (${val.room})`
+        teacherName.appendChild(name)
+    })
     classSelector.appendChild(teacherName)
 
     let submitClass = document.createElement('button')
@@ -1119,6 +1133,7 @@ const undoDelete = className => {
     let deleteButton = document.createElement('img')
     deleteButton.src = "./minus.png"
     deleteButton.className = "deleteClass"
+    deleteButton.style.width = "50px"
     deleteButton.addEventListener("click", () => {deleteClassELm(classSelector)})
     classSelector.appendChild(deleteButton)
 
@@ -1131,7 +1146,7 @@ const insertNewClass = elm => {
     let classElms = Object.values(classListElm.childNodes).filter(val => val.nodeName !== "#text")
     // Removes extraneous text node values when first taking child nodes of pre-written code in HTML file
     let classPeriods = classElms.map(val => parseInt(Object.values(val.childNodes).filter(val => val.nodeName === "P")[0].innerHTML.split(" ")[1]))
-    // Filters out 
+    // Filters out all other elements besides the paragraph tag containing Period X. Manipulates the value of innerHTML to get the int X for every element.
     let periodNumber = parseInt(elm.split(" ")[1])
 
     if (periodNumber === 0) {
@@ -1141,7 +1156,8 @@ const insertNewClass = elm => {
         classListElm.appendChild(undoDelete(elm))
         // Insert element at the last node element in the element
     }
-    
+    // TODO -- Edge case where deleting the first 2 elements or last 2 elements breaks the undo button
+
     classPeriods.map((val, index) => 
         index + 1 !== classPeriods.length 
             ? 
@@ -1157,3 +1173,36 @@ document.getElementById("undoButton").addEventListener("click", () => {
     deletedClasses.splice(deletedClasses.length-1, 1)
     // Deletes class from list to prevent multiple unnecessary undoes
 })
+
+const confirmClass = period => {
+    let teacherName = document.getElementById(period).value.split("(")[0].trim()
+    // Format of drop-down name: lastName, firstName (XXXX)
+    if (teacherName == "") return;
+    
+    if (Object.values(document.getElementsByClassName("confirmPeriod")).map(val => val.className.includes(period.split(" ").join(""))).filter(val => val === true).length !== 0) {
+        return document.getElementsByClassName("confirmTeacher " + period.split(" ").join(""))[0].innerHTML = teacherName
+        // Updates only the teacher name if an existing entry has already been created; Prevents duplicates by returning command
+        // Uses identifier established in the code below: className of "confirmPeriod PeriodX"
+    }
+    
+    // TODO -- Make smarter by auto-sorting confirmations similar to undo button?
+    let periodName = document.createElement("p")
+    periodName.className = "confirmPeriod " + period.split(" ").join("")
+    periodName.innerHTML = period
+    confirmationScreen.insertBefore(periodName, document.getElementById("saveAllClasses"))
+
+    let teacherElm = document.createElement("p")
+    teacherElm.className = "confirmTeacher " + period.split(" ").join("")
+    teacherElm.innerHTML = teacherName
+    confirmationScreen.insertBefore(teacherElm, document.getElementById("saveAllClasses"))
+
+    confirmationScreen.insertBefore(document.createElement("br"), document.getElementById("saveAllClasses"))
+    // Creates a new confirmation element composed of a Period title, teacher name, and a break.
+    
+}
+
+Object.values(document.getElementsByClassName("submitClass")).map((val, index) => val.addEventListener("click", () => {confirmClass("Period " + index)}))
+// Adds button click to Submit Class button
+
+Object.values(document.getElementsByClassName("searchTeacher")).map((val, index) => val.addEventListener("submit", event => {event.preventDefault(), confirmClass("Period " + index)}))
+// Adds ability to hit enter on Class autocomplete forms
