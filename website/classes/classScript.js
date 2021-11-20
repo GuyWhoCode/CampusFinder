@@ -1059,12 +1059,11 @@ let teachers =
         "image": null
     }
 ]
-let teacherNamesList = document.getElementById("teacherAutocomplete")
-let searchBar = document.getElementById("searchTeacher")
 let classListElm = document.getElementById("classList")
 let confirmationScreen = document.getElementById("confirmationScreen")
 let deletedClasses = []
 
+// eslint-disable-next-line no-unused-vars
 const findTeacherInfo = teacherName => {
     let teacherInfo = ""
     teachers.map(val => val.name === teacherName ? (teacherInfo = val) : undefined)
@@ -1082,12 +1081,25 @@ Object.values(document.getElementsByClassName("classSelector")).map((elm, index)
 
 
 const deleteClassELm = classElm => {
-    deletedClasses.push(Object.values(classElm.childNodes).filter(val => val.nodeName === "P")[0].innerHTML) 
-    Object.values(document.getElementsByClassName("confirmTeacher " + deletedClasses[deletedClasses.length-1].split(" ").join("")))[0].remove()
-    Object.values(document.getElementsByClassName("confirmPeriod " + deletedClasses[deletedClasses.length-1].split(" ").join("")))[0].remove()
-    // Removes element from confirmation list -- TODO add way to delete brs (maybe count elements?)
+    deletedClasses.push(Object.values(classElm.childNodes).filter(val => val.nodeName === "P")[0].innerHTML)
     classElm.remove()
     // Stores the name of the removed class and then deletes the element
+    if (Object.values(document.getElementsByClassName("confirmTeacher")).length === 0) return; 
+    // Edge case: When there are no elements to delete, exit out of the code.
+    let periodNumber = deletedClasses[deletedClasses.length-1].split(" ").join("")
+    // Returns a string that contains the period number
+    let confirmNodes = Object.values(confirmationScreen.childNodes)
+    let confirmPeriodIndex = confirmNodes
+        .map((val, index) => val.className === "confirmPeriod " + periodNumber ? index : undefined)
+        .filter(val => val !== undefined)[0]
+    // Finds confirmsPeriod Element first by filtering out the child node list to delete the rest of the class entry.
+    confirmNodes[confirmPeriodIndex].remove()
+    // Deletes the element containing the period number
+    confirmNodes[confirmPeriodIndex + 1].remove()
+    // Deletes the element containing the teacher name
+    confirmNodes[confirmPeriodIndex + 2].remove()
+    // Deletes the spacing element
+
 }
 
 Object.values(document.getElementsByClassName("classSelector")).map(val => val.childNodes[9].addEventListener("click", () => {deleteClassELm(val)}))
@@ -1149,19 +1161,19 @@ const insertNewClass = elm => {
     // Filters out all other elements besides the paragraph tag containing Period X. Manipulates the value of innerHTML to get the int X for every element.
     let periodNumber = parseInt(elm.split(" ")[1])
 
-    if (periodNumber === 0) {
+    if (periodNumber < classPeriods[0]) {
         classListElm.insertBefore(undoDelete(elm), classListElm.childNodes[0])
         // Insert element at the first node element in the element
-    } else if (periodNumber === 6) {
+    } 
+    else if (periodNumber > classPeriods[classPeriods.length-1]) {
         classListElm.appendChild(undoDelete(elm))
         // Insert element at the last node element in the element
     }
-    // TODO -- Edge case where deleting the first 2 elements or last 2 elements breaks the undo button
 
     classPeriods.map((val, index) => 
         index + 1 !== classPeriods.length 
             ? 
-            val < periodNumber && classPeriods[index+1] > periodNumber ?  classListElm.insertBefore(undoDelete(elm), classElms[index+1]) : undefined
+            val < periodNumber && classPeriods[index + 1] > periodNumber ?  classListElm.insertBefore(undoDelete(elm), classElms[index+1]) : undefined
             // If the value before is less than the period number and the value after is greater than the period number, insert the period number there.
             // The index is one greater than calculated to compensate for weird behavior of inserting 1 index before intended index.
             : undefined).filter(val => val !== undefined)[0]
@@ -1177,7 +1189,7 @@ document.getElementById("undoButton").addEventListener("click", () => {
 const confirmClass = period => {
     let teacherName = document.getElementById(period).value.split("(")[0].trim()
     // Format of drop-down name: lastName, firstName (XXXX)
-    if (teacherName == "") return;
+    if (teacherName === "") return;
     
     if (Object.values(document.getElementsByClassName("confirmPeriod")).map(val => val.className.includes(period.split(" ").join(""))).filter(val => val === true).length !== 0) {
         return document.getElementsByClassName("confirmTeacher " + period.split(" ").join(""))[0].innerHTML = teacherName
@@ -1185,7 +1197,7 @@ const confirmClass = period => {
         // Uses identifier established in the code below: className of "confirmPeriod PeriodX"
     }
     
-    // TODO -- Make smarter by auto-sorting confirmations similar to undo button?
+    // TODO -- Make smarter by auto-sorting confirmations similar to undo button
     let periodName = document.createElement("p")
     periodName.className = "confirmPeriod " + period.split(" ").join("")
     periodName.innerHTML = period
