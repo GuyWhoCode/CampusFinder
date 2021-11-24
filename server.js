@@ -21,16 +21,20 @@ app.get("/home", function(request, response) {
 });
 
 app.get("/admin", function(request, response) {
-    response.sendFile(__dirname + "/website/admin.html");
+    response.sendFile(__dirname + "/website/admin/admin.html");
 });
 
 app.get("/about", function(request, response) {
     response.sendFile(__dirname + "/website/about/about.html");
 });
+
+app.get("/class", function(request, response) {
+    response.sendFile(__dirname + "/website/classes/class.html");
+});
+
 // Express.js setup to initialize different routes of the webpage.
-// const fileReader = require("graceful-fs")
-// let teacherData = fileReader.readFileSync("./faculty.json", "utf8")
-// console.log(JSON.parse(teacherData).teachers.map(val => console.log(val.name)))
+const fileReader = require("graceful-fs")
+
 // dbClient.connect(async () => {
 //     console.log("Connected to database!")
 //     let campusDB = dbClient.db("campusInfo").collection("campus")
@@ -40,7 +44,17 @@ app.get("/about", function(request, response) {
 const socket = require("socket.io")(server)
 socket.on('connection', io => {
     console.log("I have a connection to the website!")
-    io.on("userLogin", (userInfo) => {
+    io.on("requestTeacher", () => {
+        let teacherData = fileReader.readFileSync("./faculty.json", "utf8")
+        socket.emit("teacherData", JSON.parse(teacherData).teachers)
+    })
+    // Processes internal socket request from client-side website for teacher information
+
+    io.on("saveTeacherSelection", selection => {
+        console.log("The selection is below!")
+        console.log(selection)
+    })
+    // io.on("userLogin", (userInfo) => {
         // sessionStorage.setItem("username", user.displayName)
         // sessionStorage.setItem("email", user.email)
         // sessionStorage.setItem("userPic", user.photoURL)
@@ -60,6 +74,5 @@ socket.on('connection', io => {
         //     }
         // })
         // Check to see if the user has already been created, if not, create a new user
-
-    })
+    // })
 })

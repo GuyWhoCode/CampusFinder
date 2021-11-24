@@ -63,3 +63,13 @@ li:hover {
     padding-bottom: 2%;
     padding-right: 2%;
 }
+#fullScreen {
+    width: 3.5em;
+    position: absolute;
+    top: 85vh;
+    right: 3vw;
+}
+#fullScreen:hover {
+    background-color: #FFFFFF;
+    border-radius: 10%;
+}
