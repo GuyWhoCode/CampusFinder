@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-undef
 let adminSocket = io()
+let teachers;
 adminSocket.emit("requestTeacher")
 adminSocket.on("teacherData", data => {
     teachers = data

@@ -2,8 +2,11 @@ body {
     margin: 0;
     padding: 0;
 }
+p {
+    margin: 0;
+}
 .founders {
-    background-position: center center;
+    background-position: center;
     width: 20vw;
     overflow: hidden;
     background-size: cover;
@@ -25,4 +28,12 @@ section {
 #founderTwo {
     grid-template-columns: auto 23vw;
     grid-template-rows: auto auto;
+}
+.founderTitle, #alignCenter {
+    text-align: center;
+}
+.founderPics {
+    display: flex;
+    flex-direction: column;
+    margin-left: 5%;
 }

@@ -6,45 +6,89 @@
     <title>Campus Finder</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./style.css"/>
 </head>
-<body>
-    <ul id="navbar">
-        <li id="loginElm"><a id="login">Login</a></li>
-        <li id="main" class="activeTab"><a>Home</a></li>
-        <li id="darkMode">
-            <img src="/dark.png" width="15%" height="auto" id="darkModeIcon">
-            <a id="darkText">Dark Mode</a>
-        </li>
-    </ul>
-    <a id="admin">Admin Page</a>
-    <br>
-    <a id="class">Class Page</a>
+<body>    
+    <nav class="navbar navbar-expand-md navbar-light" id="navbar">
+    <!-- <nav class="navbar navbar-expand-lg navbar-light" id="navbar"> -->
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarTogglerDemo01">
+                <div>
+                    <form class="d-flex">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-primary" type="submit" id="searchButton">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            </svg>
+                            Search
+                        </button>
+                    </form>
+                </div>
+                <ul class="nav mb-2 mb-lg-0" id="navbarElements">
+                    <!-- <li class="nav-item">
+                        <a class="nav-link text-white" aria-current="page">Home</a>
+                    </li> -->
+                    <li class="nav-item">
+                        <a class="nav-link text-white"" data-bs-toggle="offcanvas" href="#offcanvasNavbar" role="button" aria-controls="offcanvasNavbar">View Classes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="/admin">Admin Dashboard</a>
+                    </li>
+                    <li class="nav-item" id="darkModeToggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32px" fill="#000000" class="bi bi-moon-stars-fill" viewBox="0 0 16 16" id="darkIcon">
+                            <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+                            <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
+                        </svg>
+                        <!-- Moon Stars fill Bootstrap Icon -->
+                        <a class="navbar-brand text-white" id="darkText"></a>
+                    </li>
+                    <li class="nav-item" id="loginElm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" fill="currentColor" class="bi bi-google" viewBox="0 0 16 16">
+                            <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z"/>
+                        </svg>
+                        <!-- Google Bootstrap Icon -->
+                        <a id="login">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Bootstrap Navbar -->
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel"></h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div id="classListElm">
+                Login to see saved classes and add new ones!
+            </div>
+            <section id="goBottom">
+                <div>
+                    <button type="button" class="btn btn-primary" id="class">Change Classes</button>
+                    <button type="button" class="btn btn-primary" id="preferences">Preferences</button>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- Bootstrap Classes Sidebar -->
+
     <img src="/full-screen.png" alt="Full Screen" id="fullScreen">
     <div>Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
     <div>Icons made by <a href="https://www.flaticon.com/authors/uicon" title="uicon">uicon</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
     <div>Icons made by <a href="https://www.flaticon.com/authors/ariefstudio" title="ariefstudio">ariefstudio</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
 
 
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js" defer></script>
-    <script src="./script.js" defer></script>
+    <script src="./initialize.js" defer></script>
     <script src="./offlineLib.js" defer></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js";
-        const firebaseConfig = {
-          apiKey: "AIzaSyAf_3f23Nt4oxSVJVct-yivqjMOBvb67mM",
-          authDomain: "campus-finder-a24e5.firebaseapp.com",
-          projectId: "campus-finder-a24e5",
-          storageBucket: "campus-finder-a24e5.appspot.com",
-          messagingSenderId: "16539301349",
-          appId: "1:16539301349:web:002e38ca505e16c235eb0c",
-          measurementId: "G-QSPMP5777D"
-        };
-      
-        const app = initializeApp(firebaseConfig);
-    </script>
     <script src="./login.js" type="module" defer></script>
 </body>
 </html>

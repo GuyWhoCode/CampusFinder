@@ -1,13 +1,3 @@
-Storage.prototype.setObject = function(key, value) {
-    this.setItem(key, JSON.stringify(value));
-}
-
-Storage.prototype.getObject = function(key) {
-    return JSON.parse(this.getItem(key));
-}
-
-let statusElm = document.getElementById('status')
-// Navbar element
 var online = false;
 const checkOnline = () => {
     setInterval(() => {

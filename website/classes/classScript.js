@@ -4,9 +4,13 @@ let classListElm = document.getElementById("classList")
 let confirmationScreen = document.getElementById("confirmationScreen")
 let confirmTitle = document.getElementById("confirmTitle")
 let saveAllClasses = document.getElementById("saveAllClasses")
+// eslint-disable-next-line no-undef
+let confirmationModal = new bootstrap.Modal(document.getElementById('confirmationClassModal'))
+let confirmationDescription = document.getElementById("confirmationDescription")
+let confirmationClassMessage = document.getElementById("confirmationClassMessage")
 let deletedClasses = []
 let periodsConfirmed = []
-let confirmationList = []
+let confirmationList = {}
 let teachers;
 
 classSocket.emit("requestTeacher")
@@ -38,11 +42,13 @@ const deleteClassELm = classElm => {
     // Stores the name of the removed class and then deletes the element
     if (Object.values(document.getElementsByClassName("confirmTeacher")).length === 0) return; 
     // Edge case: When there are no elements to delete, exit out of the code.
-    let periodNumber = deletedClasses[deletedClasses.length-1].split(" ").join("")
-    // Returns a string that contains the period number
+    let classIdentifier = deletedClasses[deletedClasses.length-1].split(" ").join("")
+    // Returns a string that contains the period number; Format: PeriodX
+    let periodNumber = parseInt(deletedClasses[deletedClasses.length-1].split(" ")[1])
+
     let confirmNodes = Object.values(confirmationScreen.childNodes)
     let confirmPeriodIndex = confirmNodes
-        .map((val, index) => val.className === "confirmPeriod " + periodNumber ? index : undefined)
+        .map((val, index) => val.className === "confirmPeriod " + classIdentifier ? index : undefined)
         .filter(val => val !== undefined)[0]
     // Finds confirmsPeriod Element first by filtering out the child node list to delete the rest of the class entry.
     confirmNodes[confirmPeriodIndex].remove()
@@ -51,7 +57,7 @@ const deleteClassELm = classElm => {
     // Deletes the teacher name element
     confirmNodes[confirmPeriodIndex - 1].remove()
     // Deletes the spacing element
-    confirmationList.map((val, index) => val.period === parseInt(periodNumber) ? confirmationList.splice(index, 1) : undefined)
+    delete confirmationList[periodNumber]
     // Updates the final confirmation list accordingly
     
     // GENERAL USE: Handles logic behind deleting the selected class entry
@@ -135,13 +141,15 @@ const insertNewClass = elm => {
 }
 
 const confirmClass = period => {
-    let teacherName = document.getElementById(period).value.split("(")[0].trim()
+    let elmValue = document.getElementById(period).value
+    let teacherName = elmValue.split("(")[0].trim()
     // Format of drop-down name: lastName, firstName (XXXX)
     if (teacherName === "") return;
 
     let classIdentifier = period.split(" ").join("")
     // Formatted as PeriodX
     let periodNumber = parseInt(period.split(" ")[1])
+    let roomNumber = elmValue.split("(")[1].split(")")[0]
     
     if (Object.values(document.getElementsByClassName("confirmPeriod")).map(val => val.className.includes(classIdentifier)).filter(val => val === true).length !== 0) {
         return document.getElementsByClassName("confirmTeacher " + classIdentifier)[0].innerHTML = teacherName
@@ -158,11 +166,8 @@ const confirmClass = period => {
     teacherElm.innerHTML = teacherName
     // Creates a new confirmation element composed of a Period title, teacher name, and a break.
 
-    confirmationList.push({
-        "period": periodNumber,
-        "teacher": teacherName
-    })
-    // Adds to the confirmation list to be saved server-side
+    confirmationList[periodNumber] = teacherName + "--" + roomNumber
+    // Adds to the confirmation list to be saved server-side; Format: Teacher--XXXX
 
     if (periodsConfirmed.length === 0 || periodNumber < periodsConfirmed[0]) {
         periodsConfirmed.push(periodNumber)
@@ -206,4 +211,28 @@ document.getElementById("undoButton").addEventListener("click", () => {
     // GENERAL USE: Handles event handling of undo button
 })
 
-saveAllClasses.addEventListener("click", () => confirmationList.length > 3 ? classSocket.emit("saveTeacherSelection", confirmationList) : alert("Please select more than 3 classes."))
+saveAllClasses.addEventListener("click", () => {
+    if (Object.values(confirmationList).length >= 3) {
+        // classSocket.emit("saveTeacherSelection", confirmationList)
+        document.getElementById('confirmationClassModal').addEventListener("hidden.bs.modal", () => {
+            window.location = "/home"
+        })
+        // Adds the ability to return to home once the classes have been submitted
+        confirmationClassMessage.innerHTML = "Success"
+        confirmationDescription.innerHTML = "Your class selections have been saved."
+        
+    } else {
+        confirmationClassMessage.innerHTML = "Error"
+        confirmationDescription.innerHTML = "Please add at least 3 classes to the selection and click Submit Class to confirm your selection."
+        // Creates error modal when the user has not submitted at least 3 classes.
+    }
+    confirmationModal.show()
+    // Provides confirmation that the classes have been submitted and redirected home
+})
+
+if (sessionStorage.getItem("email") === null) {
+    window.location = "/home"
+    // If the user is not logged in, redirect them to the main screen.
+} else {
+    confirmationList["userEmail"] = sessionStorage.getItem("email")
+}

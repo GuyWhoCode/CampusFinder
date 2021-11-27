@@ -6,23 +6,10 @@ body {
     color: #FFFFFF;
 }
 #navbar {
-    display: flex;
-    list-style-type: none;
-    flex-direction: row-reverse;
     margin: 0;
     padding: 0;
-    background-color: #554826;
-    font-size: 5vmin;
-    margin-bottom: 1%;
-}
-ul li {
-    display: inline;
-    width: 6em;
-    text-align: center;
-}
-li a {
-    margin-right: 3%;
-    text-decoration: none;
+    background-color: hsl(43, 38%, 24%);
+    font-size: 1.5em;
 }
 li:hover {
     background-color: #e9d283;
@@ -35,7 +22,6 @@ li:hover {
 #userContainer {
     display: flex;
     justify-content: center;
-    /* width: 10%; */
     height: auto;
     text-align: center;
     align-items: center;
@@ -43,25 +29,7 @@ li:hover {
     white-space: nowrap;
 }
 #username {
-    font-size: 4vmin;
-    padding-left: 3%;
-    padding-right: 3%;
     margin: 0;
-}
-
-#darkMode {
-    width: 7em;
-    display: flex;
-    margin: 0;
-    height: 1.5em;
-    justify-content: center;
-    align-content: center;
-}
-#darkModeIcon {
-    align-self: center;
-    justify-self: center;
-    padding-bottom: 2%;
-    padding-right: 2%;
 }
 #fullScreen {
     width: 3.5em;
@@ -72,4 +40,24 @@ li:hover {
 #fullScreen:hover {
     background-color: #FFFFFF;
     border-radius: 10%;
+}
+.modal, .offcanvas {
+    color: #000000;
+}
+#goBottom {
+    position: absolute;
+    bottom: 0;
+    left: 15%; 
+}
+#searchButton {
+    width: 50%;
+}
+.classListing {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+.teacherRoom {
+    float: right;
+    align-self: flex-end;
 }
