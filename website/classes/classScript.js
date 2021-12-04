@@ -211,6 +211,11 @@ document.getElementById("undoButton").addEventListener("click", () => {
     // GENERAL USE: Handles event handling of undo button
 })
 
+document.getElementById("homePage").addEventListener("click", ()=> {
+    window.location = "/home"
+})
+
+
 saveAllClasses.addEventListener("click", () => {
     if (Object.values(confirmationList).length >= 3) {
         // classSocket.emit("saveTeacherSelection", confirmationList)
@@ -230,9 +235,12 @@ saveAllClasses.addEventListener("click", () => {
     // Provides confirmation that the classes have been submitted and redirected home
 })
 
-if (sessionStorage.getItem("email") === null) {
-    window.location = "/home"
-    // If the user is not logged in, redirect them to the main screen.
-} else {
-    confirmationList["userEmail"] = sessionStorage.getItem("email")
-}
+// if (sessionStorage.getItem("email") === null) {
+//     window.location = "/home"
+//     // If the user is not logged in, redirect them to the main screen.
+// } else {
+//     confirmationList["userEmail"] = sessionStorage.getItem("email")
+// }
+// if (screen.width < 400) {
+    // Enable the phone screen modal and disable the desktop confirmation sidebar
+// }

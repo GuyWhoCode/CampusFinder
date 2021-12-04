@@ -16,7 +16,7 @@ TBD.
 - Graceful-fs
 - Socket.io
 - Firebase
-
+- Bootstrap
 
 ## Dev Dependencies
 - ESLint

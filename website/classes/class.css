@@ -40,7 +40,10 @@ h1 {
 }
 .teacherAutocomplete {
     width: 90%;
-    height: 3vh;
+    height: 5vh;
+}
+.teacherAutocomplete::placeholder {
+    font-size: 0.7em;
 }
 .deleteClass {
     justify-self: end;
@@ -68,13 +71,14 @@ h1 {
 }
 #toolBar {
     display: grid;
-    grid-template-columns: 20vw 60vw;
+    grid-template-columns: 10vw 80vw;
     height: 5vh;
     margin-top: 1%;
     margin-bottom: 1%;
 }
 #undoButton {
     margin-left: 15%;
+    cursor: pointer;
 }
 #saveAllClasses {
     width: 75%;
@@ -130,3 +134,7 @@ h1 {
 	top:1px;
 }
 /* Fancy Button generated from https://www.bestcssbuttongenerator.com/#/37 */
+#homePage {
+    cursor: pointer;
+    margin-left: 15%;
+}

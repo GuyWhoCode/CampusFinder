@@ -1,9 +1,13 @@
-body {
+html, body {
     margin: 0;
     padding: 0;
+    height: 100%;
     font-family: 'Roboto', sans-serif;
     background-color: #303030;
     color: #FFFFFF;
+}
+#map {
+    height: 90vh;
 }
 #navbar {
     margin: 0;
@@ -31,16 +35,6 @@ li:hover {
 #username {
     margin: 0;
 }
-#fullScreen {
-    width: 3.5em;
-    position: absolute;
-    top: 85vh;
-    right: 3vw;
-}
-#fullScreen:hover {
-    background-color: #FFFFFF;
-    border-radius: 10%;
-}
 .modal, .offcanvas {
     color: #000000;
 }
@@ -60,4 +54,16 @@ li:hover {
 .teacherRoom {
     float: right;
     align-self: flex-end;
+}
+.navbarItem, .navbarItem:hover, .nav-link:focus {
+    color: #FFFFFF;
+    transition-duration: 0s;
+}
+#searchBox {
+    width: 20em;
+}
+#logo {
+    width: 5%;
+    display: flex;
+    float: right;
 }
