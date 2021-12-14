@@ -56,7 +56,8 @@ function initMap() {
         /* Updates the marker's coordinates in the nodes when they are dragged */
         marker.addListener("position_changed", (event) => {
             if (marker.getLabel() in nodes) {
-                nodes[marker.getLabel()] = { lat: marker.getPosition().lat(), lng: marker.getPosition().lng() };
+                nodes[marker.getLabel()]["lat"] = marker.getPosition().lat();
+                nodes[marker.getLabel()]["lng"] = marker.getPosition().lng();
             }
         });
 
@@ -172,8 +173,8 @@ socket.on("loadNodes", (nodeData) => {
         /* Updates the marker's coordinates in the nodes when they are dragged */
         marker.addListener("position_changed", (event) => {
             if (marker.getLabel() in nodes) {
-                node[marker.getLabel()]["lat"] = marker.getPosition().lat();
-                node[marker.getLabel()]["lng"] = marker.getPosition().lng();
+                nodes[marker.getLabel()]["lat"] = marker.getPosition().lat();
+                nodes[marker.getLabel()]["lng"] = marker.getPosition().lng();
             }
         });
 
