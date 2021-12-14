@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./style.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+    <script src="./pathfinding.js"></script>
     <script src="./map.js"></script>
 </head>
 <body>    
@@ -103,7 +104,8 @@
     <div>Icons made by <a href="https://www.flaticon.com/authors/uicon" title="uicon">uicon</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
     <div>Icons made by <a href="https://www.flaticon.com/authors/ariefstudio" title="ariefstudio">ariefstudio</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div> -->
     <input type="search" id="nameOfNode">
-    <h1>Shift: Print Graph | Enter: Save graph to JSON | Backspace: Load graph from JSON</h1>
+    <h1>Shift: Print Graph | Enter: Save graph to JSON | Backspace: Load graph from JSON | Control: Display shortest path</h1>
+    <h2 id="selectedNode">Selected Node: Edit Mode: </h2>
     <div id="map"></div>
     
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCaLWlcr-27e1s6xXMQuXczqfE-Yore6XY&callback=initMap"></script>

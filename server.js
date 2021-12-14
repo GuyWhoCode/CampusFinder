@@ -44,17 +44,17 @@ socket.on('connection', io => {
     console.log("I have a connection to the website!")
     //  dbClient.connect(async () => {
     //  console.log("Connected to database!")
-        io.on("saveGraph", (graph) => {
-            fs.writeFile("graph.json", graph, function(err) {
+        io.on("saveNodes", (nodes) => {
+            fs.writeFile("nodes.json", nodes, function(err) {
                 if (err) {
                     console.log(err);
                 }
             });
         })
 
-        io.on("requestGraph", () => {
-            let graph = fileReader.readFileSync("./graph.json", "utf8")
-            socket.emit("loadGraph", JSON.parse(graph))
+        io.on("requestNodes", () => {
+            let nodes = fileReader.readFileSync("./nodes.json", "utf8")
+            socket.emit("loadNodes", JSON.parse(nodes))
         })
 
         io.on("requestTeacher", () => {
