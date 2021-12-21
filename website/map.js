@@ -236,3 +236,35 @@ function updateNeighbors() {
     }
 
 }
+
+/* TODO:
+    Honestly, because all the code is basically here, graph-node-creation-tool should be the main branch for pathfinding.
+
+    1. 
+    
+    We have coordinates of the rooms. 
+    Now we need to mark which nodes are rooms/locations and which are just intermediate nodes.
+    This can be done with a boolean in the nodes.json file for each node like 
+        "isRoom": true
+    If it is a room, create a new marker with the coordinates and neighbors and proceed with normal code.
+    If it is NOT a room, do not create a marker, but still create a node in memory
+
+
+    2.
+
+    This might need refactoring where creating a node is its own function while creating a marker is its own function
+
+    3.
+
+    Rooms/locations need to have neighbors and be connected to the intermediate node network.
+
+    ------------------------------
+
+    Down the line, the actual creation of the nodes should be left to the admin page. 
+    The images used for admin page should be changed later.
+
+
+    The user page should only have the nodes, graph, and room/location markers. The intermediate nodes will still
+    be used, but won't show up as markers. 
+    It would not allow the user to edit nodes (obviously) as it will read-only. 
+*/

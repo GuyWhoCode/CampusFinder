@@ -44,6 +44,7 @@ socket.on('connection', io => {
     console.log("I have a connection to the website!")
     //  dbClient.connect(async () => {
     //  console.log("Connected to database!")
+    // saves nodes to nodes.js
         io.on("saveNodes", (nodes) => {
             fs.writeFile("nodes.json", nodes, function(err) {
                 if (err) {
@@ -52,6 +53,7 @@ socket.on('connection', io => {
             });
         })
 
+        // reads the nodes from nodes.json and loads them into memory in map.js
         io.on("requestNodes", () => {
             let nodes = fileReader.readFileSync("./nodes.json", "utf8")
             socket.emit("loadNodes", JSON.parse(nodes))
