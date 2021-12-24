@@ -44,7 +44,7 @@ socket.on('connection', io => {
     console.log("I have a connection to the website!")
     //  dbClient.connect(async () => {
     //  console.log("Connected to database!")
-    // saves nodes to nodes.js
+    // saves nodes to nodes.json
         io.on("saveNodes", (nodes) => {
             fs.writeFile("nodes.json", nodes, function(err) {
                 if (err) {
