@@ -26,7 +26,8 @@ function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: westHighCoords,
         zoom: 18,
-        mapTypeId: 'satellite'
+        mapTypeId: 'satellite',
+        tilt: 0
     });
 
     /* Adds marker on click
@@ -163,43 +164,7 @@ function initMap() {
     });
     /* Loads in all nodes from nodes.json into memory */
     socket.emit("requestNodes");
-
-      // Define the LatLng coordinates for the polygon's path.
-  const building4Coords = [
-    { lat: 33.846370, lng: -118.368053 },
-    { lat: 33.846372, lng: -118.367906 },
-    { lat: 33.846469, lng: -118.367912 },
-    { lat: 33.846471, lng: -118.367957 },
-    { lat: 33.846500, lng: -118.367962 },
-    { lat: 33.846500, lng: -118.368488 },
-    { lat: 33.846471, lng: -118.368489 },
-    { lat: 33.846468, lng: -118.368540 },
-    { lat: 33.846376, lng: -118.368539 },
-    { lat: 33.846371, lng: -118.368497 },
-    { lat: 33.846008, lng: -118.368496 },
-    { lat: 33.846007, lng: -118.368893 },
-    { lat: 33.845913, lng: -118.368892 },
-    { lat: 33.845912, lng: -118.368841 },
-    { lat: 33.845882, lng: -118.368841 },
-    { lat: 33.845878, lng: -118.368206 },
-    { lat: 33.845842, lng: -118.368206 },
-    { lat: 33.845846, lng: -118.368087 },
-    { lat: 33.845884, lng: -118.368088 },
-    { lat: 33.845892, lng: -118.368059 },
-    { lat: 33.846370, lng: -118.368053 }
-  ];
-  // Construct the polygon.
-  const bermudaTriangle = new google.maps.Polygon({
-    paths: building4Coords,
-    strokeColor: "#FF0000",
-    strokeOpacity: 0.8,
-    strokeWeight: 2,
-    fillColor: "#FF0000",
-    fillOpacity: 0.35,
-  });
-
-  bermudaTriangle.setMap(map);
-  }
+}
 
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
