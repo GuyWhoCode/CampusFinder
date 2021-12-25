@@ -3,29 +3,27 @@ body {
     padding: 0;
     font-family: 'Roboto', sans-serif;
     text-align: center;
-    /* overflow: hidden; */
+    overflow: hidden;
+    background-color: #303030;
+    color: white;
 }
 h1 {
     margin: 0;
     font-size: 2em;
 }
 #screenFormatting {
-    display: grid;
-    grid-template-rows: 80vw 20vw;
-    grid-template-columns: repeat(2, auto);
+    display: block;
 }
 .classSelector {
     display: grid;
-    grid-template-columns: 60% 20% 20%;
+    grid-template-columns: 50% 30% 20%;
     grid-template-rows: repeat(2, 5vh);
-    background-color: lightgray;
-    width: 50vw;
+    background-color: #4b4a4a;
+    width: 90vw;
     height: 10vh;
-    margin-left: 5%;
+    margin: 0 auto;
     font-size: 1.5em;
-    margin-bottom: 2%;
-    /* box-shadow: 9px 13px 20px rgba(0,0,0,0.75); */
-    /* https://css-tricks.com/viewport-sized-typography/ */
+    margin-bottom: 5%;
 }
 .searchTeacher {
     grid-area: 2 / 1;
@@ -38,19 +36,12 @@ h1 {
     text-align: start;
     margin-left: 3%;
 }
-.teacherAutocomplete {
-    width: 90%;
-    height: 5vh;
-}
-.teacherAutocomplete::placeholder {
-    font-size: 0.7em;
-}
 .deleteClass {
     justify-self: end;
     margin: 0 auto;
-    padding-top: 25%;
+    padding-top: 50%;
     grid-area: 1 / 3 / 2 / 3;
-    max-width: 4.5vw;
+    width: 32px;
     align-self: center;
 }
 .submitClass {
@@ -58,33 +49,33 @@ h1 {
     border: none;
 }
 #confirmationScreen {
+    display: none;
+    margin: 0 auto;
+    background-color: #4b4a4a;
+    box-shadow: 12px 15px 12px 3px rgba(0,0,0,0.75);
     display: flex;
     grid-area: 1 / 2;
-    background-color: #dbdbdb;
     width: 30vw;
+    height: 75vh;
     justify-self: end;
-    margin-right: 5%;
-    height: 80vh;
     flex-direction: column;
     border-radius: 5%;
-    box-shadow: 12px 15px 12px 3px rgba(0,0,0,0.75);
 }
 #toolBar {
     display: grid;
-    grid-template-columns: 10vw 80vw;
-    height: 5vh;
-    margin-top: 1%;
-    margin-bottom: 1%;
+    grid-template-columns: 30vw 60vw;
+    height: 7vh;
+    background-color: #544726;
 }
-#undoButton {
+#undoButton, #homePage {
     margin-left: 15%;
     cursor: pointer;
+    width: 32px;
 }
 #saveAllClasses {
-    width: 75%;
-    align-self: flex-end;
-    margin-right: 3%;
-    font-size: 1em;
+    width: 50%;
+    height: 5vh;
+    margin-top: 3%;
 }
 #confirmTitle {
     font-size: 2em;
@@ -110,31 +101,120 @@ h1 {
     background-color: #c2c2c2;
 }
 
-.premadeBlue {
-	box-shadow:inset 0px 1px 0px 0px #bbdaf7;
-	background:linear-gradient(to bottom, #79bbff 5%, #378de5 100%);
-	background-color:#79bbff;
-	border-radius:6px;
-	border:1px solid #84bbf3;
+.premadeButton {
+	box-shadow: 0px 1px 0px 0px #1c1b18;
+	background:linear-gradient(to bottom, #e9d183 5%, #ccc2a6 100%);
+	background-color:#e9d183;
+	border-radius:15px;
+	border:1px solid #333029;
 	display:inline-block;
 	cursor:pointer;
-	color:#ffffff;
-	font-size: 0.5em;
+	color:#505739;
+	font-family:Arial;
+	font-size:14px;
 	font-weight:bold;
-	padding:6px 24px;
 	text-decoration:none;
-	text-shadow:0px 1px 0px #528ecc;
+	text-shadow:0px 1px 0px #ffffff;
 }
-.premadeBlue:hover {
-	background:linear-gradient(to bottom, #378de5 5%, #79bbff 100%);
-	background-color:#378de5;
+.premadeButton:hover {
+	background:linear-gradient(to bottom, #ccc2a6 5%, #e9d183 100%);
+	background-color:#ccc2a6;
 }
-.premadeBlue:active {
+.premadeButton:active {
 	position:relative;
 	top:1px;
 }
 /* Fancy Button generated from https://www.bestcssbuttongenerator.com/#/37 */
-#homePage {
-    cursor: pointer;
-    margin-left: 15%;
+
+@media (min-width: 768px) {
+    #confirmationScreen {
+        overflow-x: hidden;
+        overflow-y: scroll;
+    }
+    #screenFormatting {
+        display: grid;
+        grid-template-columns: repeat(2, auto);
+    }
+    .classSelector {
+        grid-template-columns: 60% 20% 20%;
+        width: 60vw;
+        margin-left: 5%;
+        margin-bottom: 2%;
+    }
+    .deleteClass {
+        width: 32px;
+        padding-top: 20%;
+    }
+    .teacherAutocomplete::placeholder {
+        font-size: 1em;
+    }
+    #homePage, #undoButton {
+        width: 32px;
+    }
+    #toolBar {
+        grid-template-columns: 20vw 60vw;
+        margin-bottom: 1%;
+        height: 9vh;
+    }
+    .premadeButton {
+        padding: 0;
+    }
+    .period {
+        font-size: 1rem!important;
+    }
+    .confirmPeriod {
+        font-size: 1rem;
+    }
+    #confirmTitle {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+    #saveAllClasses {
+        font-size: 0.8rem;
+    }
+    #saveAllClassesMobile {
+        display: none;
+    }
+    h1 {
+        font-size: 2rem;
+    }
+    /* Custom styling for elements when the resolution of the screen matches landscape mode of a phone or a  */
 }
+
+@media (min-width: 992px) {
+    #screenFormatting {
+        display: grid;
+        grid-template-columns: repeat(2, auto);
+    }
+    .classSelector {
+        grid-template-columns: 60% 20% 20%;
+        width: 50vw;
+        margin-left: 5%;
+        margin-bottom: 2%;
+    }
+    .deleteClass {
+        width: 48px;
+        padding-top: 25%;
+    }
+    .teacherAutocomplete::placeholder {
+        font-size: 1em;
+    }
+    #homePage, #undoButton {
+        width: 32px;
+    }
+    #toolBar {
+        grid-template-columns: 10vw 80vw;
+        margin-bottom: 1%;
+        padding-top: 0.25%;
+        color: #ffffff;
+        height: 7vh;
+    }
+    .period {
+        font-size: calc(1.275rem + .3vw)!important;
+    }
+    #confirmTitle {
+        font-size: 2em;
+    }
+    /* Custom styling for elements when the resolution of the screen matches a desktop */
+}
+/* CSS outside of media viewport are specifically styled for mobile */

@@ -12,36 +12,23 @@ html, body {
 #navbar {
     margin: 0;
     padding: 0;
-    background-color: hsl(43, 38%, 24%);
+    background-color: #544726;
     font-size: 1.5em;
-}
-li:hover {
-    background-color: #e9d283;
-    color: white;
+    display: grid;
+    grid-template-columns: 20% auto 10%;
 }
 #userPFP {
     border-radius: 50%;
-    max-width: 15%;
+    max-width: 2.5em;
+    margin-right: 3%;
 }
-#userContainer {
-    display: flex;
-    justify-content: center;
-    height: auto;
-    text-align: center;
-    align-items: center;
-    margin-left: 0;
-    white-space: nowrap;
-}
-#username {
-    margin: 0;
-}
-.modal, .offcanvas {
+.offcanvas {
     color: #000000;
 }
 #goBottom {
     position: absolute;
     bottom: 0;
-    left: 15%; 
+    left: 20%; 
 }
 #searchButton {
     width: 50%;
@@ -59,11 +46,71 @@ li:hover {
     color: #FFFFFF;
     transition-duration: 0s;
 }
-#searchBox {
-    width: 20em;
-}
 #logo {
-    width: 5%;
+    max-width: 4em;
     display: flex;
     float: right;
+    cursor: pointer;
+}
+#searchButton {
+    display: none;
+}
+#searchBox {
+    width: 10em;
+    align-self: center;
+    justify-self: center;
+}
+#mainSearch::placeholder {
+    font-size: 0.8rem;
+}
+#buildingCarousel {
+    width: 25vw;
+    margin: 0 auto;
+    background-color: gray;
+}
+.carouselImg {
+    margin: 0 auto;
+}
+.noMargin {
+    margin: 0;
+    padding: 0;
+}
+#teacherSelection {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+#infoBoxPreview {
+    display: grid;
+    width: 23em;
+    border-radius: 5%;
+    margin-right: 50%;
+    text-align: center;
+    grid-template-columns: 30% 70%;
+    font-weight: bold;
+}
+#teacherImg {
+    border-radius: 50%;
+    justify-self: start;
+    width: 5em;
+}
+#classroomAlignment {
+    display: flex;
+    flex-direction: column;
+    text-align: end;
+}
+#goClass {
+    display: block;
+    margin: 0 auto;
+}
+@media (min-width: 768px) {
+    #searchButton {
+        display: block;
+    }
+    #searchBox {
+        width: 20em;
+    }
+    #mainSearch::placeholder {
+        font-size: 1.2rem;
+    }
 }

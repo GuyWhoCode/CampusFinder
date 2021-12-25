@@ -4,8 +4,13 @@ let classListElm = document.getElementById("classList")
 let confirmationScreen = document.getElementById("confirmationScreen")
 let confirmTitle = document.getElementById("confirmTitle")
 let saveAllClasses = document.getElementById("saveAllClasses")
+let saveAllClassesMobile = document.getElementById("saveAllClassesMobile")
+let confirmationClassListMobile = document.getElementById("confirmationClassListMobile")
+let saveClassesMobileBtn = document.getElementById("saveClassesMobileBtn")
 // eslint-disable-next-line no-undef
 let confirmationModal = new bootstrap.Modal(document.getElementById('confirmationClassModal'))
+// eslint-disable-next-line no-undef
+let confirmClassMobile = new bootstrap.Modal(document.getElementById('confirmClassMobile'))
 let confirmationDescription = document.getElementById("confirmationDescription")
 let confirmationClassMessage = document.getElementById("confirmationClassMessage")
 let deletedClasses = []
@@ -69,20 +74,21 @@ const undoDelete = className => {
     classSelector.className = "classSelector"
 
     let periodName = document.createElement("p")
-    periodName.className = 'period'
+    periodName.className = 'period fs-4'
     periodName.innerHTML = className
     classSelector.appendChild(periodName)
 
     let searchTeacher = document.createElement("form")
     searchTeacher.className = "searchTeacher"
+    searchTeacher.action = "."
+    searchTeacher.addEventListener("submit", event => {event.preventDefault(), confirmClass("Period " + className.split(" ")[1])})
 
     let teacherAutocomplete = document.createElement("input")
     teacherAutocomplete.setAttribute("list", "teacherNames" + className.split(" ")[1])
     // List is not originally a native attribute that can be set with dot notation. Set attribute manually.
     teacherAutocomplete.id = className
-    teacherAutocomplete.className = "teacherAutocomplete"
-    teacherAutocomplete.placeholder = "Enter WHS teacher name"
-    teacherAutocomplete.autofocus = true
+    teacherAutocomplete.className = "teacherAutocomplete form-control"
+    teacherAutocomplete.placeholder = "Teacher name"
     searchTeacher.appendChild(teacherAutocomplete)
     classSelector.appendChild(searchTeacher)
 
@@ -96,16 +102,13 @@ const undoDelete = className => {
     classSelector.appendChild(teacherName)
 
     let submitClass = document.createElement('button')
-    submitClass.className = "submitClass premadeBlue"
+    submitClass.className = "submitClass premadeButton"
     submitClass.innerHTML = "Submit Class"
     classSelector.appendChild(submitClass)
 
-    let deleteButton = document.createElement('img')
-    deleteButton.src = "./classes./minus.png"
-    deleteButton.className = "deleteClass"
-    deleteButton.style.width = "50px"
-    deleteButton.addEventListener("click", () => {deleteClassELm(classSelector)})
-    classSelector.appendChild(deleteButton)
+    submitClass.insertAdjacentHTML("afterend", '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-dash-circle-fill deleteClass" viewBox="0 0 16 16"> <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7z"/> </svg>')
+    // Adds SVG image of delete button
+    classSelector.childNodes[4].addEventListener("click", () => {deleteClassELm(classSelector)})
 
     return classSelector
     // Creates a class selector element with the following components: Period name, form with text input, drop-down menu, submit button, and Delete Class button
@@ -164,44 +167,87 @@ const confirmClass = period => {
     let teacherElm = document.createElement("p")
     teacherElm.className = "confirmTeacher " + classIdentifier
     teacherElm.innerHTML = teacherName
+
+    let periodNameMobile = document.createElement("p")
+    periodNameMobile.className = "confirmPeriod " + classIdentifier
+    periodNameMobile.innerHTML = period
+
+    let teacherElmMobile = document.createElement("p")
+    teacherElmMobile.className = "confirmTeacher " + classIdentifier
+    teacherElmMobile.innerHTML = teacherName
     // Creates a new confirmation element composed of a Period title, teacher name, and a break.
 
     confirmationList[periodNumber] = teacherName + "--" + roomNumber
     // Adds to the confirmation list to be saved server-side; Format: Teacher--XXXX
 
-    if (periodsConfirmed.length === 0 || periodNumber < periodsConfirmed[0]) {
+    periodsConfirmed.sort()
+    // Helps with the insertion algorithm by organizing the periods confirmed from least to greatest (default sort)
+    if (periodsConfirmed.length === 0) {
         periodsConfirmed.push(periodNumber)
+        confirmationClassListMobile.appendChild(periodNameMobile)
+        confirmationClassListMobile.appendChild(teacherElmMobile)
+        confirmationClassListMobile.appendChild(document.createElement("br"))
+        // Mobile modal sorting for first element of the list (no other items present)
+
         confirmTitle.insertAdjacentElement("afterend", periodName)
         periodName.insertAdjacentElement("afterend", teacherElm)
         return teacherElm.insertAdjacentElement("afterend", document.createElement("br"))
         // Uses Adjacent Element insertion to insert at the beginning; each element added after one is added
-    } 
-    else if (periodNumber > periodsConfirmed[periodsConfirmed.length-1]) {
-        periodsConfirmed.push(periodNumber)
-        confirmationScreen.insertBefore(periodName, saveAllClasses)
-        confirmationScreen.insertBefore(teacherElm, saveAllClasses)
-        return confirmationScreen.insertBefore(document.createElement("br"), saveAllClasses)
-        // Uses the Confirm classes button as a reference to insert the elements before it
-    }
+        // INSERT BEGINNING for Desktop
 
+    } else if (periodNumber > periodsConfirmed[periodsConfirmed.length-1]) {
+        periodsConfirmed.push(periodNumber)
+        confirmationClassListMobile.appendChild(periodNameMobile)
+        confirmationClassListMobile.appendChild(teacherElmMobile)
+        confirmationClassListMobile.appendChild(document.createElement("br"))
+
+        confirmationScreen.appendChild(periodName)
+        confirmationScreen.appendChild(teacherElm)
+        return confirmationScreen.appendChild(document.createElement("br"))
+        // INSERT LAST for both Desktop and Mobile
+
+    } else if (periodNumber < periodsConfirmed[0]) {
+        periodsConfirmed.push(periodNumber)
+        confirmationClassListMobile.insertBefore(periodName, confirmationClassListMobile.firstChild)
+        periodName.insertAdjacentElement("afterend", teacherElm)
+        teacherElm.insertAdjacentElement("afterend", document.createElement("br"))
+        // Mobile modal sorting for the first element of the list (when items ARE present)
+
+        confirmTitle.insertAdjacentElement("afterend", periodName)
+        periodName.insertAdjacentElement("afterend", teacherElm)
+        return teacherElm.insertAdjacentElement("afterend", document.createElement("br"))
+        // Uses Adjacent Element insertion to insert at the beginning; each element added after one is added
+        // INSERT BEGINNING for Desktop
+    } 
+    
+
+    periodsConfirmed.push(periodNumber)
     periodsConfirmed.map((val, index) => {if (classInsertion(val, index, periodsConfirmed, periodNumber) !== undefined) {
         confirmationScreen.insertBefore(periodName, document.getElementsByClassName("confirmPeriod Period" + periodsConfirmed[index+1])[0])
         confirmationScreen.insertBefore(teacherElm, document.getElementsByClassName("confirmPeriod Period" + periodsConfirmed[index+1])[0])
         confirmationScreen.insertBefore(document.createElement("br"), document.getElementsByClassName("confirmPeriod Period" + periodsConfirmed[index+1])[0])
+        // Desktop Version
+
+        confirmationClassListMobile.insertBefore(periodNameMobile, document.getElementsByClassName("confirmPeriod Period" + periodsConfirmed[index+1])[0])
+        confirmationClassListMobile.insertBefore(teacherElmMobile, document.getElementsByClassName("confirmPeriod Period" + periodsConfirmed[index+1])[0])
+        confirmationClassListMobile.insertBefore(document.createElement("br"), document.getElementsByClassName("confirmPeriod Period" + periodsConfirmed[index+1])[0])
+        // Mobile Version
         // Gets the Period X container after at the found index (uses the number at the index, not the index number itself) as a reference point to insert
     }}) 
-    periodsConfirmed.sort()
-    // Helps with the insertion algorithm by organizing the periods confirmed from least to greatest (default sort)
-
 }
-Object.values(document.getElementsByClassName("classSelector")).map(val => val.childNodes[9].addEventListener("click", () => {deleteClassELm(val)}))
-// Adds button click to delete class image 
+
 
 Object.values(document.getElementsByClassName("submitClass")).map((val, index) => val.addEventListener("click", () => {confirmClass("Period " + index)}))
 // Adds button click to Submit Class button
 
 Object.values(document.getElementsByClassName("searchTeacher")).map((val, index) => val.addEventListener("submit", event => {event.preventDefault(), confirmClass("Period " + index)}))
 // Adds ability to hit enter on Class autocomplete forms
+
+Object.values(document.getElementsByClassName("submitClass premadeButton")).map(val => val.insertAdjacentHTML("afterend", '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-dash-circle-fill deleteClass" viewBox="0 0 16 16"> <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7z"/> </svg>'))
+// Adds scalable delete button image
+
+Object.values(document.getElementsByClassName("classSelector")).map(val => val.childNodes[8].addEventListener("click", () => {deleteClassELm(val)}))
+// Adds button click to delete class image 
 
 document.getElementById("undoButton").addEventListener("click", () => {
     let periodDeleted = deletedClasses.length-1
@@ -219,10 +265,6 @@ document.getElementById("homePage").addEventListener("click", ()=> {
 saveAllClasses.addEventListener("click", () => {
     if (Object.values(confirmationList).length >= 3) {
         // classSocket.emit("saveTeacherSelection", confirmationList)
-        document.getElementById('confirmationClassModal').addEventListener("hidden.bs.modal", () => {
-            window.location = "/home"
-        })
-        // Adds the ability to return to home once the classes have been submitted
         confirmationClassMessage.innerHTML = "Success"
         confirmationDescription.innerHTML = "Your class selections have been saved."
         
@@ -235,12 +277,56 @@ saveAllClasses.addEventListener("click", () => {
     // Provides confirmation that the classes have been submitted and redirected home
 })
 
+saveAllClassesMobile.addEventListener("click", () => {
+    if (Object.values(confirmationList).length <= 3) {
+        confirmationClassMessage.innerHTML = "Error"
+        confirmationDescription.innerHTML = "Please add at least 3 classes to the selection and click Save Classes to confirm your selection."
+        return confirmationModal.show()
+        // Measure to prevent class submission when there is less than 3 classes added
+    }
+    confirmClassMobile.show()
+    // Shows class confirmation modal for mobile
+})
+
+saveClassesMobileBtn.addEventListener("click", () => {
+    confirmClassMobile.hide()
+    confirmationClassMessage.innerHTML = "Success"
+    confirmationDescription.innerHTML = "Your class selections have been saved."
+    confirmationModal.show()
+
+    // classSocket.emit("saveTeacherSelection", confirmationList)
+    // Shows success message and saves the classes for mobile
+})
+
+document.getElementById('confirmationClassModal').addEventListener("hidden.bs.modal", () => {
+    window.location = "/home"
+})
+// Redirects the user home after the confirmation class modal is closed
+
 // if (sessionStorage.getItem("email") === null) {
 //     window.location = "/home"
 //     // If the user is not logged in, redirect them to the main screen.
 // } else {
 //     confirmationList["userEmail"] = sessionStorage.getItem("email")
 // }
-// if (screen.width < 400) {
-    // Enable the phone screen modal and disable the desktop confirmation sidebar
-// }
+ 
+if (sessionStorage.darkMode === "false") {
+    document.getElementById("toolBar").style.backgroundColor = "#e9d283"
+    document.getElementById("toolBar").style.color = "#000000"
+    document.body.style.backgroundColor = "#FFFFFF"
+    document.body.style.color = "#000000"
+    Object.values(document.getElementsByClassName("classSelector")).map(val => val.style.backgroundColor = "#cfcdcd")
+    confirmationScreen.style.backgroundColor = "#cfcdcd"
+}
+
+
+function enableUndoHotkey(e) {
+    let eventHandler = window.event ? event : e
+    if (eventHandler.keyCode === 90 && (eventHandler.ctrlKey || e.metaKey)) {
+        let periodDeleted = deletedClasses.length-1
+        insertNewClass(deletedClasses[periodDeleted])
+        deletedClasses.splice(periodDeleted, 1)
+    }
+}
+document.onkeydown = enableUndoHotkey;
+// https://stackoverflow.com/questions/16006583/capturing-ctrlz-key-combination-in-javascript        

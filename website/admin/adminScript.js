@@ -10,26 +10,8 @@ adminSocket.on("teacherData", data => {
         document.getElementById("teacherNames").appendChild(name)
     })
 })
-let teacherNamesList = document.getElementById("teacherAutocomplete")
-let searchBar = document.getElementById("searchTeacher")
 
-const findTeacherInfo = teacherName => {
-    let teacherInfo = ""
-    teachers.map(val => val.name === teacherName ? (teacherInfo = val) : undefined)
-    return teacherInfo
+if (sessionStorage.darkMode === "false") {
+    document.body.style.backgroundColor = "#FFFFFF"
+    document.body.style.color = "#000000"
 }
-const flipName = name => name.split(",").reverse().join(" ").trim()
-
-searchBar.addEventListener("submit", (event) => {
-    event.preventDefault()
-    let teacherName = teacherNamesList.value.split("(")[0].trim()
-    let teacherInfo = findTeacherInfo(teacherName)
-    document.getElementById("selection").innerHTML = flipName(teacherName)
-    document.getElementById("roomNumber").innerHTML = "Room " + teacherInfo.room 
-    document.getElementById("department").innerHTML = "Teaches " + teacherInfo.dept 
-    document.getElementById("teacherImg").src = teacherInfo.image
-    teacherNamesList.value = ""
-})
-document.getElementById("home").addEventListener("click", () => {
-    window.location = "/home"
-})
