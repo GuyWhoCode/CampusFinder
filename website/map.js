@@ -11,7 +11,7 @@ var shortestNode = null;
 let map;
 let westHighCoords = { lat: 33.8468, lng: -118.3689 };
 let markers = [];
-let nodes = {};
+let nodes = [];
 let graph = {};
 let lines = null;
 let editMode = false; // editMode can be deleted for user site
@@ -26,7 +26,8 @@ function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: westHighCoords,
         zoom: 18,
-        mapTypeId: 'satellite'
+        mapTypeId: 'satellite',
+        tilt: 0
     });
 
     /* Adds marker on click
@@ -35,72 +36,9 @@ function initMap() {
         let marker = new google.maps.Marker({
             position: event.latLng,
             draggable: true,
-            label: document.getElementById("nameOfNode").value,
             map,
         });
-
-        /*  Makes the marker bounce on click 
-            If in edit mode, clicking on this marker will toggle whether or not the marker
-            is a neighbor of the selected node (selected node denoted by Don Cheadle)*/
-        marker.addListener("click", (event) => {
-            if (editMode) {
-                if (marker.getAnimation() != google.maps.Animation.BOUNCE) {
-                    if (nodes[selectedNode]["neighbors"].includes(marker.getLabel())) {
-                        for (var i = 0; i < nodes[selectedNode]["neighbors"].length; i++) {
-                            if (marker.getLabel() == nodes[selectedNode]["neighbors"][i]) {
-                                nodes[selectedNode]["neighbors"].splice(i, 1);
-                            }
-                        }
-                    }
-                    else {
-                        nodes[selectedNode]["neighbors"].push(marker.getLabel())
-                    }
-                    updateNeighbors();
-                }
-            }
-            else {
-                for (var i = 0; i < markers.length; i++) {
-                    markers[i].setAnimation(null);
-                    markers[i].setIcon(null);
-                }
-                marker.setAnimation(google.maps.Animation.BOUNCE);
-                marker.setIcon(selectedNodeImage);
-                selectedNode = marker.getLabel();
-            }
-            document.getElementById("selectedNode").innerHTML = "Selected Node: " + selectedNode + " | Edit mode: " + editMode + " | " + nodes[selectedNode]["neighbors"];
-        });
-
-        /* Updates the marker's coordinates in the nodes dictionary when it is dragged */
-        marker.addListener("position_changed", (event) => {
-            if (marker.getLabel() in nodes) {
-                nodes[marker.getLabel()]["lat"] = marker.getPosition().lat();
-                nodes[marker.getLabel()]["lng"] = marker.getPosition().lng();
-            }
-        });
-
         markers.push(marker);
-        nodes[document.getElementById("nameOfNode").value] = { lat: marker.getPosition().lat(), lng: marker.getPosition().lng(), neighbors: [] };
-    });
-
-    // current position marker
-    let currentMarker = new google.maps.Marker({
-        position: { lat: 33.846323, lng: -118.367719 },
-        draggable: true,
-        label: "YOU ARE HERE",
-        map,
-    });
-
-    // dragging the current position marker makes the (almost) shortest path from
-    // the current position to the selected node
-    currentMarker.addListener("position_changed", (event) => {
-        currentLat = currentMarker.getPosition().lat();
-        currentLng = currentMarker.getPosition().lng();
-        findShortestNode();
-        if (lines != null) {
-            lines.setMap(null);
-            lines = null;
-        }
-        lines = drawLines(findShortestPath(graph, shortestNode, selectedNode));
     });
 
     /* All of this keydown listener can get deleted for user site */
@@ -128,6 +66,9 @@ function initMap() {
         }
         /* Saves all nodes to nodes.json */
         else if (event.key == "Enter") {
+            for (var i = 0; i < markers.length; i++) {
+                nodes.push({ lat: markers[i].getPosition().lat(), lng: markers[i].getPosition().lng() });
+            }
             var jsonData = JSON.stringify(nodes, null, "\t");
             socket.emit("saveNodes", jsonData);
             console.log("Saved JSON");
@@ -137,242 +78,378 @@ function initMap() {
             console.log(nodes);
             console.log(graph);
         }
-        /* Draws the shortest path from shortestNode to Main Entrance */
-        else if (event.key == "Control") {
-            let shortestPath = findShortestPath(graph, shortestNode, "Main Entrance");
-
-            if (debug) {
-                console.log(shortestPath.distance);
-                for (var i = 0; i < shortestPath.path.length; i++) {
-                    console.log(shortestPath.path[i]);
-                }
-            }
-
-            if (lines != null) {
-                lines.setMap(null);
-                lines = null;
-            }
-            lines = drawLines(shortestPath);
-        }
-        /* Changes into Edit Mode, which lets you change the neighbors of a selected node */
-        else if (event.key == "CapsLock") {
-            editMode = !editMode;
-            document.getElementById("selectedNode").innerHTML = "Selected Node: " + selectedNode + " | Edit mode: " + editMode + " | " + nodes[selectedNode]["neighbors"];
-            updateNeighbors();
-        }
     });
     /* Loads in all nodes from nodes.json into memory */
-    socket.emit("requestNodes");
+    // socket.emit("requestNodes");
 
       // Define the LatLng coordinates for the polygon's path.
-  const building4Coords = [
-    { lat: 33.846370, lng: -118.368053 },
-    { lat: 33.846372, lng: -118.367906 },
-    { lat: 33.846469, lng: -118.367912 },
-    { lat: 33.846471, lng: -118.367957 },
-    { lat: 33.846500, lng: -118.367962 },
-    { lat: 33.846500, lng: -118.368488 },
-    { lat: 33.846471, lng: -118.368489 },
-    { lat: 33.846468, lng: -118.368540 },
-    { lat: 33.846376, lng: -118.368539 },
-    { lat: 33.846371, lng: -118.368497 },
-    { lat: 33.846008, lng: -118.368496 },
-    { lat: 33.846007, lng: -118.368893 },
-    { lat: 33.845913, lng: -118.368892 },
-    { lat: 33.845912, lng: -118.368841 },
-    { lat: 33.845882, lng: -118.368841 },
-    { lat: 33.845878, lng: -118.368206 },
-    { lat: 33.845842, lng: -118.368206 },
-    { lat: 33.845846, lng: -118.368087 },
-    { lat: 33.845884, lng: -118.368088 },
-    { lat: 33.845892, lng: -118.368059 },
-    { lat: 33.846370, lng: -118.368053 }
-  ];
-  // Construct the polygon.
-  const bermudaTriangle = new google.maps.Polygon({
-    paths: building4Coords,
-    strokeColor: "#FF0000",
-    strokeOpacity: 0.8,
-    strokeWeight: 2,
-    fillColor: "#FF0000",
-    fillOpacity: 0.35,
-  });
-
-  bermudaTriangle.setMap(map);
-  }
-
-
-function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-    infoWindow.setPosition(pos);
-    infoWindow.setContent(
-      browserHasGeolocation
-        ? "Error: The Geolocation service failed."
-        : "Error: Your browser doesn't support geolocation."
-    );
-    infoWindow.open(map);
-  }
-
-/* Takes parsed node json data from server.js socket and loads it into nodes and graph dataset */
-socket.on("loadNodes", (nodeData) => {
-    nodes = nodeData;
-    for (var node in nodes) {
-        // changes all rooms' isRoom flag to true
-        // everything from here to the next comment can be removed for user site
-        nodes[node]["isRoom"] = false;
-        if (node.length > 2) {
-            nodes[node]["isRoom"] = true;
+    const building4Coords = [
+        {
+            "lat": 33.84595282194775,
+            "lng": -118.36820409860879
+        },
+        {
+            "lat": 33.84591768880718,
+            "lng": -118.36820518551237
+        },
+        {
+            "lat": 33.84591781330818,
+            "lng": -118.36808738031202
+        },
+        {
+            "lat": 33.84595876865132,
+            "lng": -118.36809006252103
+        },
+        {
+            "lat": 33.84596270666408,
+            "lng": -118.36805318214708
+        },
+        {
+            "lat": 33.84644126258403,
+            "lng": -118.36805157736808
+        },
+        {
+            "lat": 33.84644351185024,
+            "lng": -118.36790439038084
+        },
+        {
+            "lat": 33.846541173958315,
+            "lng": -118.36790573148535
+        },
+        {
+            "lat": 33.84654432434702,
+            "lng": -118.36795803456114
+        },
+        {
+            "lat": 33.84657504063095,
+            "lng": -118.3679587051134
+        },
+        {
+            "lat": 33.84657553843007,
+            "lng": -118.36848867220868
+        },
+        {
+            "lat": 33.84654324695196,
+            "lng": -118.36848934276094
+        },
+        {
+            "lat": 33.84654245935474,
+            "lng": -118.36854164583673
+        },
+        {
+            "lat": 33.84644952283654,
+            "lng": -118.36853963417997
+        },
+        {
+            "lat": 33.846446372444326,
+            "lng": -118.36849537773122
+        },
+        {
+            "lat": 33.846083457373624,
+            "lng": -118.36849629189504
+        },
+        {
+            "lat": 33.84608466589169,
+            "lng": -118.36889321265699
+        },
+        {
+            "lat": 33.84598621565951,
+            "lng": -118.36889522431375
+        },
+        {
+            "lat": 33.84598700326181,
+            "lng": -118.3688422506857
+        },
+        {
+            "lat": 33.84595628676644,
+            "lng": -118.3688422506857
         }
-        //
+    ];
 
-        graph[node] = {};
-        // loads each node and its neighbors into the graph
-        for (var neighbor = 0; neighbor < nodes[node]["neighbors"].length; neighbor++) {
-            graph[node][nodes[node]["neighbors"][neighbor]] = distance(nodes[node]["lat"], nodes[node]["lng"], nodes[nodes[node]["neighbors"][neighbor]]["lat"], nodes[nodes[node]["neighbors"][neighbor]]["lng"]);
+    const cafe4Coords = [
+        {
+            "lat": 33.846446372444326,
+            "lng": -118.36849537773122
+        },
+        {
+            "lat": 33.846083457373624,
+            "lng": -118.36849629189504
+        },
+        {
+            "lat": 33.84608403474203,
+            "lng": -118.36875569130144
+        },
+        {
+            "lat": 33.84610923798339,
+            "lng": -118.3687563618537
+        },
+        {
+            "lat": 33.84611317598921,
+            "lng": -118.3688026299592
+        },
+        {
+            "lat": 33.84633449162311,
+            "lng": -118.3688026299592
+        },
+        {
+            "lat": 33.84633357109308,
+            "lng": -118.3687577029582
+        },
+        {
+            "lat": 33.8463879154143,
+            "lng": -118.36875703240595
+        },
+        {
+            "lat": 33.8463879154143,
+            "lng": -118.36869534159861
+        },
+        {
+            "lat": 33.846452498475735,
+            "lng": -118.36869332994185
         }
-        if (nodes[node]["isRoom"] || debug) {
-            // loads each marker as each node's coordinate and name
-            var latitude = nodes[node]["lat"];
-            var longitude = nodes[node]["lng"];
-            let marker = new google.maps.Marker({
-                position: { lat: latitude, lng: longitude },
-                draggable: true,
-                animation: google.maps.Animation.DROP,
-                label: node,
-                map,
-            });
+    ];
 
-            /* Makes the marker bounce on click */
-            marker.addListener("click", (event) => {
-                // delete first part of if statement for user site
-                if (editMode) {
-                    if (marker.getAnimation() != google.maps.Animation.BOUNCE) {
-                        if (nodes[selectedNode]["neighbors"].includes(marker.getLabel())) {
-                            for (var i = 0; i < nodes[selectedNode]["neighbors"].length; i++) {
-                                if (marker.getLabel() == nodes[selectedNode]["neighbors"][i]) {
-                                    nodes[selectedNode]["neighbors"].splice(i, 1);
-                                }
-                            }
-                        }
-                        else {
-                            nodes[selectedNode]["neighbors"].push(marker.getLabel())
-                        }
-                        updateNeighbors();
-                    }
-                }
-                else {
-                    for (var i = 0; i < markers.length; i++) {
-                        markers[i].setAnimation(null);
-                        markers[i].setIcon(null);
-                    }
-                    marker.setAnimation(google.maps.Animation.BOUNCE);
-                    marker.setIcon(selectedNodeImage);
-                    selectedNode = marker.getLabel();
-                }
-                // can delete this html for user site
-                document.getElementById("selectedNode").innerHTML = "Selected Node: " + selectedNode + " | Edit mode: " + editMode + " | " + nodes[selectedNode]["neighbors"];
-            });
-
-            /* Updates the marker's coordinates in the nodes when they are dragged */
-            marker.addListener("position_changed", (event) => {
-                if (marker.getLabel() in nodes) {
-                    nodes[marker.getLabel()]["lat"] = marker.getPosition().lat();
-                    nodes[marker.getLabel()]["lng"] = marker.getPosition().lng();
-                }
-            });
-
-            markers.push(marker);
+    const building5Coords = [
+        {
+            "lat": 33.84672404211643,
+            "lng": -118.3676812037051
+        },
+        {
+            "lat": 33.84672439951816,
+            "lng": -118.36762748873312
+        },
+        {
+            "lat": 33.84681969852128,
+            "lng": -118.36763017094214
+        },
+        {
+            "lat": 33.84681969852128,
+            "lng": -118.36769655561525
+        },
+        {
+            "lat": 33.84718329224963,
+            "lng": -118.36769584804095
+        },
+        {
+            "lat": 33.84718678553655,
+            "lng": -118.36748307764164
+        },
+        {
+            "lat": 33.847284446794916,
+            "lng": -118.36748307764164
+        },
+        {
+            "lat": 33.84728523438528,
+            "lng": -118.36753672182193
+        },
+        {
+            "lat": 33.847315950402944,
+            "lng": -118.36753605126968
+        },
+        {
+            "lat": 33.847316980063525,
+            "lng": -118.36813446836427
+        },
+        {
+            "lat": 33.8472862640463,
+            "lng": -118.36813446836427
+        },
+        {
+            "lat": 33.84728564843893,
+            "lng": -118.36818664828606
+        },
+        {
+            "lat": 33.8471871995907,
+            "lng": -118.36818664828606
+        },
+        {
+            "lat": 33.84718641199943,
+            "lng": -118.36814507404632
+        },
+        {
+            "lat": 33.84682186803755,
+            "lng": -118.36814207374955
+        },
+        {
+            "lat": 33.84682128055859,
+            "lng": -118.36854188231405
+        },
+        {
+            "lat": 33.84672440636625,
+            "lng": -118.3685412117618
+        },
+        {
+            "lat": 33.84672283117524,
+            "lng": -118.368488908686
+        },
+        {
+            "lat": 33.84669295071146,
+            "lng": -118.36848853000552
+        },
+        {
+            "lat": 33.84669265106426,
+            "lng": -118.36768147290844
         }
-    }
-    // If there is a neighbor for a node, that neighbor's neighbor will be the node.
-    // Ex. A is a neighbor of B, but B is not defined as a neighbor of A
-    // These for loops will make B a neighbor of A
-    for (var node in graph) {
-        for (var neighbor in graph[node]) {
-            graph[neighbor][node] = graph[node][neighbor];
+    ];
+    const cafe5Coords = [
+        {
+            "lat": 33.84718641199943,
+            "lng": -118.36814507404632
+        },
+        {
+            "lat": 33.84682186803755,
+            "lng": -118.36814207374955
+        },
+        {
+            "lat": 33.84682212865276,
+            "lng": -118.36840233319727
+        },
+        {
+            "lat": 33.84684733167639,
+            "lng": -118.36840434485403
+        },
+        {
+            "lat": 33.8468496944595,
+            "lng": -118.36845061295953
+        },
+        {
+            "lat": 33.84707253006308,
+            "lng": -118.3684501982589
+        },
+        {
+            "lat": 33.84707253006311,
+            "lng": -118.36840057739212
+        },
+        {
+            "lat": 33.847186730869836,
+            "lng": -118.36839990683987
         }
-    }
-
-    /* Code sample from https://developers.google.com/maps/documentation/javascript/geolocation
-       Gets current Location and the node closest to the current location
-    */
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            currentLat = position.coords.latitude;
-            currentLng = position.coords.longitude;
-            findShortestNode();
-          },
-          () => {
-            handleLocationError(true, infoWindow, map.getCenter());
-          }
-        );
-        
-      } else {
-        // Browser doesn't support Geolocation
-        handleLocationError(false, infoWindow, map.getCenter());
-      }
-});
-
-/* Code sample from https://developers.google.com/maps/documentation/javascript/examples/polyline-simple */
-function drawLines(shortestPath) {
-    let routeCoordinates = [];
-    routeCoordinates.push({ lat: currentLat, lng: currentLng })
-    for (var i = 0; i < shortestPath.path.length; i++) {
-        let node = shortestPath.path[i];
-        routeCoordinates.push({ lat: nodes[node]["lat"], lng: nodes[node]["lng"] });
-    }
-    drawnPath = new google.maps.Polyline({
-        path: routeCoordinates,
-        geodesic: true,
+    ];
+    const building3Coords = [
+        {
+            "lat": 33.84526485243251,
+            "lng": -118.36768458917
+        },
+        {
+            "lat": 33.84539402020447,
+            "lng": -118.36768458917
+        },
+        {
+            "lat": 33.84539795824321,
+            "lng": -118.36838824461165
+        },
+        {
+            "lat": 33.845293206350384,
+            "lng": -118.36838690350714
+        },
+        {
+            "lat": 33.84529399395908,
+            "lng": -118.36833661208811
+        },
+        {
+            "lat": 33.845261701996606,
+            "lng": -118.3683339298791
+        }
+    ];
+    const building6Coords = [
+        {
+            "lat": 33.845207339524556,
+            "lng": -118.36854691908313
+        },
+        {
+            "lat": 33.84564367406842,
+            "lng": -118.36854691908313
+        },
+        {
+            "lat": 33.845659426176354,
+            "lng": -118.36920137808276
+        },
+        {
+            "lat": 33.84520891474352,
+            "lng": -118.36919869587375
+        },
+        {
+            "lat": 33.84520103864838,
+            "lng": -118.36903776333286
+        },
+        {
+            "lat": 33.84522466693161,
+            "lng": -118.36903508112384
+        },
+        {
+            "lat": 33.84522299357151,
+            "lng": -118.36897639087961
+        },
+        {
+            "lat": 33.84546085126311,
+            "lng": -118.3689737086706
+        },
+        {
+            "lat": 33.84545612562005,
+            "lng": -118.36872962765024
+        },
+        {
+            "lat": 33.84521354225883,
+            "lng": -118.36872828654573
+        }
+    ];
+    // Construct the polygon.
+    const building4 = new google.maps.Polygon({
+        paths: building4Coords,
         strokeColor: "#FF0000",
-        strokeOpacity: 1.0,
+        strokeOpacity: 0.8,
         strokeWeight: 2,
-      });
+        fillColor: "#FF0000",
+        fillOpacity: 0.35,
+    });
+    const cafe4 = new google.maps.Polygon({
+        paths: cafe4Coords,
+        strokeColor: "#32a852",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: "#32a852",
+        fillOpacity: 0.35,
+    });
+    const building5 = new google.maps.Polygon({
+        paths: building5Coords,
+        strokeColor: "#FF0000",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: "#FF0000",
+        fillOpacity: 0.35,
+    }); 
+    const cafe5 = new google.maps.Polygon({
+        paths: cafe5Coords,
+        strokeColor: "#32a852",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: "#32a852",
+        fillOpacity: 0.35,
+    });
+    const building3 = new google.maps.Polygon({
+        paths: building3Coords,
+        strokeColor: "#FF0000",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: "#FF0000",
+        fillOpacity: 0.35,
+    }); 
+    const building6 = new google.maps.Polygon({
+        paths: building6Coords,
+        strokeColor: "#FF0000",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: "#FF0000",
+        fillOpacity: 0.35,
+    }); 
 
-      drawnPath.setMap(map);
-      return drawnPath;
-}
-
-/*  Calculates the distance in meters between two points with the latitude and longitude of each
-    https://www.movable-type.co.uk/scripts/latlong.html */
-function distance(lat1, lon1, lat2, lon2) {
-    const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180, Δλ = (lon2-lon1) * Math.PI/180, R = 6371e3;
-    const x = Δλ * Math.cos((φ1+φ2)/2);
-    const y = (φ2-φ1);
-    const d = Math.sqrt(x*x + y*y) * R;
-    return d;
-}
-
-function findShortestNode() {
-    let shortestDist = Infinity;
-    for (var node in nodes) {
-        var dist = distance(nodes[node]["lat"], nodes[node]["lng"], currentLat, currentLng);
-        if (dist < shortestDist) {
-            shortestDist = dist;
-            shortestNode = node;
-        }
-    }
-}
-
-/*  Should be deleted for user site
-    Visually shows which nodes are neighbors of the selected node */
-function updateNeighbors() {
-    for (var j = 0; j < markers.length; j++) {
-        if (nodes[selectedNode]["neighbors"].includes(markers[j].getLabel())) {
-            markers[j].setIcon(neighborNodeImage);
-        }
-        else if (markers[j].getLabel() == selectedNode) {
-            markers[j].setIcon(selectedNodeImage);
-        }
-        else {
-            markers[j].setIcon(null);
-        }
-        if (editMode == false && markers[j].getLabel() != selectedNode) {
-            markers[j].setIcon(null);
-        }
-    }
-
-}
+    building4.setMap(map);
+    cafe4.setMap(map);
+    building5.setMap(map);
+    cafe5.setMap(map);
+    building3.setMap(map);
+    building6.setMap(map);
+  }
 
 function createBuildingShapes() {
 
