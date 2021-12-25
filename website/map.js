@@ -2,30 +2,35 @@
 
 /* debug enables and disables intermediate nodes */
 var debug = false;
+
+/* For current position */
 var currentLat;
 var currentLng;
 var shortestNode = null;
 
 let map;
+let westHighCoords = { lat: 33.8468, lng: -118.3689 };
 let markers = [];
 let nodes = {};
 let graph = {};
 let lines = null;
-let editMode = false;
+let editMode = false; // editMode can be deleted for user site
 let selectedNode = "Main Entrance";
 
-let selectedNodeImage = "./Don-Cheadle (2).png";
+let selectedNodeImage = "./Don-Cheadle (2).png"; // maybe change these icons to ones more appropriate
 let neighborNodeImage = "./parking_lot_maps.png";
 // eslint-disable-next-line no-undef
 let socket = io("/");
 
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 33.8468, lng: -118.3689 },
-        zoom: 17,
+        center: westHighCoords,
+        zoom: 18,
         mapTypeId: 'satellite'
     });
 
+    /* Adds marker on click
+        Click listener can be deleted for user site. */
     map.addListener("click", (event) => {
         let marker = new google.maps.Marker({
             position: event.latLng,
@@ -98,7 +103,7 @@ function initMap() {
         lines = drawLines(findShortestPath(graph, shortestNode, selectedNode));
     });
 
-    /* All of this can get deleted for user site */
+    /* All of this keydown listener can get deleted for user site */
     document.getElementById("map").addEventListener("keydown", function(event) {
         /*  Deletes the selected marker from nodes and markers list and all mentions of it
             in the neighbors list of other nodes */
@@ -158,6 +163,42 @@ function initMap() {
     });
     /* Loads in all nodes from nodes.json into memory */
     socket.emit("requestNodes");
+
+      // Define the LatLng coordinates for the polygon's path.
+  const building4Coords = [
+    { lat: 33.846370, lng: -118.368053 },
+    { lat: 33.846372, lng: -118.367906 },
+    { lat: 33.846469, lng: -118.367912 },
+    { lat: 33.846471, lng: -118.367957 },
+    { lat: 33.846500, lng: -118.367962 },
+    { lat: 33.846500, lng: -118.368488 },
+    { lat: 33.846471, lng: -118.368489 },
+    { lat: 33.846468, lng: -118.368540 },
+    { lat: 33.846376, lng: -118.368539 },
+    { lat: 33.846371, lng: -118.368497 },
+    { lat: 33.846008, lng: -118.368496 },
+    { lat: 33.846007, lng: -118.368893 },
+    { lat: 33.845913, lng: -118.368892 },
+    { lat: 33.845912, lng: -118.368841 },
+    { lat: 33.845882, lng: -118.368841 },
+    { lat: 33.845878, lng: -118.368206 },
+    { lat: 33.845842, lng: -118.368206 },
+    { lat: 33.845846, lng: -118.368087 },
+    { lat: 33.845884, lng: -118.368088 },
+    { lat: 33.845892, lng: -118.368059 },
+    { lat: 33.846370, lng: -118.368053 }
+  ];
+  // Construct the polygon.
+  const bermudaTriangle = new google.maps.Polygon({
+    paths: building4Coords,
+    strokeColor: "#FF0000",
+    strokeOpacity: 0.8,
+    strokeWeight: 2,
+    fillColor: "#FF0000",
+    fillOpacity: 0.35,
+  });
+
+  bermudaTriangle.setMap(map);
   }
 
 
@@ -171,6 +212,7 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     infoWindow.open(map);
   }
 
+/* Takes parsed node json data from server.js socket and loads it into nodes and graph dataset */
 socket.on("loadNodes", (nodeData) => {
     nodes = nodeData;
     for (var node in nodes) {
@@ -201,6 +243,7 @@ socket.on("loadNodes", (nodeData) => {
 
             /* Makes the marker bounce on click */
             marker.addListener("click", (event) => {
+                // delete first part of if statement for user site
                 if (editMode) {
                     if (marker.getAnimation() != google.maps.Animation.BOUNCE) {
                         if (nodes[selectedNode]["neighbors"].includes(marker.getLabel())) {
@@ -225,6 +268,7 @@ socket.on("loadNodes", (nodeData) => {
                     marker.setIcon(selectedNodeImage);
                     selectedNode = marker.getLabel();
                 }
+                // can delete this html for user site
                 document.getElementById("selectedNode").innerHTML = "Selected Node: " + selectedNode + " | Edit mode: " + editMode + " | " + nodes[selectedNode]["neighbors"];
             });
 
@@ -330,6 +374,10 @@ function updateNeighbors() {
 
 }
 
+function createBuildingShapes() {
+
+}
+
 /* TODO:
     Honestly, because all the code is basically here, graph-node-creation-tool should be the main branch for pathfinding.
 
@@ -341,7 +389,6 @@ function updateNeighbors() {
         "isRoom": true
     If it is a room, create a new marker with the coordinates and neighbors and proceed with normal code.
     If it is NOT a room, do not create a marker, but still create a node in memory
-
 
     2.
 
@@ -359,6 +406,11 @@ function updateNeighbors() {
         College and Career Center
         Gym
         Portable 1
+        ASB
+        Student Activities (4139C)
+        All Baseball Field entrances
+        Tennis Court
+        Entrance near tennis court
         All restrooms
         Both Cafeterias
 
@@ -367,6 +419,12 @@ function updateNeighbors() {
             Therapists
             Principal
             Attendance Window
+        
+        There should also be an easter egg for finding the Swimming Pool.
+        Swimming Pool will not show up in the dropdown list when searching,
+        but if "Swimming Pool" is entered into the search field, a marker previously
+        not automatically shown on the map will show up on top of building 3, 
+        with additional information on how to get there.
     
     We also need to figure out how multiple floors are going to be represented both in code
     and to the user
