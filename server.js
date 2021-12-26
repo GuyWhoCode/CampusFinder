@@ -54,9 +54,9 @@ socket.on('connection', io => {
         })
 
         // reads the nodes from nodes.json and loads them into memory in map.js
-        io.on("requestNodes", () => {
-            let nodes = fileReader.readFileSync("./nodes.json", "utf8")
-            socket.emit("loadNodes", JSON.parse(nodes))
+        io.on("requestOutlineCoords", () => {
+            let nodes = fileReader.readFileSync("./outlineCoords.json", "utf8")
+            socket.emit("loadOutlineCoords", JSON.parse(nodes))
         })
 
         io.on("requestTeacher", () => {
