@@ -1,12 +1,13 @@
 // Local Development environment: http://localhost:3000
 require("dotenv").config()
-const mongoClient = require('mongodb').MongoClient
-const dbClient = new mongoClient(process.env.uri);
+// const mongoClient = require('mongodb').MongoClient
+// const dbClient = new mongoClient(process.env.uri);
 const fileReader = require("graceful-fs")
 
 const express = require("express");
 const app = express();
 const server = app.listen(3000, function() {
+    // Process.env.PORT on Glitch for server.js
     console.log("Your app is listening on port " + server.address().port);
     // Enter command in Terminal on Windows: npx nodemon server.js
 });
@@ -41,10 +42,17 @@ app.get("/settings", function(request, response) {
 const socket = require("socket.io")(server)
 socket.on('connection', io => {
     console.log("I have a connection to the website!")
-    dbClient.connect(async () => {
-        console.log("Connected to database!")
+    // dbClient.connect(async () => {
+    //     console.log("Connected to database!")
         
-        io.on("requestTeacher", () => {
+        io.on("requestTeacher", async() => {
+            // let teacherDB = dbClient.db("campusInfo").collection("teacherInfo")
+            // let dbLastUpdated = await teacherDB.find({"identifier": "teacherUpdated"}).toArray()
+            // // if (dbLastUpdated) {
+            // //     return "hi"
+            // // }
+
+            // let teacherList = await teacherDB.find({}).toArray()
             let teacherData = fileReader.readFileSync("./faculty.json", "utf8")
             socket.emit("teacherData", JSON.parse(teacherData).teachers)
         })
@@ -70,23 +78,22 @@ socket.on('connection', io => {
         })
         io.on("userLogin", async(user) => {
             let userDB = dbClient.db("campusInfo").collection("users")
-            let doesUserExist = await userDB.find({"email": user.info.email}).toArray()
+            let doesUserExist = await userDB.find({"email": user.email}).toArray()
             if (doesUserExist.length === 0) {
                 userDB.insertOne({
-                    "userName": user.info.displayName,
-                    "email": user.info.email,
-                    "url": user.info.photoURL,
+                    "userName": user.displayName,
+                    "email": user.email,
+                    "url": user.photoURL,
                     "admin": true,
-                    "darkModeOn": user.darkMode,
+                    "darkModeOn": true,
                     "periods": {}
                 })
                 // If a user entry has not been created, create a new user entry into the database
-                socket.emit("classData", undefined)
+                socket.emit("userData", undefined)
             }
-            socket.emit("classData", doesUserExist[0].periods)
+            socket.emit("userData", doesUserExist[0])
 
         })
-
         // userDB.updateOne({"email": user.info.email}, 
         //     {$set: {
         //         "userName": user.info.displayName,
@@ -96,6 +103,6 @@ socket.on('connection', io => {
         //         "darkModeOn": user.darkMode,
         //         "periods": doesUserExist[0].periods
         //     }})
-    })
+    // })
     // Database instance initialized once the socket makes a connection with the client-side website
 })
