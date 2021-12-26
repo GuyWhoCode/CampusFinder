@@ -9,7 +9,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./style.css"/>
-    <!-- <script src="./map.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+    <script src="./pathfinding.js"></script>
+    <script src="./markerManager.js"></script>
+    <script src="./map.js"></script>
 </head>
 <body>    
     <div id="navbar">
@@ -63,7 +66,20 @@
     </div>
     <!-- Bootstrap Classes Sidebar -->
     
-
+    <input type="search" id="nameOfNode">
+    <h1>Shift: Print Graph | Enter: Save graph to JSON | Backspace: Load graph from JSON | Control: Display shortest path</h1>
+    <h2 id="selectedNode">Selected Node: Edit Mode: </h2>
+    <div id="map"></div>
+	<!--
+		This is just to expedite the process of creating nodes. 
+		There is the map on the left side of the screen and on the right will be the graph data structure printed out basically.
+		So with the above method of clicking on the map and having a marker appear, we can then have an input field set up above
+		such that when we press enter, the graph gets updated with an entry with the name from the input field. 
+		The node dictionary will also be displayed to the right and it will have the name of our node as well as its coordinates. 
+		When we are done, we just export both dictionaries as json files or something so we can load it in later. 
+	-->
+	
+    
     <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="classSearchResult" aria-labelledby="searchResultArea">        
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="searchResultArea">Search Result</h5>
@@ -106,10 +122,9 @@
     </div>
     <!-- Bootstrap Search Result for Classes Sidebar -->
 
-    <!-- <div id="map"></div> -->
-    <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCaLWlcr-27e1s6xXMQuXczqfE-Yore6XY&callback=initMap"></script> -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCaLWlcr-27e1s6xXMQuXczqfE-Yore6XY&callback=initMap"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js" defer></script>
+    
     <script src="./initialize.js" defer></script>
     <script src="./offlineLib.js" defer></script>
     <script src="./login.js" type="module" defer></script>
