@@ -8,6 +8,7 @@ const fs = require("fs")
 const express = require("express");
 const app = express();
 const server = app.listen(3000, function() {
+    // Process.env.PORT on Glitch for server.js
     console.log("Your app is listening on port " + server.address().port);
     // Enter command in Terminal on Windows: npx nodemon server.js
 });
@@ -44,7 +45,7 @@ socket.on('connection', io => {
     console.log("I have a connection to the website!")
     //  dbClient.connect(async () => {
     //  console.log("Connected to database!")
-    // saves nodes to nodes.json
+    
         io.on("saveNodes", (nodes) => {
             fs.writeFile("nodes.json", nodes, function(err) {
                 if (err) {
@@ -52,19 +53,27 @@ socket.on('connection', io => {
                 }
             });
         })
-
-        // reads the nodes from nodes.json and loads them into memory in map.js
+		// saves nodes to nodes.json
+        
         io.on("requestNodes", () => {
             let nodes = fileReader.readFileSync("./nodes.json", "utf8")
             socket.emit("loadNodes", JSON.parse(nodes))
         })
-
+		// reads the nodes from nodes.json and loads them into memory in map.js
+	
         io.on("requestOutlines", () => {
             let outlineCoords = fileReader.readFileSync("./outlineCoords.json", "utf8")
             socket.emit("loadOutlines", JSON.parse(outlineCoords))
         })
-
-        io.on("requestTeacher", () => {
+        
+        io.on("requestTeacher", async() => {
+            // let teacherDB = dbClient.db("campusInfo").collection("teacherInfo")
+            // let dbLastUpdated = await teacherDB.find({"identifier": "teacherUpdated"}).toArray()
+            // // if (dbLastUpdated) {
+            // //     return "hi"
+            // // }
+            // let teacherList = await teacherDB.find({}).toArray()
+          
             let teacherData = fileReader.readFileSync("./faculty.json", "utf8")
             socket.emit("teacherData", JSON.parse(teacherData).teachers)
         })
@@ -90,23 +99,22 @@ socket.on('connection', io => {
         })
         io.on("userLogin", async(user) => {
             let userDB = dbClient.db("campusInfo").collection("users")
-            let doesUserExist = await userDB.find({"email": user.info.email}).toArray()
+            let doesUserExist = await userDB.find({"email": user.email}).toArray()
             if (doesUserExist.length === 0) {
                 userDB.insertOne({
-                    "userName": user.info.displayName,
-                    "email": user.info.email,
-                    "url": user.info.photoURL,
+                    "userName": user.displayName,
+                    "email": user.email,
+                    "url": user.photoURL,
                     "admin": true,
-                    "darkModeOn": user.darkMode,
+                    "darkModeOn": true,
                     "periods": {}
                 })
                 // If a user entry has not been created, create a new user entry into the database
-                socket.emit("classData", undefined)
+                socket.emit("userData", undefined)
             }
-            socket.emit("classData", doesUserExist[0].periods)
+            socket.emit("userData", doesUserExist[0])
 
         })
-
         // userDB.updateOne({"email": user.info.email}, 
         //     {$set: {
         //         "userName": user.info.displayName,
