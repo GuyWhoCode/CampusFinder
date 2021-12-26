@@ -59,6 +59,11 @@ socket.on('connection', io => {
             socket.emit("loadNodes", JSON.parse(nodes))
         })
 
+        io.on("requestOutlines", () => {
+            let outlineCoords = fileReader.readFileSync("./outlineCoords.json", "utf8")
+            socket.emit("loadOutlines", JSON.parse(outlineCoords))
+        })
+
         io.on("requestTeacher", () => {
             let teacherData = fileReader.readFileSync("./faculty.json", "utf8")
             socket.emit("teacherData", JSON.parse(teacherData).teachers)
