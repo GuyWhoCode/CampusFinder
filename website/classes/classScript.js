@@ -53,15 +53,15 @@ const deleteClassELm = classElm => {
 
     let confirmNodes = Object.values(confirmationScreen.childNodes)
     let confirmPeriodIndex = confirmNodes
-        .map((val, index) => val.className === "confirmPeriod " + classIdentifier ? index : undefined)
+        .map((val, index) => val.className === "confirmTeacher " + classIdentifier ? index : undefined)
         .filter(val => val !== undefined)[0]
     // Finds confirmsPeriod Element first by filtering out the child node list to delete the rest of the class entry.
     confirmNodes[confirmPeriodIndex].remove()
-    // Deletes the period number element
-    confirmNodes[confirmPeriodIndex + 1].remove()
     // Deletes the teacher name element
     confirmNodes[confirmPeriodIndex - 1].remove()
-    // Deletes the spacing element
+    // Deletes the period number element
+    confirmNodes[confirmPeriodIndex + 1].remove()
+    // // Deletes the spacing element
     delete confirmationList[periodNumber]
     // Updates the final confirmation list accordingly
     
@@ -319,6 +319,13 @@ if (sessionStorage.darkMode === "false") {
     confirmationScreen.style.backgroundColor = "#cfcdcd"
 }
 
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+// eslint-disable-next-line no-unused-vars
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    // eslint-disable-next-line no-undef
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+// Initializes Bootstrap tooltips
 
 function enableUndoHotkey(e) {
     let eventHandler = window.event ? event : e

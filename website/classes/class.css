@@ -49,7 +49,6 @@ h1 {
     border: none;
 }
 #confirmationScreen {
-    display: none;
     margin: 0 auto;
     background-color: #4b4a4a;
     box-shadow: 12px 15px 12px 3px rgba(0,0,0,0.75);
@@ -61,11 +60,15 @@ h1 {
     flex-direction: column;
     border-radius: 5%;
 }
+#confirmSection {
+    display: none;
+}
 #toolBar {
     display: grid;
     grid-template-columns: 30vw 60vw;
-    height: 7vh;
+    height: 5vh;
     background-color: #544726;
+    margin-bottom: 5%;
 }
 #undoButton, #homePage {
     margin-left: 15%;
@@ -88,7 +91,7 @@ h1 {
     padding-left: 3%;
 }
 .confirmPeriod:nth-child(even) {
-    background-color: #c2c2c2;
+    background-color: #6c6a6a;
 }
 .confirmTeacher {
     width: 97%;
@@ -98,7 +101,7 @@ h1 {
     padding-right: 3%;
 }
 .confirmTeacher:nth-child(odd) {
-    background-color: #c2c2c2;
+    background-color: #6c6a6a;
 }
 
 .premadeButton {
@@ -124,9 +127,16 @@ h1 {
 	position:relative;
 	top:1px;
 }
+#saveAllClassesMobile {
+    display: block;
+    margin: 0 auto;
+}
 /* Fancy Button generated from https://www.bestcssbuttongenerator.com/#/37 */
 
 @media (min-width: 768px) {
+    #confirmSection {
+        display: block;
+    }
     #confirmationScreen {
         overflow-x: hidden;
         overflow-y: scroll;
