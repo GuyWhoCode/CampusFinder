@@ -1,0 +1,49 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+.horizontal {
+    display: flex;
+    flex-direction: row;
+}
+.viewBoxMain {
+    height: 30vh;
+}
+#darkMode {
+    background-color: #303030;
+}
+#darkNav {
+    background-color: #554826;
+}
+.preview {
+    display: flex;
+    flex-direction: column;
+    width: 20vw;
+    align-content: center;
+    justify-content: center;
+    border: 5px solid black;
+    border-radius: 5%;
+    background-color: #FFFFFF;
+    height: 35vh;
+    margin: auto 0;
+}
+#darkPreview {
+    color: #FFFFFF;
+}
+#themeChooser {
+    display: flex;
+    justify-content: space-around;
+    background-color: lightgray;
+    /* height: 50vh; */
+}
+#lightNav {
+    background-color: #e9d283;
+}
+.hoverSelect {
+    display: flex;
+    height: 45vh;
+    width: 25vw;
+    align-content: center;
+    justify-content: center;
+    cursor: pointer;
+}
