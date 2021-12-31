@@ -8,6 +8,7 @@ html, body {
 }
 #map {
     height: 90vh;
+    color: #000000
 }
 #navbar {
     margin: 0;

@@ -11,7 +11,7 @@ function createMarker(node) {
     });
 
     /* Makes the marker bounce on click */
-    marker.addListener("click", (event) => {
+    marker.addListener("click", () => {
         // delete first part of if statement for user site
         if (editMode) {
             if (marker.getAnimation() != google.maps.Animation.BOUNCE) {
@@ -158,5 +158,25 @@ function findClosestNodeToCurrentPos() {
             shortestDist = dist;
             closestNodeToCurrentPos = node;
         }
+    }
+}
+
+function createInfoMarkers(locationCoords) {
+    for (var location in locationCoords) {
+        let marker = new google.maps.Marker({
+            position: locationCoords[location],
+            map
+        });
+        let infoWindow = new google.maps.InfoWindow({
+            content: "<h6>" + location + "</h6>",
+        });
+        marker.addListener("click", () => {
+            infoWindow.open({
+              anchor: marker,
+              map,
+              shouldFocus: false,
+            });
+          });
+        locationMarkers.push(marker);
     }
 }

@@ -6,6 +6,7 @@ var debug = false;
 let map;
 let westHighCoords = { lat: 33.8468, lng: -118.3689 };
 let markers = [];
+let locationMarkers = [];
 let locationOutlines = [];
 let lines = null;
 
@@ -96,6 +97,7 @@ function initMap() {
     /* Loads in all nodes from nodes.json into memory */
     socket.emit("requestNodes");
     socket.emit("requestOutlines");
+    socket.emit("requestLocationCoords");
 }
 
 
@@ -116,7 +118,7 @@ socket.on("loadNodes", (nodeData) => {
         for (var neighbor = 0; neighbor < nodes[node]["neighbors"].length; neighbor++) {
             graph[node][nodes[node]["neighbors"][neighbor]] = distance(nodes[node]["lat"], nodes[node]["lng"], nodes[nodes[node]["neighbors"][neighbor]]["lat"], nodes[nodes[node]["neighbors"][neighbor]]["lng"]);
         }
-        if (nodes[node]["isRoom"] || debug) {
+        if (nodes[node].isRoom || debug) {
             createMarker(node);
         }
     }
@@ -140,13 +142,13 @@ socket.on("loadNodes", (nodeData) => {
             findClosestNodeToCurrentPos();
           },
           () => {
-              console.log("Error: The Geolocation service failed.");
+            alert("Error: The Geolocation service failed.");
           }
         );
         
       } else {
         // Browser doesn't support Geolocation
-        console.log("Error: Your browser doesn't support geolocation.");
+        alert("Error: Your browser doesn't support geolocation.");
       }
 });
 
@@ -231,23 +233,14 @@ function createBuildingOutlines(locationOutlinesCoords) {
     }
 }
 
+socket.on("loadLocationCoords", (coordsData) => {
+    createInfoMarkers(coordsData);
+});
+
 /* TODO:
     Honestly, because all the code is basically here, graph-node-creation-tool should be the main branch for pathfinding.
 
-    DONE 1. 
-    
-    We have coordinates of the rooms. 
-    Now we need to mark which nodes are rooms/locations and which are just intermediate nodes.
-    This can be done with a boolean in the nodes.json file for each node like 
-        "isRoom": true
-    If it is a room, create a new marker with the coordinates and neighbors and proceed with normal code.
-    If it is NOT a room, do not create a marker, but still create a node in memory
-
-    2.
-
-    Refactor and comment
-
-    3.
+    1.
 
     Rooms/locations need to have neighbors and be connected to the intermediate node network.
 
@@ -273,14 +266,21 @@ function createBuildingOutlines(locationOutlinesCoords) {
             Principal
             Attendance Window
         
-        There should also be an easter egg for finding the Swimming Pool.
+        I want an easter egg for finding the Swimming Pool.
         Swimming Pool will not show up in the dropdown list when searching,
         but if "Swimming Pool" is entered into the search field, a marker previously
         not automatically shown on the map will show up on top of building 3, 
         with additional information on how to get there.
     
+    2. 
+    
     We also need to figure out how multiple floors are going to be represented both in code
     and to the user
+
+    3. 
+
+    Like the UCLA map, we can use markers to drag the start and end nodes, with both of them being connected to the nearest node.
+
     ------------------------------
 
     Down the line, the actual creation of the nodes should be left to the admin page. 
@@ -289,5 +289,7 @@ function createBuildingOutlines(locationOutlinesCoords) {
 
     The user page should only have the nodes, graph, and room/location markers. The intermediate nodes will still
     be used, but won't show up as markers. 
-    It would not allow the user to edit nodes (obviously) as it will read-only. 
+    It would not allow the user to edit nodes (obviously) as it will be read-only. 
+
+    Delete all things that have comments for user site
 */

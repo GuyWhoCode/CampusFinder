@@ -64,6 +64,11 @@ socket.on('connection', io => {
             socket.emit("loadOutlines", JSON.parse(outlineCoords))
         })
 
+        io.on("requestLocationCoords", () => {
+            let locationCoords = fileReader.readFileSync("./locationCoords.json", "utf8")
+            socket.emit("loadLocationCoords", JSON.parse(locationCoords))
+        })
+
         io.on("requestTeacher", () => {
             let teacherData = fileReader.readFileSync("./faculty.json", "utf8")
             socket.emit("teacherData", JSON.parse(teacherData).teachers)
