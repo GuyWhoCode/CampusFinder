@@ -5,9 +5,10 @@ html, body {
     font-family: 'Roboto', sans-serif;
     background-color: #303030;
     color: #FFFFFF;
+    overflow: hidden;
 }
 #map {
-    height: 90vh;
+    height: 92vh;
 }
 #navbar {
     margin: 0;
@@ -15,7 +16,7 @@ html, body {
     background-color: #544726;
     font-size: 1.5em;
     display: grid;
-    grid-template-columns: 20% auto 10%;
+    grid-template-columns: repeat(3, auto);
 }
 #userPFP {
     border-radius: 50%;
@@ -47,16 +48,17 @@ html, body {
     transition-duration: 0s;
 }
 #logo {
-    max-width: 4em;
+    max-width: 3em;
     display: flex;
     float: right;
     cursor: pointer;
+    margin: auto 0;
 }
 #searchButton {
     display: none;
 }
 #searchBox {
-    width: 10em;
+    width: 9em;
     align-self: center;
     justify-self: center;
 }
@@ -103,6 +105,9 @@ html, body {
     display: block;
     margin: 0 auto;
 }
+#userInfo {
+  color: white;
+}
 @media (min-width: 768px) {
     #searchButton {
         display: block;
@@ -112,5 +117,11 @@ html, body {
     }
     #mainSearch::placeholder {
         font-size: 1.2rem;
+    }
+    #navbar {
+        grid-template-columns: 20% auto 10%;
+    }
+    #logo {
+        max-width: 4em;
     }
 }

@@ -58,4 +58,5 @@ if (sessionStorage.darkMode === "false") {
     document.getElementById("navbar").style.backgroundColor = "#e9d283"
     document.body.style.backgroundColor = "#FFFFFF"
     document.body.style.color = "#000000"
+    document.getElementById("userInfo").style.color = "#000000"
 }
