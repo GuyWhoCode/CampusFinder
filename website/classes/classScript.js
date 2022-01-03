@@ -240,7 +240,14 @@ const confirmClass = period => {
 Object.values(document.getElementsByClassName("submitClass")).map((val, index) => val.addEventListener("click", () => {confirmClass("Period " + index)}))
 // Adds button click to Submit Class button
 
-Object.values(document.getElementsByClassName("searchTeacher")).map((val, index) => val.addEventListener("submit", event => {event.preventDefault(), confirmClass("Period " + index)}))
+Object.values(document.getElementsByClassName("searchTeacher")).map((val, index) => {
+    if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf("like Mac") !== -1) {
+        val.addEventListener("keydown", event => { if (event.key === "Enter") confirmClass("Period " + index) })
+        // Adds keydown event listener for mobile that adds functionality to the Search button
+    } else {
+        val.addEventListener("submit", event => {event.preventDefault(), confirmClass("Period " + index)})
+    }
+})
 // Adds ability to hit enter on Class autocomplete forms
 
 Object.values(document.getElementsByClassName("submitClass premadeButton")).map(val => val.insertAdjacentHTML("afterend", '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-dash-circle-fill deleteClass" viewBox="0 0 16 16"> <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7z"/> </svg>'))

@@ -3,7 +3,6 @@ require("dotenv").config()
 const mongoClient = require('mongodb').MongoClient
 const dbClient = new mongoClient(process.env.uri);
 const fileReader = require("graceful-fs")
-const fs = require("fs")
 
 const express = require("express");
 const app = express();
@@ -43,17 +42,8 @@ app.get("/settings", function(request, response) {
 const socket = require("socket.io")(server)
 socket.on('connection', io => {
     console.log("I have a connection to the website!")
-     dbClient.connect(async () => {
-     console.log("Connected to database!")
-    
-        io.on("saveNodes", (nodes) => {
-            fs.writeFile("nodes.json", nodes, function(err) {
-                if (err) {
-                    console.log(err);
-                }
-            });
-        })
-		// saves nodes to nodes.json
+    dbClient.connect(async () => {
+        console.log("Connected to database!")
         
         io.on("requestNodes", () => {
             let nodes = fileReader.readFileSync("./nodes.json", "utf8")
@@ -65,7 +55,21 @@ socket.on('connection', io => {
             let outlineCoords = fileReader.readFileSync("./outlineCoords.json", "utf8")
             socket.emit("loadOutlines", JSON.parse(outlineCoords))
         })
+
+        io.on("requestNodeInfo", nodeInfo => {
+            if (nodeInfo.origin === "sidebar") {
+                return socket.emit("nodeSelected", nodeInfo.room)
+                // Node request from the sidebar creates a request to the map to display an animation showing where the classroom is
+                // Sidebar request comes from user-submitted classes sidebar
+            }
+            socket.emit("showNodeSidebar", nodeInfo.room)
+            // Node request from clicking a map icon sends a request to the sidebar to display information 
+        })
         
+        io.on("easterEgg", () => {
+            socket.emit("showSwimmingPool")
+        })
+
         io.on("requestTeacher", async() => {
             // let teacherDB = dbClient.db("campusInfo").collection("teacherInfo")
             // let dbLastUpdated = await teacherDB.find({"identifier": "teacherUpdated"}).toArray()
