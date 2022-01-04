@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-undef
-const classSocket = io()
+const classSocket = io("/")
 let classListElm = document.getElementById("classList")
 let confirmationScreen = document.getElementById("confirmationScreen")
 let confirmTitle = document.getElementById("confirmTitle")
@@ -17,6 +17,14 @@ let deletedClasses = []
 let periodsConfirmed = []
 let confirmationList = {}
 let teachers;
+
+Storage.prototype.setObject = function(key, value) {
+    this.setItem(key, JSON.stringify(value));
+}
+
+Storage.prototype.getObject = function(key) {
+    return JSON.parse(this.getItem(key));
+}
 
 classSocket.emit("requestTeacher")
 classSocket.on("teacherData", data => {
@@ -271,7 +279,9 @@ document.getElementById("homePage").addEventListener("click", ()=> {
 
 saveAllClasses.addEventListener("click", () => {
     if (Object.values(confirmationList).length >= 3) {
-        // classSocket.emit("saveTeacherSelection", confirmationList)
+        classSocket.emit("saveTeacherSelection", confirmationList)
+        sessionStorage.setObject("userClasses", confirmationList)
+        // Sets the session storage to the new class list so that the user can see the updated class list on home page
         confirmationClassMessage.innerHTML = "Success"
         confirmationDescription.innerHTML = "Your class selections have been saved."
         
@@ -301,21 +311,24 @@ saveClassesMobileBtn.addEventListener("click", () => {
     confirmationDescription.innerHTML = "Your class selections have been saved."
     confirmationModal.show()
 
-    // classSocket.emit("saveTeacherSelection", confirmationList)
+    sessionStorage.setObject("userClasses", confirmationList)
+    // Sets the session storage to the new class list so that the user can see the updated class list on home page
+    classSocket.emit("saveTeacherSelection", confirmationList)
     // Shows success message and saves the classes for mobile
 })
+
 
 document.getElementById('confirmationClassModal').addEventListener("hidden.bs.modal", () => {
     window.location = "/home"
 })
 // Redirects the user home after the confirmation class modal is closed
 
-// if (sessionStorage.getItem("email") === null) {
-//     window.location = "/home"
-//     // If the user is not logged in, redirect them to the main screen.
-// } else {
-//     confirmationList["userEmail"] = sessionStorage.getItem("email")
-// }
+if (sessionStorage.getItem("email") === null) {
+    window.location = "/home"
+    // If the user is not logged in, redirect them to the main screen.
+} else {
+    confirmationList["userEmail"] = sessionStorage.getItem("email")
+}
  
 if (sessionStorage.darkMode === "false") {
     document.getElementById("toolBar").style.backgroundColor = "#e9d283"
