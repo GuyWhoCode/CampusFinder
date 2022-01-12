@@ -1,7 +1,7 @@
 // Local Development environment: http://localhost:3000
 require("dotenv").config()
-// const mongoClient = require('mongodb').MongoClient
-// const dbClient = new mongoClient(process.env.uri);
+const mongoClient = require('mongodb').MongoClient
+const dbClient = new mongoClient(process.env.uri);
 const fileReader = require("graceful-fs")
 const fs = require("fs")
 
@@ -43,8 +43,8 @@ app.get("/settings", function(request, response) {
 const socket = require("socket.io")(server)
 socket.on('connection', io => {
     console.log("I have a connection to the website!")
-    //  dbClient.connect(async () => {
-    //  console.log("Connected to database!")
+     dbClient.connect(async () => {
+     console.log("Connected to database!")
     
         io.on("saveNodes", (nodes) => {
             fs.writeFile("nodes.json", nodes, function(err) {
@@ -130,6 +130,6 @@ socket.on('connection', io => {
         //         "darkModeOn": user.darkMode,
         //         "periods": doesUserExist[0].periods
         //     }})
-    // })
+    })
     // Database instance initialized once the socket makes a connection with the client-side website
 })

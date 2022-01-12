@@ -3,11 +3,27 @@
 /* debug enables and disables intermediate nodes */
 var debug = false;
 
+Storage.prototype.setObject = function(key, value) {
+    this.setItem(key, JSON.stringify(value));
+}
+
+Storage.prototype.getObject = function(key) {
+    return JSON.parse(this.getItem(key));
+}
+
 let map;
 let westHighCoords = { lat: 33.8468, lng: -118.3689 };
 let markers = [];
 let locationMarkers = [];
 let locationOutlines = [];
+let classPaths = [];
+const PERIOD0PATH = 0;
+const PERIOD1PATH = 1;
+const PERIOD2PATH = 2;
+const PERIOD3PATH = 3;
+const PERIOD4PATH = 4;
+const PERIOD5PATH = 5;
+let selectedPath = PERIOD0PATH;
 let lines = null;
 
 /* For current position */
@@ -57,7 +73,36 @@ function initMap() {
         }
         /* Draws the shortest path from closestNodeToCurrentPos to Main Entrance */
         else if (event.key == "Control") {
-            let shortestPath = findShortestPath(graph, closestNodeToCurrentPos, "Main Entrance");
+            // closest node to main entrance
+            // let shortestPath = findShortestPath(graph, "8104", "Main Entrance");
+
+            // maps path from one period to the next
+            // find a way so that paths don't just overlap and just cross each other
+            sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--8104', 1: 'Reyes, Pete--6106', 2: 'Charlin-Wade, Kathryn--2117', 3: 'Jin, Jason--4102', 4: 'Cerda, Becky--3100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--8104' })
+            let rooms = Object.values(sessionStorage.getObject("userClasses")).map(val => val.split("--")[1]);
+            // (arr[0]==5124) // makes whatever the array is to a number but doesn't change the array
+            // returns array of strings of the class numbers
+            // ['5124', '5454']
+            /* 
+                Drawing one line from one period to the next is probably the only way to do this. 
+                The options for the user should be:
+                Path from period 0 to period 1
+                Path from period 1 to period 2
+                Path from period 2 to period 3
+                Path from period 3 to period 4
+                Path from period 4 to period 5
+                Path from period 5 to period 6
+                Path from period 6 to period 7
+                All lines at once
+                    For the paths individually, the selected one is much more bolder while the others' opacity are lowered greatly.
+                The path from the first period to the second is the default with the other ones being options.
+                 */
+            for (var period = 0; period < rooms.length - 1; period++) {
+                console.log(rooms[period]);
+                let path = findShortestPath(graph, rooms[period], rooms[period + 1]);
+                classPaths.push(drawLines(path));
+            }
+            updateSelectedLineOpacity()
 
             if (debug) {
                 console.log(shortestPath.distance);
@@ -66,11 +111,11 @@ function initMap() {
                 }
             }
             /* Deletes the previous path before creating another path */
-            if (lines != null) {
-                lines.setMap(null);
-                lines = null;
-            }
-            lines = drawLines(shortestPath);
+            // if (lines != null) {
+            //     lines.setMap(null);
+            //     lines = null;
+            // }
+            // lines = drawLines(shortestPath);
         }
         /* Toggles Edit Mode, which lets you change the neighbors of a selected node */
         else if (event.key == "CapsLock") {
@@ -91,13 +136,20 @@ function initMap() {
                 }
             }
         }
+        document.getElementById("button1").addEventListener('click', () => { selectedPath = PERIOD0PATH; updateSelectedLineOpacity() });
+        document.getElementById("button2").addEventListener('click', () => { selectedPath = PERIOD1PATH; updateSelectedLineOpacity() });
+        document.getElementById("button3").addEventListener('click', () => { selectedPath = PERIOD2PATH; updateSelectedLineOpacity() });
+        document.getElementById("button4").addEventListener('click', () => { selectedPath = PERIOD3PATH; updateSelectedLineOpacity() });
+        document.getElementById("button5").addEventListener('click', () => { selectedPath = PERIOD4PATH; updateSelectedLineOpacity() });
+        document.getElementById("button6").addEventListener('click', () => { selectedPath = PERIOD5PATH; updateSelectedLineOpacity() });
     });
     createCurrentPosMarker();
 
     /* Loads in all nodes from nodes.json into memory */
     socket.emit("requestNodes");
-    socket.emit("requestOutlines");
-    socket.emit("requestLocationCoords");
+    
+    // socket.emit("requestOutlines");
+    // socket.emit("requestLocationCoords");
 }
 
 
@@ -153,9 +205,11 @@ socket.on("loadNodes", (nodeData) => {
 });
 
 /* Code sample from https://developers.google.com/maps/documentation/javascript/examples/polyline-simple */
-function drawLines(shortestPath) {
+function drawLines(shortestPath, isCurrentPos) {
     let routeCoordinates = [];
-    routeCoordinates.push({ lat: currentLat, lng: currentLng })
+    if (isCurrentPos) {
+        routeCoordinates.push({ lat: currentLat, lng: currentLng })
+    }
     for (var i = 0; i < shortestPath.path.length; i++) {
         let node = shortestPath.path[i];
         routeCoordinates.push({ lat: nodes[node]["lat"], lng: nodes[node]["lng"] });
@@ -164,12 +218,24 @@ function drawLines(shortestPath) {
         path: routeCoordinates,
         geodesic: true,
         strokeColor: "#FF0000",
-        strokeOpacity: 1.0,
-        strokeWeight: 2,
+        // strokeColor: "#" + Math.floor(Math.random()*16777215).toString(16),
+        strokeOpacity: 1,
+        strokeWeight: 69,
       });
 
       drawnPath.setMap(map);
       return drawnPath;
+}
+
+function updateSelectedLineOpacity() {
+    for (var path = 0; path < classPaths.length; path++) {
+        if (path == selectedPath) {
+            classPaths[path].setOptions({ strokeOpacity: 1 });
+        }
+        else {
+            classPaths[path].setOptions({ strokeOpacity: 0.1 });
+        }
+    }
 }
 
 /*  Calculates the distance in meters between two points with the latitude and longitude of each
@@ -236,60 +302,3 @@ function createBuildingOutlines(locationOutlinesCoords) {
 socket.on("loadLocationCoords", (coordsData) => {
     createInfoMarkers(coordsData);
 });
-
-/* TODO:
-    Honestly, because all the code is basically here, graph-node-creation-tool should be the main branch for pathfinding.
-
-    1.
-
-    Rooms/locations need to have neighbors and be connected to the intermediate node network.
-
-    Nodes that need to be created (we need the coordinates of these):
-        Both library entrances
-        All second floor rooms of building 4
-        All second floor rooms of building 5
-        Pavilion
-        College and Career Center
-        Gym
-        Portable 1
-        ASB
-        Student Activities (4139C)
-        All Baseball Field entrances
-        Tennis Court
-        Entrance near tennis court
-        All restrooms
-        Both Cafeterias
-
-        We literally do not have anything for the administration building
-            Counselors
-            Therapists
-            Principal
-            Attendance Window
-        
-        I want an easter egg for finding the Swimming Pool.
-        Swimming Pool will not show up in the dropdown list when searching,
-        but if "Swimming Pool" is entered into the search field, a marker previously
-        not automatically shown on the map will show up on top of building 3, 
-        with additional information on how to get there.
-    
-    2. 
-    
-    We also need to figure out how multiple floors are going to be represented both in code
-    and to the user
-
-    3. 
-
-    Like the UCLA map, we can use markers to drag the start and end nodes, with both of them being connected to the nearest node.
-
-    ------------------------------
-
-    Down the line, the actual creation of the nodes should be left to the admin page. 
-    The images used for admin page should be changed later.
-
-
-    The user page should only have the nodes, graph, and room/location markers. The intermediate nodes will still
-    be used, but won't show up as markers. 
-    It would not allow the user to edit nodes (obviously) as it will be read-only. 
-
-    Delete all things that have comments for user site
-*/

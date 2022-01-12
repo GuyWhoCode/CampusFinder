@@ -190,6 +190,66 @@
 		],
 		"isRoom": true
 	},
+	"4200": {
+		"lat": 33.846339,
+		"lng": -118.3681744,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"4201": {
+		"lat": 33.8462944,
+		"lng": -118.3681808,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"4203": {
+		"lat": 33.846195,
+		"lng": -118.3681798,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"4204": {
+		"lat": 33.8460781,
+		"lng": -118.3681818,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"4205": {
+		"lat": 33.8459965,
+		"lng": -118.3681791,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"4206": {
+		"lat": 33.8460018,
+		"lng": -118.3682344,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"4207": {
+		"lat": 33.8460023,
+		"lng": -118.3683049,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"4208": {
+		"lat": 33.8460062,
+		"lng": -118.3683954,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"4209": {
+		"lat": 33.8460087,
+		"lng": -118.3684762,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"4210": {
+		"lat": 33.8460112,
+		"lng": -118.3686334,
+		"neighbors": [],
+		"isRoom": true
+	},
 	"4213": {
 		"lat": 33.8460469,
 		"lng": -118.3683696,
@@ -197,92 +257,194 @@
 		"isRoom": true
 	},
 	"4214": {
-		"lat": 33.84616829999999,
-		"lng": -118.36835750613423,
+		"lat": 33.8461683,
+		"lng": -118.3683622,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"4215": {
-		"lat": 33.84628360000001,
-		"lng": -118.36835818282069,
+		"lat": 33.8463554,
+		"lng": -118.3683464,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"4221": {
-		"lat": 33.84636793066515,
-		"lng": -118.36836216994057,
+		"lat": 33.8463682,
+		"lng": -118.3682271,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"4222": {
-		"lat": 33.8463966,
-		"lng": -118.3681319,
+		"lat": 33.8464228,
+		"lng": -118.3680038,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"5100": {
-		"lat": 33.8470418,
-		"lng": -118.3678837,
+		"lat": 33.84710085367547,
+		"lng": -118.36783345828381,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"5101": {
-		"lat": 33.8469613,
-		"lng": -118.3679538,
+		"lat": 33.8470259,
+		"lng": -118.3678257,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"5102": {
-		"lat": 33.8470243,
-		"lng": -118.3679444,
+		"lat": 33.84693211382555,
+		"lng": -118.36782637607479,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"5103": {
-		"lat": 33.846814,
-		"lng": -118.3679411,
+		"lat": 33.8468067829633,
+		"lng": -118.36782708895493,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"5105": {
-		"lat": 33.8467277,
-		"lng": -118.3676638,
+		"lat": 33.846746356914004,
+		"lng": -118.36783548895492,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"5106": {
-		"lat": 33.8468508,
-		"lng": -118.3678211,
+		"lat": 33.846745545288734,
+		"lng": -118.36791521962604,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"5107": {
-		"lat": 33.8468472,
-		"lng": -118.3679146,
+		"lat": 33.84674743246299,
+		"lng": -118.36802493434124,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"5108": {
-		"lat": 33.846819,
-		"lng": -118.3683199,
+		"lat": 33.846746647893355,
+		"lng": -118.36837393067114,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"5139": {
-		"lat": 33.8471465,
-		"lng": -118.3679109,
+		"lat": 33.8471404,
+		"lng": -118.3680008,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"5141": {
-		"lat": 33.847144,
-		"lng": -118.3677714,
+		"lat": 33.8471421016203,
+		"lng": -118.36787064110449,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"5142": {
-		"lat": 33.8471451,
-		"lng": -118.3676534,
+		"lat": 33.84714508617724,
+		"lng": -118.36774630000001,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5143": {
+		"lat": 33.84714564470909,
+		"lng": -118.3676004,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5200": {
+		"lat": 33.8470326,
+		"lng": -118.3678522,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5201": {
+		"lat": 33.8470237,
+		"lng": -118.3678392,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5202": {
+		"lat": 33.8469449,
+		"lng": -118.3678234,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5203": {
+		"lat": 33.8468399,
+		"lng": -118.3678211,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5204": {
+		"lat": 33.846743,
+		"lng": -118.367759,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5206": {
+		"lat": 33.8467455,
+		"lng": -118.3678713,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5207": {
+		"lat": 33.84675,
+		"lng": -118.3679679,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5208": {
+		"lat": 33.8467519,
+		"lng": -118.3680638,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5209": {
+		"lat": 33.8467427,
+		"lng": -118.36815,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5210": {
+		"lat": 33.8467414,
+		"lng": -118.3682881,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5213": {
+		"lat": 33.8467419,
+		"lng": -118.3681734,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5214": {
+		"lat": 33.8467734,
+		"lng": -118.3679796,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5215": {
+		"lat": 33.8469076,
+		"lng": -118.3679998,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5216": {
+		"lat": 33.8470613,
+		"lng": -118.367977,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5220": {
+		"lat": 33.8471134,
+		"lng": -118.3678837,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5221": {
+		"lat": 33.8471206,
+		"lng": -118.3676373,
 		"neighbors": [],
 		"isRoom": true
 	},
@@ -968,21 +1130,21 @@
 		"neighbors": [],
 		"isRoom": true
 	},
-	"Gym": {
-		"lat": 33.8471518,
-		"lng": -118.3682029,
+	"Pavillion1": {
+		"lat": 33.8466626,
+		"lng": -118.3686066,
 		"neighbors": [],
 		"isRoom": true
 	},
-	"Pavillion": {
-		"lat": 33.8470872,
-		"lng": -118.368623,
+	"Pavillion2": {
+		"lat": 33.8469928,
+		"lng": -118.3687411,
 		"neighbors": [],
 		"isRoom": true
 	},
 	"College and Career Center": {
-		"lat": 33.8469967,
-		"lng": -118.3685865,
+		"lat": 33.8470864,
+		"lng": -118.368677,
 		"neighbors": [],
 		"isRoom": true
 	},
@@ -1008,6 +1170,42 @@
 			"BF",
 			"8107"
 		],
+		"isRoom": true
+	},
+	"Attendance Window": {
+		"lat": 33.8469903,
+		"lng": -118.3673832,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"Health Office": {
+		"lat": 33.846831,
+		"lng": -118.3673852,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5NorthBathroom": {
+		"lat": 33.8471409,
+		"lng": -118.3680413,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"5SouthBathroom": {
+		"lat": 33.84674604148397,
+		"lng": -118.36841413435859,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"4NorthBathroom": {
+		"lat": 33.846403275508685,
+		"lng": -118.368396,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"4SouthBathroom": {
+		"lat": 33.8459995,
+		"lng": -118.3687223,
+		"neighbors": [],
 		"isRoom": true
 	}
 }
