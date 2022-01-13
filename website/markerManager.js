@@ -25,7 +25,7 @@ function createMarker(node) {
                 else {
                     nodes[selectedNode]["neighbors"].push(marker.getLabel())
                 }
-                updateNeighbors();
+                updateNeighborVisibility();
             }
         }
         else {
@@ -104,6 +104,25 @@ function createMarkerClick(event) {
     nodes[document.getElementById("nameOfNode").value] = { lat: marker.getPosition().lat(), lng: marker.getPosition().lng(), neighbors: [], isRoom: false };
 }
 
+/*  Should be deleted for user site
+    Visually shows which nodes are neighbors of the selected node */
+function updateNeighborVisibility() {
+    for (var j = 0; j < markers.length; j++) {
+        if (nodes[selectedNode]["neighbors"].includes(markers[j].getLabel())) {
+            markers[j].setIcon(neighborNodeImage);
+        }
+        else if (markers[j].getLabel() == selectedNode) {
+            markers[j].setIcon(selectedNodeImage);
+        }
+        else {
+            markers[j].setIcon(null);
+        }
+        if (editMode == false && markers[j].getLabel() != selectedNode) {
+            markers[j].setIcon(null);
+        }
+    }
+}
+
 /* Delete this function for user site */
 /*  Deletes the selected marker from nodes and markers list and all mentions of it
     in the neighbors list of other nodes */
@@ -146,7 +165,7 @@ function createCurrentPosMarker() {
             lines.setMap(null);
             lines = null;
         }
-        lines = drawLines(findShortestPath(graph, closestNodeToCurrentPos, selectedNode));
+        lines = drawLines(findShortestPath(graph, closestNodeToCurrentPos, selectedNode), true);
     });
 }
 
@@ -178,5 +197,29 @@ function createInfoMarkers(locationCoords) {
             });
           });
         locationMarkers.push(marker);
+    }
+}
+
+// part of creating filters
+function showMarkersOfBuilding(buildingNumber) {
+    if ((buildingNumber >= 2 && buildingNumber <= 6) || buildingNumber == 8) {
+        for (var marker in markers) {
+            if (markers[marker].getLabel().charAt(0) == buildingNumber) {
+                markers[marker].setMap(map);
+            }
+            else {
+                markers[marker].setMap(null);
+            }
+        }
+    }
+    // reset number
+    else if (buildingNumber == -1) {
+        for (var marker in markers) {
+            markers[marker].setMap(map);
+        }
+    }
+    // can delete the else segment for user site
+    else {
+        alert(buildingNumber + " is not a valid building number.");
     }
 }

@@ -1,7 +1,12 @@
+
+
 /* eslint-disable no-unused-vars */
 
 /* debug enables and disables intermediate nodes */
-var debug = false;
+var debugLogs = false;
+var intermediateNodesEnabled = false;
+var locationOutlinesEnabled = true;
+var buildingLabelsEnabled = false;
 
 Storage.prototype.setObject = function(key, value) {
     this.setItem(key, JSON.stringify(value));
@@ -14,8 +19,9 @@ Storage.prototype.getObject = function(key) {
 let map;
 let westHighCoords = { lat: 33.8468, lng: -118.3689 };
 let markers = [];
+let buildingSelector = 0;
 let locationMarkers = [];
-let locationOutlines = [];
+let locationOutlinesMap = new Map();
 let classPaths = [];
 const PERIOD0PATH = 0;
 const PERIOD1PATH = 1;
@@ -40,6 +46,8 @@ let selectedNodeImage = "./Don-Cheadle (2).png"; // maybe change these icons to 
 let neighborNodeImage = "./parking_lot_maps.png";
 // eslint-disable-next-line no-undef
 let socket = io("/");
+
+
 
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
@@ -80,23 +88,7 @@ function initMap() {
             // find a way so that paths don't just overlap and just cross each other
             sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--8104', 1: 'Reyes, Pete--6106', 2: 'Charlin-Wade, Kathryn--2117', 3: 'Jin, Jason--4102', 4: 'Cerda, Becky--3100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--8104' })
             let rooms = Object.values(sessionStorage.getObject("userClasses")).map(val => val.split("--")[1]);
-            // (arr[0]==5124) // makes whatever the array is to a number but doesn't change the array
-            // returns array of strings of the class numbers
-            // ['5124', '5454']
-            /* 
-                Drawing one line from one period to the next is probably the only way to do this. 
-                The options for the user should be:
-                Path from period 0 to period 1
-                Path from period 1 to period 2
-                Path from period 2 to period 3
-                Path from period 3 to period 4
-                Path from period 4 to period 5
-                Path from period 5 to period 6
-                Path from period 6 to period 7
-                All lines at once
-                    For the paths individually, the selected one is much more bolder while the others' opacity are lowered greatly.
-                The path from the first period to the second is the default with the other ones being options.
-                 */
+
             for (var period = 0; period < rooms.length - 1; period++) {
                 console.log(rooms[period]);
                 let path = findShortestPath(graph, rooms[period], rooms[period + 1]);
@@ -104,7 +96,7 @@ function initMap() {
             }
             updateSelectedLineOpacity()
 
-            if (debug) {
+            if (debugLogs) {
                 console.log(shortestPath.distance);
                 for (var i = 0; i < shortestPath.path.length; i++) {
                     console.log(shortestPath.path[i]);
@@ -125,33 +117,40 @@ function initMap() {
         }
         /* Toggles location outlines visibility */
         else if (event.key == "NumLock") {
-            if (locationOutlines[0].getMap() == null) {
-                for (var outline in locationOutlines) {
-                    locationOutlines[outline].setMap(map);
-                }
-            }
-            else {
-                for (var outline in locationOutlines) {
-                    locationOutlines[outline].setMap(null);
-                }
-            }
+            
         }
-        document.getElementById("button1").addEventListener('click', () => { selectedPath = PERIOD0PATH; updateSelectedLineOpacity() });
-        document.getElementById("button2").addEventListener('click', () => { selectedPath = PERIOD1PATH; updateSelectedLineOpacity() });
-        document.getElementById("button3").addEventListener('click', () => { selectedPath = PERIOD2PATH; updateSelectedLineOpacity() });
-        document.getElementById("button4").addEventListener('click', () => { selectedPath = PERIOD3PATH; updateSelectedLineOpacity() });
-        document.getElementById("button5").addEventListener('click', () => { selectedPath = PERIOD4PATH; updateSelectedLineOpacity() });
-        document.getElementById("button6").addEventListener('click', () => { selectedPath = PERIOD5PATH; updateSelectedLineOpacity() });
     });
+    document.getElementById("button1").addEventListener('click', () => { selectedPath = PERIOD0PATH; updateSelectedLineOpacity() });
+    document.getElementById("button2").addEventListener('click', () => { selectedPath = PERIOD1PATH; updateSelectedLineOpacity() });
+    document.getElementById("button3").addEventListener('click', () => { selectedPath = PERIOD2PATH; updateSelectedLineOpacity() });
+    document.getElementById("button4").addEventListener('click', () => { selectedPath = PERIOD3PATH; updateSelectedLineOpacity() });
+    document.getElementById("button5").addEventListener('click', () => { selectedPath = PERIOD4PATH; updateSelectedLineOpacity() });
+    document.getElementById("button6").addEventListener('click', () => { selectedPath = PERIOD5PATH; updateSelectedLineOpacity() });
+    
+    document.getElementById("bldg2button").addEventListener('click', () => { showMarkersOfBuilding(2) });
+    document.getElementById("bldg3button").addEventListener('click', () => { showMarkersOfBuilding(3) });
+    document.getElementById("bldg4button").addEventListener('click', () => { showMarkersOfBuilding(4) });
+    document.getElementById("bldg5button").addEventListener('click', () => { showMarkersOfBuilding(5) });
+    document.getElementById("bldg6button").addEventListener('click', () => { showMarkersOfBuilding(6) });
+    document.getElementById("bldg8button").addEventListener('click', () => { showMarkersOfBuilding(8) });
+    document.getElementById("resetButton").addEventListener('click', () => { showMarkersOfBuilding(-1) });
+
+    document.getElementById("classBldgButton").addEventListener('click', () => { showOutlinesOfBuilding("bldgs") });
+    document.getElementById("cafeButton").addEventListener('click', () => { showOutlinesOfBuilding("cafe") });
+    document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other") });
+    document.getElementById("resetOutlines").addEventListener('click', () => { showOutlinesOfBuilding("", true) });
     createCurrentPosMarker();
 
     /* Loads in all nodes from nodes.json into memory */
     socket.emit("requestNodes");
     
-    // socket.emit("requestOutlines");
-    // socket.emit("requestLocationCoords");
+    if (locationOutlinesEnabled) {
+        socket.emit("requestOutlines");
+    }
+    if (buildingLabelsEnabled) {
+        socket.emit("requestLocationCoords");
+    }
 }
-
 
 /* Takes parsed node json data from server.js socket and loads it into nodes and graph dataset */
 socket.on("loadNodes", (nodeData) => {
@@ -170,7 +169,7 @@ socket.on("loadNodes", (nodeData) => {
         for (var neighbor = 0; neighbor < nodes[node]["neighbors"].length; neighbor++) {
             graph[node][nodes[node]["neighbors"][neighbor]] = distance(nodes[node]["lat"], nodes[node]["lng"], nodes[nodes[node]["neighbors"][neighbor]]["lat"], nodes[nodes[node]["neighbors"][neighbor]]["lng"]);
         }
-        if (nodes[node].isRoom || debug) {
+        if (nodes[node].isRoom || intermediateNodesEnabled) {
             createMarker(node);
         }
     }
@@ -220,7 +219,7 @@ function drawLines(shortestPath, isCurrentPos) {
         strokeColor: "#FF0000",
         // strokeColor: "#" + Math.floor(Math.random()*16777215).toString(16),
         strokeOpacity: 1,
-        strokeWeight: 69,
+        strokeWeight: 4,
       });
 
       drawnPath.setMap(map);
@@ -248,31 +247,13 @@ function distance(lat1, lon1, lat2, lon2) {
     return d;
 }
 
-/*  Should be deleted for user site
-    Visually shows which nodes are neighbors of the selected node */
-function updateNeighborVisibility() {
-    for (var j = 0; j < markers.length; j++) {
-        if (nodes[selectedNode]["neighbors"].includes(markers[j].getLabel())) {
-            markers[j].setIcon(neighborNodeImage);
-        }
-        else if (markers[j].getLabel() == selectedNode) {
-            markers[j].setIcon(selectedNodeImage);
-        }
-        else {
-            markers[j].setIcon(null);
-        }
-        if (editMode == false && markers[j].getLabel() != selectedNode) {
-            markers[j].setIcon(null);
-        }
-    }
-}
-
 socket.on("loadOutlines", (coordsData) => {
     createBuildingOutlines(coordsData);
 });
 
 function createBuildingOutlines(locationOutlinesCoords) {
     for (var category in locationOutlinesCoords) {
+        let locationOutlinesRow = [];
         let color;
         switch (category) {
             case "bldgs":
@@ -286,7 +267,7 @@ function createBuildingOutlines(locationOutlinesCoords) {
                 break;
         }
         for (var location in locationOutlinesCoords[category]) {
-            locationOutlines.push(new google.maps.Polygon({
+            locationOutlinesRow.push(new google.maps.Polygon({
                 paths: locationOutlinesCoords[category][location],
                 strokeColor: color,
                 strokeOpacity: 0.8,
@@ -295,6 +276,15 @@ function createBuildingOutlines(locationOutlinesCoords) {
                 fillOpacity: 0.25,
                 map: map
             }));
+        }
+        locationOutlinesMap.set(category, locationOutlinesRow);
+    }
+}
+
+function showOutlinesOfBuilding(buildingType, reset) {
+    for (let [locationType, locations] of locationOutlinesMap) {
+        for (var location in locations) {
+            locations[location].setMap(locationType == buildingType || reset ? map : null);
         }
     }
 }
