@@ -1,5 +1,4 @@
-// https://github.com/noamsauerutley/shortest-path
-// for algorithm
+// https://github.com/noamsauerutley/shortest-path for algorithm
 const shortestDistanceNode = (distances, visited) => {
 	let shortest = null;
 
@@ -78,18 +77,3 @@ const findShortestPath = (graph, startNode, endNode) => {
 
 	return results;
 };
-
-// var graph = {
-// 	start: { A: 5, B: 2 },
-// 	A: { C: 4, D: 2 },
-// 	B: { D: 7 },
-// 	C: { D: 6, end: 3 },
-// 	D: { end: 1 },
-// 	end: {},
-// };
-
-// const shortestPath = findShortestPath(graph, 'start', 'end');
-// console.log(shortestPath.distance);
-// for (var i = 0; i < shortestPath.path.length; i++) {
-//     console.log(shortestPath.path[i]);
-// }

@@ -67,32 +67,39 @@
     <!-- Bootstrap Classes Sidebar -->
     
     <input type="search" id="nameOfNode">
-    <h1>Shift: Print Graph | Enter: Save graph to JSON | Backspace: Load graph from JSON | Control: Display shortest path</h1>
-    <h2 id="selectedNode">Selected Node: Edit Mode: </h2>
-    <button type="button" id="button1">Path 1</button>
-    <button type="button" id="button2">Path 2</button>
-    <button type="button" id="button3">Path 3</button>
-    <button type="button" id="button4">Path 4</button>
-    <button type="button" id="button5">Path 5</button>
-    <button type="button" id="button6">Path 6</button>
+    <!-- <h1>Shift: Print Graph | Enter: Save graph to JSON | Backspace: Load graph from JSON | Control: Display shortest path</h1> -->
+    <!-- <h2 id="selectedNode">Selected Node: Edit Mode: </h2> -->
+    <div id="debugMap">
+        <div id="buttons">
+            <button type="button" id="showPaths">Show Paths</button>
+            <button type="button" id="button1">Path 1</button>
+            <button type="button" id="button2">Path 2</button>
+            <button type="button" id="button3">Path 3</button>
+            <button type="button" id="button4">Path 4</button>
+            <button type="button" id="button5">Path 5</button>
+            <button type="button" id="button6">Path 6</button>
 
-    <p>|</p>
+            <p>|</p>
 
-    <button type="button" id="bldg2button">Building 2</button>
-    <button type="button" id="bldg3button">Building 3</button>
-    <button type="button" id="bldg4button">Building 4</button>
-    <button type="button" id="bldg5button">Building 5</button>
-    <button type="button" id="bldg6button">Building 6</button>
-    <button type="button" id="bldg8button">Building 8</button>
-    <button type="button" id="resetButton">Reset Buildings</button>
+            <button type="button" id="bldg2button">Building 2</button>
+            <button type="button" id="bldg3button">Building 3</button>
+            <button type="button" id="bldg4button">Building 4</button>
+            <button type="button" id="bldg5button">Building 5</button>
+            <button type="button" id="bldg6button">Building 6</button>
+            <button type="button" id="bldg8button">Building 8</button>
+            <button type="button" id="resetButton">Reset Buildings</button>
 
-    <p>|</p>
+            <p>|</p>
 
-    <button type="button" id="classBldgButton">Class Buildings</button>
-    <button type="button" id="cafeButton">Cafeterias</button>
-    <button type="button" id="otherButton">Other Buildings</button>
-    <button type="button" id="resetOutlines">Reset Outlines</button>
-    <div id="map"></div>	
+            <button type="button" id="classBldgButton">Class Buildings</button>
+            <button type="button" id="cafeButton">Cafeterias</button>
+            <button type="button" id="otherButton">Other Buildings</button>
+            <button type="button" id="resetOutlines">Reset Outlines</button>
+        </div>
+        <div id="map"></div>
+    </div>
+    <!-- Eventually, at the end, div debugMap should just resolve to the div with map -->
+    
     
     <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="classSearchResult" aria-labelledby="searchResultArea">        
         <div class="offcanvas-header">

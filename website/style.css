@@ -6,8 +6,16 @@ html, body {
     background-color: #303030;
     color: #FFFFFF;
 }
+/* debugMap should be removed eventually */
+#debugMap {
+    display: grid;
+    grid-template-areas: 'left right';
+    /* grid-template-columns: repeat(2, 1fr); */
+    grid-template-rows: 80px;
+}
 #map {
     height: 90vh;
+    width: 1290px;
     color: #000000
 }
 #navbar {

@@ -184,6 +184,7 @@ function createInfoMarkers(locationCoords) {
     for (var location in locationCoords) {
         let marker = new google.maps.Marker({
             position: locationCoords[location],
+            label: location,
             map
         });
         let infoWindow = new google.maps.InfoWindow({
@@ -218,8 +219,12 @@ function showMarkersOfBuilding(buildingNumber) {
             markers[marker].setMap(map);
         }
     }
-    // can delete the else segment for user site
-    else {
-        alert(buildingNumber + " is not a valid building number.");
+    // Centers on the building marker at the building
+    for (var buildingCenterMarker in locationMarkers) {
+        let markerLabelLength = locationMarkers[buildingCenterMarker].getLabel().length;
+        if (locationMarkers[buildingCenterMarker].getLabel().charAt(markerLabelLength - 1) == buildingNumber || buildingNumber == -1) {
+            map.setCenter((buildingNumber > 0) ? locationMarkers[buildingCenterMarker].getPosition() : westHighCoords);
+            map.setZoom((buildingNumber > 0) ? 19 : 18);
+        }
     }
 }

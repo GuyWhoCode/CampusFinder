@@ -6,7 +6,7 @@
 var debugLogs = false;
 var intermediateNodesEnabled = false;
 var locationOutlinesEnabled = true;
-var buildingLabelsEnabled = false;
+var buildingLabelsEnabled = true;
 
 Storage.prototype.setObject = function(key, value) {
     this.setItem(key, JSON.stringify(value));
@@ -17,11 +17,12 @@ Storage.prototype.getObject = function(key) {
 }
 
 let map;
-let westHighCoords = { lat: 33.8468, lng: -118.3689 };
+let westHighCoords = { lat: 33.846586, lng: -118.367709 };
 let markers = [];
 let buildingSelector = 0;
 let locationMarkers = [];
 let locationOutlinesMap = new Map();
+const RESET_BUILDINGS = -1;
 let classPaths = [];
 const PERIOD0PATH = 0;
 const PERIOD1PATH = 1;
@@ -46,7 +47,6 @@ let selectedNodeImage = "./Don-Cheadle (2).png"; // maybe change these icons to 
 let neighborNodeImage = "./parking_lot_maps.png";
 // eslint-disable-next-line no-undef
 let socket = io("/");
-
 
 
 function initMap() {
@@ -120,7 +120,28 @@ function initMap() {
             
         }
     });
-    document.getElementById("button1").addEventListener('click', () => { selectedPath = PERIOD0PATH; updateSelectedLineOpacity() });
+    createCurrentPosMarker();
+    
+    /* Temporarily testing for different selectors/filters. These would be buttons, but more organized of course.  */
+    document.getElementById("showPaths").addEventListener('click', () => { 
+        sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--8104', 1: 'Reyes, Pete--6106', 2: 'Charlin-Wade, Kathryn--2117', 3: 'Jin, Jason--4102', 4: 'Cerda, Becky--3100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--8104' })
+        let rooms = Object.values(sessionStorage.getObject("userClasses")).map(val => val.split("--")[1]);
+
+        for (var period = 0; period < rooms.length - 1; period++) {
+            console.log(rooms[period]);
+            let path = findShortestPath(graph, rooms[period], rooms[period + 1]);
+            classPaths.push(drawLines(path));
+        }
+        updateSelectedLineOpacity()
+
+        if (debugLogs) {
+            console.log(shortestPath.distance);
+            for (var i = 0; i < shortestPath.path.length; i++) {
+                console.log(shortestPath.path[i]);
+            }
+        }
+    });
+    document.getElementById("button1").addEventListener('click', () => { selectedPath = PERIOD0PATH; updateSelectedLineOpacity(); });
     document.getElementById("button2").addEventListener('click', () => { selectedPath = PERIOD1PATH; updateSelectedLineOpacity() });
     document.getElementById("button3").addEventListener('click', () => { selectedPath = PERIOD2PATH; updateSelectedLineOpacity() });
     document.getElementById("button4").addEventListener('click', () => { selectedPath = PERIOD3PATH; updateSelectedLineOpacity() });
@@ -133,13 +154,12 @@ function initMap() {
     document.getElementById("bldg5button").addEventListener('click', () => { showMarkersOfBuilding(5) });
     document.getElementById("bldg6button").addEventListener('click', () => { showMarkersOfBuilding(6) });
     document.getElementById("bldg8button").addEventListener('click', () => { showMarkersOfBuilding(8) });
-    document.getElementById("resetButton").addEventListener('click', () => { showMarkersOfBuilding(-1) });
+    document.getElementById("resetButton").addEventListener('click', () => { showMarkersOfBuilding(RESET_BUILDINGS) });
 
     document.getElementById("classBldgButton").addEventListener('click', () => { showOutlinesOfBuilding("bldgs") });
     document.getElementById("cafeButton").addEventListener('click', () => { showOutlinesOfBuilding("cafe") });
     document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other") });
     document.getElementById("resetOutlines").addEventListener('click', () => { showOutlinesOfBuilding("", true) });
-    createCurrentPosMarker();
 
     /* Loads in all nodes from nodes.json into memory */
     socket.emit("requestNodes");
@@ -281,14 +301,36 @@ function createBuildingOutlines(locationOutlinesCoords) {
     }
 }
 
+// part of creating filters
 function showOutlinesOfBuilding(buildingType, reset) {
     for (let [locationType, locations] of locationOutlinesMap) {
         for (var location in locations) {
-            locations[location].setMap(locationType == buildingType || reset ? map : null);
+            if (locationType == buildingType || reset) {
+                locations[location].setMap(map);
+            }
+            else {
+                locations[location].setMap(null);
+            }
+        }
+        switch (buildingType) {
+            case "bldgs":
+                map.setCenter(westHighCoords);
+                break;
+            case "cafe":
+                map.setCenter( {lat: 33.846552, lng: -118.368392} );
+                break;
+            case "other":
+                map.setCenter( {lat: 33.847221, lng: -118.367507} );
+                break;
         }
     }
+    map.setZoom(18);
 }
 
 socket.on("loadLocationCoords", (coordsData) => {
     createInfoMarkers(coordsData);
 });
+
+
+/* Still need to organize second floors and connect their coordinates
+*/
