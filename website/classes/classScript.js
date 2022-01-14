@@ -17,6 +17,7 @@ let deletedClasses = []
 let periodsConfirmed = []
 let confirmationList = {}
 let teachers;
+let debug = true
 
 Storage.prototype.setObject = function(key, value) {
     this.setItem(key, JSON.stringify(value));
@@ -279,9 +280,11 @@ document.getElementById("homePage").addEventListener("click", ()=> {
 
 saveAllClasses.addEventListener("click", () => {
     if (Object.values(confirmationList).length >= 3) {
-        classSocket.emit("saveTeacherSelection", confirmationList)
-        sessionStorage.setObject("userClasses", confirmationList)
-        // Sets the session storage to the new class list so that the user can see the updated class list on home page
+        if (!debug) {
+            classSocket.emit("saveTeacherSelection", confirmationList)
+            sessionStorage.setObject("userClasses", confirmationList)
+            // Sets the session storage to the new class list so that the user can see the updated class list on home page
+        }
         confirmationClassMessage.innerHTML = "Success"
         confirmationDescription.innerHTML = "Your class selections have been saved."
         
@@ -311,23 +314,27 @@ saveClassesMobileBtn.addEventListener("click", () => {
     confirmationDescription.innerHTML = "Your class selections have been saved."
     confirmationModal.show()
 
-    sessionStorage.setObject("userClasses", confirmationList)
-    // Sets the session storage to the new class list so that the user can see the updated class list on home page
-    classSocket.emit("saveTeacherSelection", confirmationList)
-    // Shows success message and saves the classes for mobile
+    if (!debug) {
+        sessionStorage.setObject("userClasses", confirmationList)
+        // Sets the session storage to the new class list so that the user can see the updated class list on home page
+        classSocket.emit("saveTeacherSelection", confirmationList)
+        // Shows success message and saves the classes for mobile
+    } 
 })
 
 
-document.getElementById('confirmationClassModal').addEventListener("hidden.bs.modal", () => {
-    window.location = "/home"
-})
+// document.getElementById('confirmationClassModal').addEventListener("hidden.bs.modal", () => {
+//     window.location = "/home"
+// })
 // Redirects the user home after the confirmation class modal is closed
 
-if (sessionStorage.getItem("email") === null) {
-    window.location = "/home"
-    // If the user is not logged in, redirect them to the main screen.
-} else {
-    confirmationList["userEmail"] = sessionStorage.getItem("email")
+if (!debug) {
+    if (sessionStorage.getItem("email") === null) {
+        window.location = "/home"
+        // If the user is not logged in, redirect them to the main screen.
+    } else {
+        confirmationList["userEmail"] = sessionStorage.getItem("email")
+    }
 }
  
 if (sessionStorage.darkMode === "false") {

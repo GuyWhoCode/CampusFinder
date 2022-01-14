@@ -18,7 +18,7 @@ body {
 .preview {
     display: flex;
     flex-direction: column;
-    width: 20vw;
+    width: 75%;
     align-content: center;
     justify-content: center;
     border: 5px solid black;
@@ -34,6 +34,7 @@ body {
     display: flex;
     justify-content: space-around;
     background-color: lightgray;
+    flex-direction: column;
     /* height: 50vh; */
 }
 #lightNav {
@@ -42,8 +43,19 @@ body {
 .hoverSelect {
     display: flex;
     height: 45vh;
-    width: 25vw;
+    width: 100vw;
     align-content: center;
     justify-content: center;
     cursor: pointer;
+}
+@media (min-width: 768px) {
+    #themeChooser {
+        flex-direction: row;
+    }
+    .hoverSelect {
+        width: 25vw;
+    }
+    .preview {
+        width: 20vw;
+    }
 }

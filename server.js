@@ -1,7 +1,7 @@
 // Local Development environment: http://localhost:3000
 require("dotenv").config()
-const mongoClient = require('mongodb').MongoClient
-const dbClient = new mongoClient(process.env.uri);
+// const mongoClient = require('mongodb').MongoClient
+// const dbClient = new mongoClient(process.env.uri);
 const fileReader = require("graceful-fs")
 
 const express = require("express");
@@ -39,11 +39,12 @@ app.get("/settings", function(request, response) {
 // Express.js setup to initialize different routes of the webpage.
 
 
-const socket = require("socket.io")(server)
+const socket = require("socket.io")(server, { pingTimeout: 60000 })
+// socket.on("connect_error", ())
 socket.on('connection', io => {
     console.log("I have a connection to the website!")
-    dbClient.connect(async () => {
-        console.log("Connected to database!")
+    // dbClient.connect(async () => {
+    //     console.log("Connected to database!")
         
         io.on("requestNodes", () => {
             let nodes = fileReader.readFileSync("./nodes.json", "utf8")
@@ -128,6 +129,6 @@ socket.on('connection', io => {
         //         "darkModeOn": user.darkMode,
         //         "periods": doesUserExist[0].periods
         //     }})
-    })
+    // })
     // Database instance initialized once the socket makes a connection with the client-side website
 })

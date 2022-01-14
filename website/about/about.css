@@ -1,13 +1,15 @@
 body {
     margin: 0;
     padding: 0;
+    background-color: #303030;
+    color: #FFFFFF;
 }
 p {
     margin: 0;
 }
 .founders {
     background-position: center;
-    width: 20vw;
+    width: 15vw;
     overflow: hidden;
     background-size: cover;
     float: right;
@@ -15,9 +17,9 @@ p {
 }
 #founderTwoPFP {
     grid-area: 1 / 2;
-    margin: 0;
+    margin: 0 auto;
 }
-#description {
+.description {
     margin: 5%;
 }
 section {
@@ -26,7 +28,7 @@ section {
     grid-template-rows: auto auto;
 }
 #founderTwo {
-    grid-template-columns: auto 23vw;
+    grid-template-columns: auto 20vw;
     grid-template-rows: auto auto;
 }
 .founderTitle, #alignCenter {
@@ -35,5 +37,8 @@ section {
 .founderPics {
     display: flex;
     flex-direction: column;
-    margin-left: 5%;
+    margin: 0 auto;
+}
+.founderInfo:nth-child(even) {
+    background-color: #464647;
 }

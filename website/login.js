@@ -106,6 +106,7 @@ const createUserProfile = pfp => {
             document.getElementById("navbar").style.backgroundColor = "#554826"
             document.body.style.backgroundColor = "#303030"
             document.body.style.color = "#FFFFFF"
+            document.getElementById("userInfo").style.color = "#FFFFFF"
             // Dark Mode re-initialization for default theme
 
             classListElm.innerHTML = "Login to see saved classes and add new ones!"

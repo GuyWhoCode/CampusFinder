@@ -18,6 +18,8 @@ let roomNumber = document.getElementById("roomNumber")
 let teacherImg = document.getElementById("teacherImg")
 // eslint-disable-next-line no-undef
 let classSearchResult = new bootstrap.Offcanvas(document.getElementById("classSearchResult"))
+// eslint-disable-next-line no-undef
+let classDenialModal = new bootstrap.Modal(document.getElementById('classDenialModal'))
 
 mainSocket.emit("requestTeacher")
 mainSocket.on("teacherData", data => {
@@ -81,6 +83,7 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
     searchBar.addEventListener("submit", (event) => {
         event.preventDefault()
         if (mainSearch.value.toLowerCase().trim() === "swimming pool") return mainSocket.emit("easterEgg")
+        // Egg of the Easter
         let teacherName = mainSearch.value.split("(")[0].trim()
         let teacherInfo = findTeacherInfo(teacherName)
         if (teacherName === "" || teacherInfo === "") return;
@@ -90,8 +93,9 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
         mainSearch.value = ""
         classSearchResult.show()
         goClassSearch.style.display = "block"
+        mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar"})
+        // Snaps the map view on the center of the classroom marker zoomed in
         goClassSearch.addEventListener("click", () => {
-            console.log("this event listener is working!")
             mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar"})
         })
     })
@@ -102,6 +106,10 @@ document.getElementById("logo").addEventListener("click", () => {
     window.open("https://whs.tusd.org/", "_blank")
 })
 
+document.getElementById("changeClasses").addEventListener("click", () => {
+    if (sessionStorage.getItem("email") !== null) window.location = "/home"
+    else classDenialModal.show()
+})
 if (sessionStorage.darkMode === "false") {
     document.getElementById("navbar").style.backgroundColor = "#e9d283"
     document.body.style.backgroundColor = "#FFFFFF"

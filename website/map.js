@@ -37,7 +37,8 @@ function initMap() {
             strictBounds: false,
         },
         mapTypeId: 'satellite',
-        tilt: 0
+        tilt: 0,
+        gestureHandling: "greedy",
     });
 
     // All of this keydown listener except for numLock can be deleted for user site
@@ -171,7 +172,6 @@ socket.on("loadNodes", (nodeData) => {
                 map,
             });
         
-            /* Makes the marker bounce on click */
             marker.addListener("click", () => {
                 markers.map(val => {
                     val.setAnimation(null);
@@ -184,6 +184,7 @@ socket.on("loadNodes", (nodeData) => {
             
                 socket.emit("requestNodeInfo", {"room": selectedNode, "origin": "map"})
                 // Sends an internal request to initialize.js to pull up the Bootstrap sidebar information about the teacher
+                // Triggers when the user clicks on a marker on the map
             });
         
             markers.push(marker);
@@ -229,10 +230,15 @@ socket.on("nodeSelected", room => {
         val.setIcon(null);
         // eslint-disable-next-line eqeqeq
         if (val.getLabel() == room) {
+            let markerLat = val.getPosition().lat();
+            let markerLng = val.getPosition().lng();
+            map.setCenter({lat: markerLat, lng: markerLng})
+            map.setZoom(19)
             val.setAnimation(google.maps.Animation.BOUNCE);
             val.setIcon(selectedNodeImage);
         }
     })
+    // Triggers when user clicks on the Show Room as a result of the Search Result
 })
 
 socket.on("showSwimmingPool", () => {
@@ -240,6 +246,10 @@ socket.on("showSwimmingPool", () => {
         val.setAnimation(null);
         val.setIcon(null);
         if (val.getLabel() === "Swimming Pool") {
+            let markerLat = val.getPosition().lat();
+            let markerLng = val.getPosition().lng();
+            map.setCenter({lat: markerLat, lng: markerLng})
+            map.setZoom(20)
             val.setAnimation(google.maps.Animation.BOUNCE);
             val.setIcon(selectedNodeImage);
         }
