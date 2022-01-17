@@ -21,19 +21,25 @@ let classSearchResult = new bootstrap.Offcanvas(document.getElementById("classSe
 // eslint-disable-next-line no-undef
 let classDenialModal = new bootstrap.Modal(document.getElementById('classDenialModal'))
 
-mainSocket.emit("requestTeacher")
+const initializeTeacherAutocomplete = teacherData => {
+    teacherData.map(val => {
+        if (val.name !== undefined) {
+            let name = document.createElement("option")
+            name.value = `${val.name} (${val.room})`
+            document.getElementById("teacherAutocomplete").appendChild(name)
+        }
+        // Weeds out the database update identifier 
+    })
+    // Adds autocomplete option element to datalist -- Enables autocomplete on inputs
+}
+
+mainSocket.emit("requestTeacher", localStorage.getObject("teacherList"))
 mainSocket.on("teacherData", data => {
     teachers = data
-    data.map(val => {
-        let name = document.createElement("option")
-        name.value = `${val.name} (${val.room})`
-        document.getElementById("teacherAutocomplete").appendChild(name)
-        // Adds autocomplete option element to datalist -- Enables autocomplete on inputs
-    })
-    // localStorage.setObject("teacherList", {
-    //     "teachers": data,
-    //     "lastUpdated": Date.now()
-    // })
+    localStorage.setObject("teacherList", data)
+    // Sets persistent storage in the browser to lower the amount of requests to the database
+    
+    initializeTeacherAutocomplete(data)
     // Initializes autocomplete feature by sending an internal request through a socket to the server for teacher names
 })
 
@@ -106,13 +112,16 @@ document.getElementById("logo").addEventListener("click", () => {
     window.open("https://whs.tusd.org/", "_blank")
 })
 
-document.getElementById("changeClasses").addEventListener("click", () => {
-    if (sessionStorage.getItem("email") !== null) window.location = "/home"
-    else classDenialModal.show()
-})
+document.getElementById("changeClasses").addEventListener("click", () => sessionStorage.getItem("email") !== null ? window.location = "/home" : classDenialModal.show())
 if (sessionStorage.darkMode === "false") {
     document.getElementById("navbar").style.backgroundColor = "#e9d283"
     document.body.style.backgroundColor = "#FFFFFF"
     document.body.style.color = "#000000"
     document.getElementById("userInfo").style.color = "#000000"
+}
+
+if (localStorage.getObject("teacherList") !== null) {
+    initializeTeacherAutocomplete(localStorage.getObject("teacherList"))
+    teachers = localStorage.getObject("teacherList")
+    // Uses the local teacher list to initialize teacher autocomplete
 }

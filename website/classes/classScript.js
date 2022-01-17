@@ -16,7 +16,8 @@ let confirmationClassMessage = document.getElementById("confirmationClassMessage
 let deletedClasses = []
 let periodsConfirmed = []
 let confirmationList = {}
-let teachers;
+let teachers = localStorage.getObject("teacherList")
+// Initializes autocomplete feature by referencing local storage of teacher list
 let debug = true
 
 Storage.prototype.setObject = function(key, value) {
@@ -27,18 +28,16 @@ Storage.prototype.getObject = function(key) {
     return JSON.parse(this.getItem(key));
 }
 
-classSocket.emit("requestTeacher")
-classSocket.on("teacherData", data => {
-    teachers = data
-    Object.values(document.getElementsByClassName("classSelector")).map((elm, index) => {
-        teachers.map(val => {
+Object.values(document.getElementsByClassName("classSelector")).map((elm, index) => {
+    teachers.map(val => {
+        if (val.name !== undefined) {
             let name = document.createElement("option")
             name.value = `${val.name} (${val.room})`
             document.getElementById("teacherNames" + index).appendChild(name)
-            // Adds autocomplete option element to datalist -- Enables autocomplete on inputs
-        })
+        }
+        // Weeds out the database update identifier 
     })
-    // Initializes autocomplete feature by sending an internal request through a socket to the server for teacher names
+    // Adds autocomplete option element to datalist -- Enables autocomplete on inputs
 })
 
 
@@ -323,9 +322,9 @@ saveClassesMobileBtn.addEventListener("click", () => {
 })
 
 
-// document.getElementById('confirmationClassModal').addEventListener("hidden.bs.modal", () => {
-//     window.location = "/home"
-// })
+document.getElementById('confirmationClassModal').addEventListener("hidden.bs.modal", () => {
+    window.location = "/home"
+})
 // Redirects the user home after the confirmation class modal is closed
 
 if (!debug) {

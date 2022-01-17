@@ -36,9 +36,6 @@ const initializeClassList = classes => {
 }
 
 socket.on("userData", data => {
-    if (data.periods === undefined || data.periods === {}) {
-        return classListElm.innerHTML = "Add classes with the Change Classes button below!"
-    }
     sessionStorage.setObject("userClasses", data.periods)
     if (!data.darkModeOn) {
         darkMode = false
@@ -47,7 +44,11 @@ socket.on("userData", data => {
         document.body.style.color = "#000000"
         // Light Mode initialization
     }
-    sessionStorage.darkMode = darkMode
+    sessionStorage.darkMode = data.darkModeOn
+
+    if (data.periods === undefined || data.periods === {} || Object.values(data.periods).length === 0) {
+        return classListElm.innerHTML = "Add classes with the Change Classes button below!"
+    }
     initializeClassList(data.periods)
 })
 // Initializes the class list when the user has logged in and saves it locally; also initializes theme
@@ -92,7 +93,7 @@ const createUserProfile = pfp => {
 
             let login = document.createElement("a")
             login.id = "login"
-            login.innerHTML = "Login"
+            login.innerHTML = "Login with Google"
             login.className = "dropdown-item"
             loginElm.appendChild(login)
 
