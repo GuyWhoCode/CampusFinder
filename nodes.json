@@ -699,8 +699,8 @@
 		"isRoom": false
 	},
 	"P": {
-		"lat": 33.84525385116189,
-		"lng": -118.36766728287078,
+		"lat": 33.84530675889785,
+		"lng": -118.36767532949783,
 		"neighbors": [
 			"B",
 			"O"
@@ -708,8 +708,8 @@
 		"isRoom": false
 	},
 	"R": {
-		"lat": 33.84587448484884,
-		"lng": -118.36751842027046,
+		"lat": 33.8458750417685,
+		"lng": -118.36752914910652,
 		"neighbors": [
 			"O",
 			"2113"
@@ -731,25 +731,25 @@
 		"neighbors": [
 			"G",
 			"O",
-			"U"
+			"Library"
 		],
 		"isRoom": false
 	},
-	"U": {
-		"lat": 33.84638408587565,
-		"lng": -118.36755655490552,
+	"Library": {
+		"lat": 33.84636960604956,
+		"lng": -118.36752906226312,
 		"neighbors": [
 			"V",
 			"T",
 			"Main Entrance"
 		],
-		"isRoom": false
+		"isRoom": true
 	},
 	"V": {
 		"lat": 33.84653291870496,
 		"lng": -118.36760617577228,
 		"neighbors": [
-			"U",
+			"Library",
 			"AA",
 			"AF",
 			"Main Entrance"
@@ -934,7 +934,7 @@
 			"AQ",
 			"AR",
 			"College and Career Center",
-			"Pavillion2"
+			"Pavilion 2"
 		],
 		"isRoom": false
 	},
@@ -942,9 +942,9 @@
 		"lat": 33.84674013304366,
 		"lng": -118.36857280266194,
 		"neighbors": [
-			"AH",
 			"AP",
-			"5SouthBathroom"
+			"5SouthBathroom",
+			"ZY"
 		],
 		"isRoom": false
 	},
@@ -965,7 +965,7 @@
 		"neighbors": [
 			"AS",
 			"College and Career Center",
-			"Pavillion2"
+			"Pavilion 2"
 		],
 		"isRoom": true
 	},
@@ -976,7 +976,7 @@
 			"Gym 1",
 			"AT",
 			"N",
-			"Pavillion2",
+			"Pavilion 2",
 			"College and Career Center",
 			"AP",
 			"AO"
@@ -1100,9 +1100,9 @@
 	},
 	"BG": {
 		"lat": 33.84767186500117,
-		"lng": -118.36724004313392,
+		"lng": -118.367253454179,
 		"neighbors": [
-			"PAC 1",
+			"PAC 2",
 			"8101",
 			"8107",
 			"8105",
@@ -1111,17 +1111,20 @@
 		"isRoom": false
 	},
 	"8 Gate": {
-		"lat": 33.84722213767378,
-		"lng": -118.36702932689823,
+		"lat": 33.84722659296071,
+		"lng": -118.36702798579373,
 		"neighbors": [
 			"AX"
 		],
 		"isRoom": true
 	},
-	"PAC 1": {
+	"PAC 2": {
 		"lat": 33.848105626645086,
 		"lng": -118.36725803461749,
-		"neighbors": [],
+		"neighbors": [
+			"YZ",
+			"BG"
+		],
 		"isRoom": true
 	},
 	"Stadium 2": {
@@ -1155,23 +1158,24 @@
 		"neighbors": [
 			"AB",
 			"V",
-			"U"
+			"Library",
+			"YW"
 		],
 		"isRoom": true
 	},
 	"Portable 1": {
-		"lat": 33.8476544,
-		"lng": -118.3687471,
+		"lat": 33.84739265281032,
+		"lng": -118.3680631367012,
 		"neighbors": [],
 		"isRoom": true
 	},
-	"Pavillion1": {
+	"Pavilion 1": {
 		"lat": 33.8466626,
 		"lng": -118.3686066,
 		"neighbors": [],
 		"isRoom": true
 	},
-	"Pavillion2": {
+	"Pavilion 2": {
 		"lat": 33.8469928,
 		"lng": -118.3687411,
 		"neighbors": [
@@ -1187,7 +1191,7 @@
 		"lat": 33.847126497637596,
 		"lng": -118.36867297668648,
 		"neighbors": [
-			"Pavillion2",
+			"Pavilion 2",
 			"AS",
 			"Gym 1",
 			"AP",
@@ -1280,6 +1284,68 @@
 			"4103",
 			"4105",
 			"C"
+		],
+		"isRoom": false
+	},
+	"Library Back": {
+		"lat": 33.84597640902958,
+		"lng": -118.3674955742968,
+		"neighbors": [
+			"R"
+		],
+		"isRoom": true
+	},
+	"ZY": {
+		"lat": 33.84666220954356,
+		"lng": -118.36857369590345,
+		"neighbors": [
+			"Pavilion 1",
+			"AH",
+			"AQ"
+		],
+		"isRoom": false
+	},
+	"PAC Main Entrance": {
+		"lat": 33.84830268432162,
+		"lng": -118.36699284886764,
+		"neighbors": [],
+		"isRoom": true
+	},
+	"YZ": {
+		"lat": 33.848107596934724,
+		"lng": -118.36681066887836,
+		"neighbors": [
+			"PAC 2",
+			"YX",
+			"YY"
+		],
+		"isRoom": false
+	},
+	"YY": {
+		"lat": 33.84829917207671,
+		"lng": -118.36681335108737,
+		"neighbors": [
+			"PAC Main Entrance",
+			"YZ"
+		],
+		"isRoom": false
+	},
+	"YX": {
+		"lat": 33.84722773612786,
+		"lng": -118.36681158009299,
+		"neighbors": [
+			"8 Gate",
+			"YW",
+			"YZ"
+		],
+		"isRoom": false
+	},
+	"YW": {
+		"lat": 33.8465488961481,
+		"lng": -118.36681771779793,
+		"neighbors": [
+			"Main Entrance",
+			"YX"
 		],
 		"isRoom": false
 	}

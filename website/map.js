@@ -1,5 +1,3 @@
-
-
 /* eslint-disable no-unused-vars */
 
 /* debug enables and disables intermediate nodes */
@@ -16,12 +14,15 @@ Storage.prototype.getObject = function(key) {
     return JSON.parse(this.getItem(key));
 }
 
+sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--Main Entrance', 1: 'Reyes, Pete--8 Gate', 2: 'Charlin-Wade, Kathryn--2117', 3: 'Jin, Jason--4102', 4: 'Cerda, Becky--3100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--8104' })
+
 let map;
 let westHighCoords = { lat: 33.846586, lng: -118.367709 };
+let markersMap = {};
 let markers = [];
-let buildingSelector = 0;
 let locationMarkers = [];
-let locationOutlinesMap = new Map();
+let locationOutlines = {};
+const ADMIN = 10;
 const RESET_BUILDINGS = -1;
 let classPaths = [];
 const PERIOD0PATH = 0;
@@ -76,8 +77,9 @@ function initMap() {
         }
         /* Prints nodes (coordinates) and graph (distances) */
         else if (event.key == "Shift") {
-            console.log(nodes);
-            console.log(graph);
+            // console.log(nodes);
+            // console.log(graph);
+            console.log(markersMap);
         }
         /* Draws the shortest path from closestNodeToCurrentPos to Main Entrance */
         else if (event.key == "Control") {
@@ -86,11 +88,9 @@ function initMap() {
 
             // maps path from one period to the next
             // find a way so that paths don't just overlap and just cross each other
-            sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--8104', 1: 'Reyes, Pete--6106', 2: 'Charlin-Wade, Kathryn--2117', 3: 'Jin, Jason--4102', 4: 'Cerda, Becky--3100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--8104' })
             let rooms = Object.values(sessionStorage.getObject("userClasses")).map(val => val.split("--")[1]);
 
             for (var period = 0; period < rooms.length - 1; period++) {
-                console.log(rooms[period]);
                 let path = findShortestPath(graph, rooms[period], rooms[period + 1]);
                 classPaths.push(drawLines(path));
             }
@@ -112,19 +112,17 @@ function initMap() {
         /* Toggles Edit Mode, which lets you change the neighbors of a selected node */
         else if (event.key == "CapsLock") {
             editMode = !editMode;
-            document.getElementById("selectedNode").innerHTML = "Selected Node: " + selectedNode + " | Edit mode: " + editMode + " | " + nodes[selectedNode]["neighbors"];
+            // document.getElementById("selectedNode").innerHTML = "Selected Node: " + selectedNode + " | Edit mode: " + editMode + " | " + nodes[selectedNode]["neighbors"];
             updateNeighborVisibility();
         }
         /* Toggles location outlines visibility */
         else if (event.key == "NumLock") {
-            
         }
     });
     createCurrentPosMarker();
     
     /* Temporarily testing for different selectors/filters. These would be buttons, but more organized of course.  */
     document.getElementById("showPaths").addEventListener('click', () => { 
-        sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--8104', 1: 'Reyes, Pete--6106', 2: 'Charlin-Wade, Kathryn--2117', 3: 'Jin, Jason--4102', 4: 'Cerda, Becky--3100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--8104' })
         let rooms = Object.values(sessionStorage.getObject("userClasses")).map(val => val.split("--")[1]);
 
         for (var period = 0; period < rooms.length - 1; period++) {
@@ -148,6 +146,7 @@ function initMap() {
     document.getElementById("button5").addEventListener('click', () => { selectedPath = PERIOD4PATH; updateSelectedLineOpacity() });
     document.getElementById("button6").addEventListener('click', () => { selectedPath = PERIOD5PATH; updateSelectedLineOpacity() });
     
+    document.getElementById("adminButton").addEventListener('click', () => { showMarkersOfBuilding(ADMIN) });
     document.getElementById("bldg2button").addEventListener('click', () => { showMarkersOfBuilding(2) });
     document.getElementById("bldg3button").addEventListener('click', () => { showMarkersOfBuilding(3) });
     document.getElementById("bldg4button").addEventListener('click', () => { showMarkersOfBuilding(4) });
@@ -174,6 +173,7 @@ function initMap() {
 
 /* Takes parsed node json data from server.js socket and loads it into nodes and graph dataset */
 socket.on("loadNodes", (nodeData) => {
+    initializeMarkerMap();
     nodes = nodeData;
     for (var node in nodes) {
         // changes all rooms' isRoom flag to true
@@ -237,7 +237,6 @@ function drawLines(shortestPath, isCurrentPos) {
         path: routeCoordinates,
         geodesic: true,
         strokeColor: "#FF0000",
-        // strokeColor: "#" + Math.floor(Math.random()*16777215).toString(16),
         strokeOpacity: 1,
         strokeWeight: 4,
       });
@@ -297,21 +296,23 @@ function createBuildingOutlines(locationOutlinesCoords) {
                 map: map
             }));
         }
-        locationOutlinesMap.set(category, locationOutlinesRow);
+        locationOutlines[category] = locationOutlinesRow;
     }
 }
 
 // part of creating filters
 function showOutlinesOfBuilding(buildingType, reset) {
-    for (let [locationType, locations] of locationOutlinesMap) {
-        for (var location in locations) {
+    for (let locationType in locationOutlines) {
+        let locationsList = locationOutlines[locationType];
+        for (var location in locationsList) {
             if (locationType == buildingType || reset) {
-                locations[location].setMap(map);
+                locationsList[location].setMap(map);
             }
             else {
-                locations[location].setMap(null);
+                locationsList[location].setMap(null);
             }
         }
+
         switch (buildingType) {
             case "bldgs":
                 map.setCenter(westHighCoords);
