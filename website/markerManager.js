@@ -54,6 +54,7 @@ function createMarker(node) {
     markers.push(marker); // delete for user site. this list is used only for updateNeighborVisibility() and deleteSelectedMarker(), which will be deleted anyway
 }
 
+/* Might not use the dictionary data structure, so maybe delete this function */
 function createFloorsAndAddMarker(marker) {
     if (!Number.isNaN(parseInt(marker.getLabel()))) {
         let buildingNumber = marker.getLabel().charAt(0);
@@ -63,7 +64,7 @@ function createFloorsAndAddMarker(marker) {
             if (typeof markersMap[buildingNumber][floorNumber] === 'undefined') {
                 markersMap[buildingNumber][floorNumber] = [];      
             }
-            markersMap[buildingNumber][floorNumber].push(marker.getLabel());
+            markersMap[buildingNumber][floorNumber].push(marker);
         }
     }
     else {
@@ -115,6 +116,7 @@ function createFloorsAndAddMarker(marker) {
     }
 }
 
+/* Might not use the dictionary data structure, so maybe delete this function */
 function initializeMarkerMap() {
     for (var buildingNumber = 1; buildingNumber < 9; buildingNumber++) {
         if (buildingNumber != 7) {
@@ -279,7 +281,8 @@ function createInfoMarkers(locationCoords) {
     }
 }
 
-// part of creating filters
+/* Part of Filters for building markers 
+    Could be redundant because of the function below */
 function showMarkersOfBuilding(buildingNumber) {
     if ((buildingNumber >= 2 && buildingNumber <= 6) || buildingNumber == 8) {
         for (var marker in markers) {
@@ -297,7 +300,26 @@ function showMarkersOfBuilding(buildingNumber) {
             markers[marker].setMap(map);
         }
     }
-    // Centers on the building marker at the building
+    focusOnMarkerAtBuilding(buildingNumber);
+}
+
+/* Part of Filters for building markers for each floor*/
+function showMarkersOfBuildingAtFloor(buildingNumber, floorNumber) {
+    for (var marker in markers) {
+        let markerBuildingNumber = markers[marker].getLabel().charAt(0);
+        let markerFloorNumber = markers[marker].getLabel().charAt(1);
+
+        if (markerBuildingNumber == buildingNumber && markerFloorNumber == floorNumber) {
+            markers[marker].setMap(map);
+        }
+        else {
+            markers[marker].setMap(null);
+        }
+    }
+    focusOnMarkerAtBuilding(buildingNumber);
+}
+
+function focusOnMarkerAtBuilding(buildingNumber) {
     for (var buildingCenterMarker in locationMarkers) {
         let markerLabelLength = locationMarkers[buildingCenterMarker].getLabel().length;
         if (locationMarkers[buildingCenterMarker].getLabel().charAt(markerLabelLength - 1) == buildingNumber || buildingNumber == -1) {

@@ -6,7 +6,7 @@ html, body {
     background-color: #303030;
     color: #FFFFFF;
 }
-/* debugMap should be removed eventually */
+/* debugMap, the entire div and its buttons, should be removed for user site */
 #debugMap {
     display: grid;
     grid-template-areas: 'left right';
@@ -15,7 +15,7 @@ html, body {
 }
 #map {
     height: 90vh;
-    width: 1290px;
+    width: 1290px; /* remove this for user site*/
     color: #000000
 }
 #navbar {

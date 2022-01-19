@@ -14,11 +14,11 @@ Storage.prototype.getObject = function(key) {
     return JSON.parse(this.getItem(key));
 }
 
-sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--Main Entrance', 1: 'Reyes, Pete--8 Gate', 2: 'Charlin-Wade, Kathryn--2117', 3: 'Jin, Jason--4102', 4: 'Cerda, Becky--3100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--8104' })
+sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--Portable 1', 1: 'Reyes, Pete--8105', 2: 'Charlin-Wade, Kathryn--2117', 3: 'Jin, Jason--4102', 4: 'Cerda, Becky--3100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--8104' })
 
 let map;
 let westHighCoords = { lat: 33.846586, lng: -118.367709 };
-let markersMap = {};
+let markersMap = {}; // might delete this data structure
 let markers = [];
 let locationMarkers = [];
 let locationOutlines = {};
@@ -139,12 +139,12 @@ function initMap() {
             }
         }
     });
-    document.getElementById("button1").addEventListener('click', () => { selectedPath = PERIOD0PATH; updateSelectedLineOpacity(); });
-    document.getElementById("button2").addEventListener('click', () => { selectedPath = PERIOD1PATH; updateSelectedLineOpacity() });
-    document.getElementById("button3").addEventListener('click', () => { selectedPath = PERIOD2PATH; updateSelectedLineOpacity() });
-    document.getElementById("button4").addEventListener('click', () => { selectedPath = PERIOD3PATH; updateSelectedLineOpacity() });
-    document.getElementById("button5").addEventListener('click', () => { selectedPath = PERIOD4PATH; updateSelectedLineOpacity() });
-    document.getElementById("button6").addEventListener('click', () => { selectedPath = PERIOD5PATH; updateSelectedLineOpacity() });
+    document.getElementById("button1").addEventListener('click', () => { showPath(PERIOD0PATH) });
+    document.getElementById("button2").addEventListener('click', () => { showPath(PERIOD1PATH) });
+    document.getElementById("button3").addEventListener('click', () => { showPath(PERIOD2PATH) });
+    document.getElementById("button4").addEventListener('click', () => { showPath(PERIOD3PATH) });
+    document.getElementById("button5").addEventListener('click', () => { showPath(PERIOD4PATH) });
+    document.getElementById("button6").addEventListener('click', () => { showPath(PERIOD5PATH) });
     
     document.getElementById("adminButton").addEventListener('click', () => { showMarkersOfBuilding(ADMIN) });
     document.getElementById("bldg2button").addEventListener('click', () => { showMarkersOfBuilding(2) });
@@ -153,6 +153,15 @@ function initMap() {
     document.getElementById("bldg5button").addEventListener('click', () => { showMarkersOfBuilding(5) });
     document.getElementById("bldg6button").addEventListener('click', () => { showMarkersOfBuilding(6) });
     document.getElementById("bldg8button").addEventListener('click', () => { showMarkersOfBuilding(8) });
+    
+
+    document.getElementById("floorOneBldg4").addEventListener('click', () => { showMarkersOfBuildingAtFloor(4, 1) });
+    document.getElementById("floorTwoBldg4").addEventListener('click', () => { showMarkersOfBuildingAtFloor(4, 2) });
+    document.getElementById("floorOneBldg5").addEventListener('click', () => { showMarkersOfBuildingAtFloor(5, 1) });
+    document.getElementById("floorTwoBldg5").addEventListener('click', () => { showMarkersOfBuildingAtFloor(5, 2) });
+    document.getElementById("floorOneBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 1) });
+    document.getElementById("floorTwoBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 2) });
+    document.getElementById("floorThreeBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 3) });
     document.getElementById("resetButton").addEventListener('click', () => { showMarkersOfBuilding(RESET_BUILDINGS) });
 
     document.getElementById("classBldgButton").addEventListener('click', () => { showOutlinesOfBuilding("bldgs") });
@@ -173,7 +182,7 @@ function initMap() {
 
 /* Takes parsed node json data from server.js socket and loads it into nodes and graph dataset */
 socket.on("loadNodes", (nodeData) => {
-    initializeMarkerMap();
+    initializeMarkerMap(); // might delete this data structure
     nodes = nodeData;
     for (var node in nodes) {
         // changes all rooms' isRoom flag to true
@@ -245,6 +254,13 @@ function drawLines(shortestPath, isCurrentPos) {
       return drawnPath;
 }
 
+/* Part of Filters for class paths */
+function showPath(path) {
+    selectedPath = path;
+    updateSelectedLineOpacity();
+}
+
+/* Part of Filters for class paths */
 function updateSelectedLineOpacity() {
     for (var path = 0; path < classPaths.length; path++) {
         if (path == selectedPath) {
@@ -300,7 +316,7 @@ function createBuildingOutlines(locationOutlinesCoords) {
     }
 }
 
-// part of creating filters
+// part of creating filters for outlines
 function showOutlinesOfBuilding(buildingType, reset) {
     for (let locationType in locationOutlines) {
         let locationsList = locationOutlines[locationType];
@@ -331,7 +347,3 @@ function showOutlinesOfBuilding(buildingType, reset) {
 socket.on("loadLocationCoords", (coordsData) => {
     createInfoMarkers(coordsData);
 });
-
-
-/* Still need to organize second floors and connect their coordinates
-*/
