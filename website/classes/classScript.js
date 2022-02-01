@@ -1,5 +1,12 @@
 // eslint-disable-next-line no-undef
 const classSocket = io("/")
+Storage.prototype.setObject = function(key, value) {
+    this.setItem(key, JSON.stringify(value));
+}
+
+Storage.prototype.getObject = function(key) {
+    return JSON.parse(this.getItem(key));
+}
 let classListElm = document.getElementById("classList")
 let confirmationScreen = document.getElementById("confirmationScreen")
 let confirmTitle = document.getElementById("confirmTitle")
@@ -11,22 +18,16 @@ let saveClassesMobileBtn = document.getElementById("saveClassesMobileBtn")
 let confirmationModal = new bootstrap.Modal(document.getElementById('confirmationClassModal'))
 // eslint-disable-next-line no-undef
 let confirmClassMobile = new bootstrap.Modal(document.getElementById('confirmClassMobile'))
-let confirmationDescription = document.getElementById("confirmationDescription")
+let confirmationDescription = document.getElementById("confirmationDescript9ion")
 let confirmationClassMessage = document.getElementById("confirmationClassMessage")
 let deletedClasses = []
 let periodsConfirmed = []
 let confirmationList = {}
 let teachers = localStorage.getObject("teacherList")
 // Initializes autocomplete feature by referencing local storage of teacher list
-let debug = true
+let debug = false
 
-Storage.prototype.setObject = function(key, value) {
-    this.setItem(key, JSON.stringify(value));
-}
 
-Storage.prototype.getObject = function(key) {
-    return JSON.parse(this.getItem(key));
-}
 
 Object.values(document.getElementsByClassName("classSelector")).map((elm, index) => {
     teachers.map(val => {

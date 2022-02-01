@@ -21,7 +21,13 @@ let classSearchResult = new bootstrap.Offcanvas(document.getElementById("classSe
 // eslint-disable-next-line no-undef
 let classDenialModal = new bootstrap.Modal(document.getElementById('classDenialModal'))
 
+// eslint-disable-next-line no-undef
+let betaInformationModal = new bootstrap.Modal(document.getElementById('betaInformationModal'))
+betaInformationModal.show()
+// TEMP
+
 const initializeTeacherAutocomplete = teacherData => {
+    console.log("I am being called!")
     teacherData.map(val => {
         if (val.name !== undefined) {
             let name = document.createElement("option")
@@ -112,13 +118,17 @@ document.getElementById("logo").addEventListener("click", () => {
     window.open("https://whs.tusd.org/", "_blank")
 })
 
-document.getElementById("changeClasses").addEventListener("click", () => sessionStorage.getItem("email") !== null ? window.location = "/home" : classDenialModal.show())
+document.getElementById("changeClasses").addEventListener("click", () => sessionStorage.getItem("email") !== null ? window.location = "/class" : classDenialModal.show())
 if (sessionStorage.darkMode === "false") {
     document.getElementById("navbar").style.backgroundColor = "#e9d283"
+    document.getElementById("searchButton").style.backgroundColor = "#554826"
+    document.getElementById("searchButton").style.color = "#FFFFFF"
+    document.getElementById("quickLinks").className = "dropdown-menu dropdown-menu-end"
     document.body.style.backgroundColor = "#FFFFFF"
     document.body.style.color = "#000000"
     document.getElementById("userInfo").style.color = "#000000"
 }
+// Initializes light mode based on cached session storage
 
 if (localStorage.getObject("teacherList") !== null) {
     initializeTeacherAutocomplete(localStorage.getObject("teacherList"))

@@ -29,10 +29,10 @@ function initMap() {
         zoom: 18,
         restriction: {
             latLngBounds: {
-                north: 33.848694,
-                south: 33.844939,
-                west: -118.371160,
-                east: -118.365098,
+                north: 33.849826,
+                south: 33.843603,
+                west: -118.373926,
+                east: -118.363444,
             },
             strictBounds: false,
         },

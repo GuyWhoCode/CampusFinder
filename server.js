@@ -40,11 +40,11 @@ app.get("/settings", function(request, response) {
 
 
 const socket = require("socket.io")(server, { pingTimeout: 60000 })
-socket.on('connection', io => {
-    console.log("I have a connection to the website!")
-    dbClient.connect(async () => {
-        console.log("Connected to database!")
-        
+dbClient.connect(async () => {
+    console.log("Connected to database!")
+    socket.on('connection', io => {
+        console.log("I have a connection to the website!")
+
         io.on("requestNodes", () => {
             let nodes = fileReader.readFileSync("./nodes.json", "utf8")
             socket.emit("loadNodes", JSON.parse(nodes))
@@ -79,7 +79,7 @@ socket.on('connection', io => {
             }
 
             let dbLastUpdated = await teacherDB.find({"identifier": "teacherUpdated"}).toArray()
-            if (dbLastUpdated[0].lastUpdated !== localData.lastUpdated) {
+            if (dbLastUpdated[0].lastUpdated !== localData.filter(val => val.lastUpdated !== undefined)[0].lastUpdated) {
                 let teacherData = await teacherDB.find({}).toArray()
                 return socket.emit("teacherData", teacherData)
                 // Re-sends the teacher list if there are any changes (noted with the changing last updated)
@@ -97,7 +97,6 @@ socket.on('connection', io => {
             if (userInfo.length === 0) return;
             userDB.updateOne({"email": userEmail}, 
                 {$set: {
-                    "userName": userInfo[0].userName,
                     "email": userEmail,
                     "url": userInfo[0].url,
                     "admin": userInfo[0].admin,
@@ -112,10 +111,9 @@ socket.on('connection', io => {
             let doesUserExist = await userDB.find({"email": user.email}).toArray()
             if (doesUserExist.length === 0) {
                 userDB.insertOne({
-                    "userName": user.displayName,
                     "email": user.email,
                     "url": user.photoURL,
-                    "admin": true,
+                    "admin": false,
                     "darkModeOn": true,
                     "periods": {}
                 })
@@ -163,7 +161,6 @@ socket.on('connection', io => {
             let userProfile = await userDB.find({"email": userSettings.userEmail}).toArray()
             userDB.updateOne({"email": userSettings.userEmail}, 
                 {$set: {
-                    "userName": userProfile[0].userName,
                     "email": userProfile[0].email,
                     "url": userProfile[0].url,
                     "admin": userProfile[0].admin,
@@ -174,6 +171,29 @@ socket.on('connection', io => {
             // Saves settings from preferences page in database
         })
         
+        io.on("empowerUser", async(userInfo) => {
+            let userDB = dbClient.db("campusInfo").collection("users")
+            let doesUserExist = await userDB.find({"email": userInfo.email}).toArray()
+            if (doesUserExist.length === 0) return socket.emit("requireProfile")
+
+            userDB.updateOne({"email": userInfo.email}, 
+                {$set: {
+                    "email": doesUserExist[0].email,
+                    "url": doesUserExist[0].url,
+                    "admin": userInfo.permission,
+                    "darkModeOn": doesUserExist[0].darkModeOn,
+                    "periods": doesUserExist[0].periods
+                }
+            })
+            // Empowers the user by updating the change privileges to the admin page
+        })
+
+        io.on("deleteAccount", userEmail => {
+            let userDB = dbClient.db("campusInfo").collection("users")
+            userDB.deleteOne({"email": userEmail})
+            // Deletes a user's profile from the database
+        })
+
     })
-    // Database instance initialized once the socket makes a connection with the client-side website
 })
+// Database instance initialized before the socket makes a connection with the client-side website to lower the amount of connections established to the database

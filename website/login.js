@@ -40,6 +40,9 @@ socket.on("userData", data => {
     if (!data.darkModeOn) {
         darkMode = false
         document.getElementById("navbar").style.backgroundColor = "#e9d283"
+        document.getElementById("searchButton").style.backgroundColor = "#554826"
+        document.getElementById("searchButton").style.color = "#FFFFFF"
+        document.getElementById("quickLinks").className = "dropdown-menu dropdown-menu-end"
         document.body.style.backgroundColor = "#FFFFFF"
         document.body.style.color = "#000000"
         // Light Mode initialization
@@ -105,6 +108,9 @@ const createUserProfile = pfp => {
             sessionStorage.clear()
 
             document.getElementById("navbar").style.backgroundColor = "#554826"
+            document.getElementById("searchButton").style.backgroundColor = "#e9d283"
+            document.getElementById("searchButton").style.color = "#000000"
+            document.getElementById("quickLinks").className = "dropdown-menu dropdown-menu-end dropdown-menu-dark"
             document.body.style.backgroundColor = "#303030"
             document.body.style.color = "#FFFFFF"
             document.getElementById("userInfo").style.color = "#FFFFFF"
@@ -128,9 +134,6 @@ const createUserProfile = pfp => {
 
 getRedirectResult(auth)
 .then((result) => {
-    // This gives you a Google Access Token. You can use it to access Google APIs.
-    const credential = GoogleAuthProvider.credentialFromResult(result)
-    const token = credential.accessToken
     // The signed-in user info.
     const user = result.user
     
@@ -142,15 +145,7 @@ getRedirectResult(auth)
     
     socket.emit("userLogin", user)
     // Sends an internal socket request to the server-side to be stored
-}).catch((error) => {
-    // Handle Errors here.
-    const errorCode = error.code
-    const errorMessage = error.message
-    // The email of the user's account used.
-    const email = error.email
-    // The AuthCredential type that was used.
-    const credential = GoogleAuthProvider.credentialFromError(error)
-});
+})
 
 if (sessionStorage.getItem("email") !== null) {
     createUserProfile(sessionStorage.getItem("userPic"), sessionStorage.getItem("username"))

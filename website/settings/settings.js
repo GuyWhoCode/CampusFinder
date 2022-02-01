@@ -45,6 +45,23 @@ chooseDark.addEventListener("change", showDarkMode)
 document.getElementsByClassName("hoverSelect")[0].addEventListener("click", showDarkMode)
 // Enables Dark mode toggle on the whole element and the slider
 
+document.getElementById("deleteAccountBtn").addEventListener("click", () => {
+    // eslint-disable-next-line no-undef
+    let deletionModal = new bootstrap.Modal(document.getElementById('deletionModal'))
+    deletionModal.show()
+    // Opens the deletion modal message
+
+    document.getElementById("confirmDeletionAccount").addEventListener("click", () => {
+        settingsSocket.emit("deleteAccount", sessionStorage.getItem("email"))
+        sessionStorage.clear()
+        window.location = "/home"
+        // Resets window to delete settings locally and return back to home.
+    })
+    // Adds the command to delete account by sending an internal socket request to the "Confirm Deletion" button 
+})
+    
+
+
 if (sessionStorage.getItem("email") === null) {
     window.location = "/home"
     // If the user is not logged in, redirect them to the main screen.

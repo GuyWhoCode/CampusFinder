@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Campus Finder">
+    <meta property="og:description" content="Helping you find your way on campus.">
+    <meta property="og:image" content="./img2.jpg"> 
+    <!-- Placeholder image for logo when link is posted on platform with rich link embed -->
     <title>Campus Finder</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,10 +23,10 @@
     <div id="navbar">
         <img src="./logo.png" alt="WHS Logo" class=".img-fluid" id="logo">
         <div id="searchBox">
-            <form class="d-flex" action="." id="searchBar">
+            <form class="d-flex" action="." id="searchBar" autocomplete="off">
                 <input class="form-control" type="search" placeholder="Search Teacher or Classroom" aria-label="Search" id="mainSearch" list="teacherAutocomplete">
                 <datalist id="teacherAutocomplete"></datalist>
-                <button class="btn btn-primary" type="submit" id="searchButton">
+                <button class="btn" type="submit" id="searchButton">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
                         <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
                     </svg>
@@ -40,6 +45,8 @@
                 <li><a class="dropdown-item" data-bs-toggle="offcanvas" href="#classesSidebar" role="button" aria-controls="classesSidebar">View Classes</a></li>
                 <li><a class="dropdown-item" href="/admin">Admin Dashboard</a></li>
                 <li><a class="dropdown-item" href="/settings">Preferences</a></li>
+                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#betaInformationModal">Beta Information</a></li>
+                <!-- TEMP for Beta Information -->
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" id="loginElm">Login with Google</a></li>
             </ul>
@@ -126,8 +133,43 @@
             </div>
         </div>
     </div>
+    <!-- Error message from Bootstrap Modal when user is not logged in -->
 
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCaLWlcr-27e1s6xXMQuXczqfE-Yore6XY&callback=initMap"></script>
+    <div class="modal fade" tabindex="-1" aria-labelledby="betaInformationModal" aria-hidden="true" id="betaInformationModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Beta Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Hello voluntary beta tester (hopefully). Welcome to Campus Finder, an application that helps students navigate their way through campus. This application is part of a year-long project for the Engineering, Design, and Development (EDD) class at West, where there's only eight of us!
+                    <br>
+                    <br>
+                    Since we intend on students at West to use our app, it's only fair that we have the current students conduct tests beyond our internal ones. If you need to bring this page back again, simply click on the User icon on the top right and select "Beta Information." Here's what we want you to do:
+                    <br>
+                    <ol>
+                        <li>Search for a teacher with the search bar and see if their room location is relatively accurate</li>
+                        <li>Search for a building at West and ensure that its location is accurate and that it works.</li>
+                        <li>Login with Google and input your classes.</li>
+                        <li>Check if the path outlined in the Google map is reasonable.</li>
+                    </ol>
+                    
+                    <br>
+                    Thanks,
+                    <br>
+                    The Campus Finder Team: Jason A., Ian, and Jay
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- TEMP Temporary message telling beta testers what to do -->
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtf2i8Rq17iUueu_UCw3q0x4_K4Pav7iI&callback=initMap"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="./initialize.js"></script>
     <script src="./offlineLib.js" defer></script>

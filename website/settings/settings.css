@@ -2,6 +2,9 @@ body {
     margin: 0;
     padding: 0;
 }
+h1 {
+    text-align: center;
+}
 .horizontal {
     display: flex;
     flex-direction: row;
@@ -39,6 +42,10 @@ body {
 }
 #lightNav {
     background-color: #e9d283;
+}
+#deleteAccountBtn {
+    display: block;
+    margin: 0 auto;
 }
 .hoverSelect {
     display: flex;
