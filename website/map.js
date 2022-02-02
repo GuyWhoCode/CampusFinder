@@ -100,7 +100,6 @@ function initMap() {
         /* Toggles Edit Mode, which lets you change the neighbors of a selected node */
         else if (event.key == "CapsLock") {
             editMode = !editMode;
-            // document.getElementById("selectedNode").innerHTML = "Selected Node: " + selectedNode + " | Edit mode: " + editMode + " | " + nodes[selectedNode]["neighbors"];
             updateNeighborVisibility();
         }
         else if (event.key == "NumLock") {
@@ -173,7 +172,7 @@ socket.on("loadNodes", (nodeData) => {
         graph[node] = {};
         // loads each node and its neighbors into the graph
         for (var neighbor = 0; neighbor < nodes[node]["neighbors"].length; neighbor++) {
-            graph[node][nodes[node]["neighbors"][neighbor]] = distance(nodes[node]["lat"], nodes[node]["lng"], nodes[nodes[node]["neighbors"][neighbor]]["lat"], nodes[nodes[node]["neighbors"][neighbor]]["lng"]);
+            graph[node][nodes[node]["neighbors"][neighbor]] = google.maps.geometry.spherical.computeDistanceBetween( { lat: nodes[node]["lat"], lng: nodes[node]["lng"] }, { lat: nodes[nodes[node]["neighbors"][neighbor]]["lat"], lng: nodes[nodes[node]["neighbors"][neighbor]]["lng"] } );
         }
         if (nodes[node].isRoom || intermediateNodesEnabled) {
             createMarker(node);
