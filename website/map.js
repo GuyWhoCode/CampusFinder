@@ -2,10 +2,10 @@
 
 /* debug enables and disables intermediate nodes */
 var debugLogs = false;
-var intermediateNodesEnabled = false;
+var intermediateNodesEnabled = true;
 var locationOutlinesEnabled = true;
 var buildingLabelsEnabled = true;
-
+``
 Storage.prototype.setObject = function(key, value) {
     this.setItem(key, JSON.stringify(value));
 }
@@ -14,11 +14,10 @@ Storage.prototype.getObject = function(key) {
     return JSON.parse(this.getItem(key));
 }
 
-sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--Portable 1', 1: 'Reyes, Pete--8105', 2: 'Charlin-Wade, Kathryn--2117', 3: 'Jin, Jason--4102', 4: 'Cerda, Becky--3100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--8104' })
+sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--Portable 1', 1: 'Reyes, Pete--8105', 2: 'Charlin-Wade, Kathryn--2117', 3: 'Jin, Jason--3204', 4: 'Cerda, Becky--6100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--8104' })
 
 let map;
 let westHighCoords = { lat: 33.846586, lng: -118.367709 };
-let markersMap = {}; // might delete this data structure
 let markers = [];
 let locationMarkers = [];
 let locationOutlines = {};
@@ -77,9 +76,9 @@ function initMap() {
         }
         /* Prints nodes (coordinates) and graph (distances) */
         else if (event.key == "Shift") {
-            // console.log(nodes);
-            // console.log(graph);
-            console.log(markersMap);
+            console.log(nodes);
+            console.log(graph);
+            // console.log(markersMap);
         }
         /* Draws the shortest path from closestNodeToCurrentPos to Main Entrance */
         else if (event.key == "Control") {
@@ -88,13 +87,8 @@ function initMap() {
 
             // maps path from one period to the next
             // find a way so that paths don't just overlap and just cross each other
-            let rooms = Object.values(sessionStorage.getObject("userClasses")).map(val => val.split("--")[1]);
-
-            for (var period = 0; period < rooms.length - 1; period++) {
-                let path = findShortestPath(graph, rooms[period], rooms[period + 1]);
-                classPaths.push(drawLines(path));
-            }
-            updateSelectedLineOpacity()
+            createPeriodPaths();
+            showPath(PERIOD0PATH);
 
             if (debugLogs) {
                 console.log(shortestPath.distance);
@@ -102,12 +96,6 @@ function initMap() {
                     console.log(shortestPath.path[i]);
                 }
             }
-            /* Deletes the previous path before creating another path */
-            // if (lines != null) {
-            //     lines.setMap(null);
-            //     lines = null;
-            // }
-            // lines = drawLines(shortestPath);
         }
         /* Toggles Edit Mode, which lets you change the neighbors of a selected node */
         else if (event.key == "CapsLock") {
@@ -115,30 +103,20 @@ function initMap() {
             // document.getElementById("selectedNode").innerHTML = "Selected Node: " + selectedNode + " | Edit mode: " + editMode + " | " + nodes[selectedNode]["neighbors"];
             updateNeighborVisibility();
         }
-        /* Toggles location outlines visibility */
         else if (event.key == "NumLock") {
         }
     });
     createCurrentPosMarker();
     
     /* Temporarily testing for different selectors/filters. These would be buttons, but more organized of course.  */
-    document.getElementById("showPaths").addEventListener('click', () => { 
-        let rooms = Object.values(sessionStorage.getObject("userClasses")).map(val => val.split("--")[1]);
-
-        for (var period = 0; period < rooms.length - 1; period++) {
-            console.log(rooms[period]);
-            let path = findShortestPath(graph, rooms[period], rooms[period + 1]);
-            classPaths.push(drawLines(path));
+    document.getElementById("showPaths").addEventListener('click', () => {
+        if (classPaths.length == 0) {
+            createPeriodPaths();
         }
-        updateSelectedLineOpacity()
-
-        if (debugLogs) {
-            console.log(shortestPath.distance);
-            for (var i = 0; i < shortestPath.path.length; i++) {
-                console.log(shortestPath.path[i]);
-            }
-        }
+        showAllPaths();
+        showPath(selectedPath);
     });
+    document.getElementById("hidePaths").addEventListener('click', () => { hidePeriodPaths() });
     document.getElementById("button1").addEventListener('click', () => { showPath(PERIOD0PATH) });
     document.getElementById("button2").addEventListener('click', () => { showPath(PERIOD1PATH) });
     document.getElementById("button3").addEventListener('click', () => { showPath(PERIOD2PATH) });
@@ -182,13 +160,12 @@ function initMap() {
 
 /* Takes parsed node json data from server.js socket and loads it into nodes and graph dataset */
 socket.on("loadNodes", (nodeData) => {
-    initializeMarkerMap(); // might delete this data structure
     nodes = nodeData;
     for (var node in nodes) {
         // changes all rooms' isRoom flag to true
         // everything from here to the next comment can be removed for user site
         nodes[node]["isRoom"] = false;
-        if (node.length > 2) {
+        if (node.length > 3) {
             nodes[node]["isRoom"] = true;
         }
         //
@@ -220,6 +197,8 @@ socket.on("loadNodes", (nodeData) => {
             currentLat = position.coords.latitude;
             currentLng = position.coords.longitude;
             findClosestNodeToCurrentPos();
+            // shortestPath
+            // drawLines()
           },
           () => {
             alert("Error: The Geolocation service failed.");
@@ -231,46 +210,6 @@ socket.on("loadNodes", (nodeData) => {
         alert("Error: Your browser doesn't support geolocation.");
       }
 });
-
-/* Code sample from https://developers.google.com/maps/documentation/javascript/examples/polyline-simple */
-function drawLines(shortestPath, isCurrentPos) {
-    let routeCoordinates = [];
-    if (isCurrentPos) {
-        routeCoordinates.push({ lat: currentLat, lng: currentLng })
-    }
-    for (var i = 0; i < shortestPath.path.length; i++) {
-        let node = shortestPath.path[i];
-        routeCoordinates.push({ lat: nodes[node]["lat"], lng: nodes[node]["lng"] });
-    }
-    drawnPath = new google.maps.Polyline({
-        path: routeCoordinates,
-        geodesic: true,
-        strokeColor: "#FF0000",
-        strokeOpacity: 1,
-        strokeWeight: 4,
-      });
-
-      drawnPath.setMap(map);
-      return drawnPath;
-}
-
-/* Part of Filters for class paths */
-function showPath(path) {
-    selectedPath = path;
-    updateSelectedLineOpacity();
-}
-
-/* Part of Filters for class paths */
-function updateSelectedLineOpacity() {
-    for (var path = 0; path < classPaths.length; path++) {
-        if (path == selectedPath) {
-            classPaths[path].setOptions({ strokeOpacity: 1 });
-        }
-        else {
-            classPaths[path].setOptions({ strokeOpacity: 0.1 });
-        }
-    }
-}
 
 /*  Calculates the distance in meters between two points with the latitude and longitude of each
     https://www.movable-type.co.uk/scripts/latlong.html */

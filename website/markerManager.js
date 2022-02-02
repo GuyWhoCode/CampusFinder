@@ -37,8 +37,6 @@ function createMarker(node) {
             marker.setIcon(selectedNodeImage);
             selectedNode = marker.getLabel();
         }
-        // can delete this html for user site
-        document.getElementById("selectedNode").innerHTML = "Selected Node: " + selectedNode + " | Edit mode: " + editMode + " | " + nodes[selectedNode]["neighbors"];
     });
 
     /* Updates the marker's coordinates in the nodes when they are dragged, delete for user site*/
@@ -49,87 +47,7 @@ function createMarker(node) {
         }
     });
 
-    createFloorsAndAddMarker(marker);
-
     markers.push(marker); // delete for user site. this list is used only for updateNeighborVisibility() and deleteSelectedMarker(), which will be deleted anyway
-}
-
-/* Might not use the dictionary data structure, so maybe delete this function */
-function createFloorsAndAddMarker(marker) {
-    if (!Number.isNaN(parseInt(marker.getLabel()))) {
-        let buildingNumber = marker.getLabel().charAt(0);
-        let floorNumber = marker.getLabel().charAt(1);
-
-        if (!Number.isNaN(parseInt(floorNumber))) {
-            if (typeof markersMap[buildingNumber][floorNumber] === 'undefined') {
-                markersMap[buildingNumber][floorNumber] = [];      
-            }
-            markersMap[buildingNumber][floorNumber].push(marker);
-        }
-    }
-    else {
-        /* This hardcoding of rooms seems abysmal, dreadful, inelegant, atrocious, deplorable, appalling, disgraceful, reprehensible, inexcusable, absolutely unprofessional, shameful even,
-            but it's only 20 locations and there's like 100 markers in total, it's not that bad. */
-        switch (marker.getLabel()) {
-            case "Attendance Window":
-            case "Health Office":
-                markersMap[1][marker.getLabel()] = marker;
-                break; 
-            case "Band":
-                markersMap[8][1].push(marker);
-                break;
-            case "Main Entrance":
-            case "Back Entrance":
-            case "Side Gate 1":
-            case "Parking Lot Gate":
-                markersMap["Entrances"][marker.getLabel()] = marker;
-                break;
-            case "PAC Main Entrance":
-            case "PAC 2":
-                markersMap["PAC"][marker.getLabel()] = marker;
-                break;
-            case "Library":
-            case "Library Back":
-                markersMap["Library"][marker.getLabel()] = marker;
-                break;
-            case "Gym 1":
-            case "Gym 2":
-            case "College and Career Center":
-            case "Portable 1":
-                markersMap["Gym"][marker.getLabel()] = marker;
-                break;
-            case "Pavilion 1":
-            case "Pavilion 2":
-                markersMap["Pavilion"][marker.getLabel()] = marker;
-                break;
-            case "Stadium 1":
-            case "Stadium 2":
-                markersMap["Stadium"][marker.getLabel()] = marker;
-                break;
-            case "Wimbledon":
-            case "Mr. Holt's Stomping Grounds":
-                markersMap["Fields"][marker.getLabel()] = marker;
-                break;
-            default:
-                markersMap[marker.getLabel()] = marker;
-        }
-    }
-}
-
-/* Might not use the dictionary data structure, so maybe delete this function */
-function initializeMarkerMap() {
-    for (var buildingNumber = 1; buildingNumber < 9; buildingNumber++) {
-        if (buildingNumber != 7) {
-            markersMap[buildingNumber] = {};
-        }
-    }
-    markersMap["Entrances"] = {};
-    markersMap["PAC"] = {};
-    markersMap["Library"] = {};
-    markersMap["Gym"] = {};
-    markersMap["Pavilion"] = {};
-    markersMap["Stadium"] = {};
-    markersMap["Fields"] = {};
 }
 
 /* Delete this function for user site */
