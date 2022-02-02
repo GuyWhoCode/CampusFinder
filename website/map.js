@@ -5,7 +5,7 @@ var debugLogs = false;
 var intermediateNodesEnabled = true;
 var locationOutlinesEnabled = true;
 var buildingLabelsEnabled = true;
-``
+
 Storage.prototype.setObject = function(key, value) {
     this.setItem(key, JSON.stringify(value));
 }
