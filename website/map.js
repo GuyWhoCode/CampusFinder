@@ -2,7 +2,7 @@
 
 /* debug enables and disables intermediate nodes */
 var debugLogs = false;
-var intermediateNodesEnabled = true;
+var intermediateNodesEnabled = false;
 var locationOutlinesEnabled = true;
 var buildingLabelsEnabled = true;
 
@@ -237,6 +237,9 @@ function createBuildingOutlines(locationOutlinesCoords) {
                 break;
             case "other":
                 color = "#d7e336";
+                break;
+            case "stairs":
+                color = "#9e6f18";
                 break;
         }
         for (var location in locationOutlinesCoords[category]) {
