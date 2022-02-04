@@ -14,7 +14,7 @@ Storage.prototype.getObject = function(key) {
     return JSON.parse(this.getItem(key));
 }
 
-sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--Portable 1', 1: 'Reyes, Pete--8105', 2: 'Charlin-Wade, Kathryn--2117', 3: 'Jin, Jason--3204', 4: 'Cerda, Becky--6100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--8104' })
+sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--4203', 1: 'Reyes, Pete--Gym 1', 2: 'Charlin-Wade, Kathryn--2117', 3: 'Jin, Jason--3204', 4: 'Cerda, Becky--6100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--8104' })
 
 let map;
 let westHighCoords = { lat: 33.846586, lng: -118.367709 };

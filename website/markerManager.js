@@ -228,10 +228,10 @@ function showMarkersOfBuildingAtFloor(buildingNumber, floorNumber) {
         let markerFloorNumber = markers[marker].getLabel().charAt(1);
 
         if (markerBuildingNumber == buildingNumber && markerFloorNumber == floorNumber) {
-            markers[marker].setMap(map);
+            markers[marker].setMap(null);
         }
         else {
-            markers[marker].setMap(null);
+            markers[marker].setMap(map);
         }
     }
     focusOnMarkerAtBuilding(buildingNumber);
