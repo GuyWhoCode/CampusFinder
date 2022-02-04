@@ -98,6 +98,9 @@ function createBuildingShapes() {
             case "other":
                 color = "#d7e336";
                 break;
+            case "stairs":
+                color = "#fcba03";
+                break;
         }
         for (var location in locationOutlinesCoords[category]) {
             locationOutlines.push(new google.maps.Polygon({
