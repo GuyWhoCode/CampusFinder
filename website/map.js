@@ -14,7 +14,7 @@ Storage.prototype.getObject = function(key) {
     return JSON.parse(this.getItem(key));
 }
 
-sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--4203', 1: 'Reyes, Pete--Gym 1', 2: 'Charlin-Wade, Kathryn--2117', 3: 'Jin, Jason--3204', 4: 'Cerda, Becky--6100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--8104' })
+sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--5201', 1: 'Reyes, Pete--5200', 2: 'Charlin-Wade, Kathryn--5100', 3: 'Jin, Jason--3101', 4: 'Cerda, Becky--6100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--4210' })
 
 let map;
 let westHighCoords = { lat: 33.846586, lng: -118.367709 };
@@ -143,7 +143,7 @@ function initMap() {
 
     document.getElementById("classBldgButton").addEventListener('click', () => { showOutlinesOfBuilding("bldgs") });
     document.getElementById("cafeButton").addEventListener('click', () => { showOutlinesOfBuilding("cafe") });
-    document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other") });
+    document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other"); showStairway("S3"); });
     document.getElementById("resetOutlines").addEventListener('click', () => { showOutlinesOfBuilding("", true) });
 
     /* Loads in all nodes from nodes.json into memory */
@@ -226,7 +226,7 @@ socket.on("loadOutlines", (coordsData) => {
 
 function createBuildingOutlines(locationOutlinesCoords) {
     for (var category in locationOutlinesCoords) {
-        let locationOutlinesRow = [];
+        let locationOutlinesRow = {};
         let color;
         switch (category) {
             case "bldgs":
@@ -239,11 +239,11 @@ function createBuildingOutlines(locationOutlinesCoords) {
                 color = "#d7e336";
                 break;
             case "stairs":
-                color = "#9e6f18";
+                color = "#fc03df";
                 break;
         }
         for (var location in locationOutlinesCoords[category]) {
-            locationOutlinesRow.push(new google.maps.Polygon({
+            locationOutlinesRow[location] = new google.maps.Polygon({
                 paths: locationOutlinesCoords[category][location],
                 strokeColor: color,
                 strokeOpacity: 0.8,
@@ -251,7 +251,7 @@ function createBuildingOutlines(locationOutlinesCoords) {
                 fillColor: color,
                 fillOpacity: 0.25,
                 map: map
-            }));
+            });
         }
         locationOutlines[category] = locationOutlinesRow;
     }
@@ -269,20 +269,31 @@ function showOutlinesOfBuilding(buildingType, reset) {
                 locationsList[location].setMap(null);
             }
         }
-
-        switch (buildingType) {
-            case "bldgs":
-                map.setCenter(westHighCoords);
-                break;
-            case "cafe":
-                map.setCenter( {lat: 33.846552, lng: -118.368392} );
-                break;
-            case "other":
-                map.setCenter( {lat: 33.847221, lng: -118.367507} );
-                break;
-        }
+    }
+    switch (buildingType) {
+        case "bldgs":
+            map.setCenter(westHighCoords);
+            break;
+        case "cafe":
+            map.setCenter( {lat: 33.846552, lng: -118.368392} );
+            break;
+        case "other":
+            map.setCenter( {lat: 33.847221, lng: -118.367507} );
+            break;
     }
     map.setZoom(18);
+}
+
+function showStairway(stairway) {
+    let stairwayList = locationOutlines["stairs"];
+    for (var stairwayEntry in stairwayList) {
+        if (stairwayEntry == stairway) {
+            stairwayList[stairwayEntry].setMap(map);
+        }
+        else {
+            stairwayList[stairwayEntry].setMap(null);
+        }
+    }
 }
 
 socket.on("loadLocationCoords", (coordsData) => {

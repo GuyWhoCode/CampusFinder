@@ -3,35 +3,50 @@ function createPeriodPaths() {
     let rooms = Object.values(sessionStorage.getObject("userClasses")).map(val => val.split("--")[1]);
 
     for (var period = 0; period < rooms.length - 1; period++) {
-        let path = findShortestPath(graph, rooms[period], rooms[period + 1]);
-        classPaths.push(drawLines(path));
+        let shortestPath = findShortestPath(graph, rooms[period], rooms[period + 1]);
+        let path = [drawLines(shortestPath), shortestPath];
+        classPaths.push(path);
     }
 }
-/* Part of Filters for class paths */
-function showPath(path) {
-    selectedPath = path;
-    updateSelectedLineOpacity();
-}
+
 /* Part of Filters for class paths */
 function showAllPaths() {
     for (var period = 0; period < classPaths.length; period++) {
-        classPaths[period].setMap(map);
+        classPaths[period][0].setMap(map);
     }
 }
+
 /* Part of Filters for class paths */
 function hidePeriodPaths() {
     for (var period = 0; period < classPaths.length; period++) {
-        classPaths[period].setMap(null);
+        classPaths[period][0].setMap(null);
     }
 }
+
 /* Part of Filters for class paths */
-function updateSelectedLineOpacity() {
+function showPath(path) {
+    selectedPath = path;
+    updateSelectedPathOpacity();
+}
+
+/* Part of Filters for class paths */
+function updateSelectedPathOpacity() {
     for (var path = 0; path < classPaths.length; path++) {
         if (path == selectedPath) {
-            classPaths[path].setOptions({ strokeOpacity: 1 });
+            classPaths[path][0].setOptions({ strokeOpacity: 1 });
+            showStairsOnPath(path);
         }
         else {
-            classPaths[path].setOptions({ strokeOpacity: 0.1 });
+            classPaths[path][0].setOptions({ strokeOpacity: 0.1 });
+        }
+    }
+}
+
+function showStairsOnPath(path) {
+    let shortestPath = classPaths[path][1];
+    for (let node in shortestPath.path) {
+        if (shortestPath.path[node].charAt(0) == 'S') {
+            showStairway(shortestPath.path[node]);
         }
     }
 }
