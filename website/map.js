@@ -2,7 +2,7 @@
 
 /* debug enables and disables intermediate nodes */
 var debugLogs = false;
-var intermediateNodesEnabled = false;
+var intermediateNodesEnabled = true;
 var locationOutlinesEnabled = true;
 var buildingLabelsEnabled = true;
 
@@ -23,6 +23,7 @@ let locationMarkers = [];
 let locationOutlines = {};
 const ADMIN = 10;
 const RESET_BUILDINGS = -1;
+
 let classPaths = [];
 const PERIOD0PATH = 0;
 const PERIOD1PATH = 1;
@@ -45,6 +46,13 @@ let editMode = false; // editMode can be deleted for user site
 let selectedNode = "Main Entrance";
 let selectedNodeImage = "./Don-Cheadle (2).png"; // maybe change these icons to ones more appropriate
 let neighborNodeImage = "./parking_lot_maps.png";
+
+let altNamesClassrooms = {
+    "studentActivities": "4139C",
+    "ASB": "5107",
+    "baseballField": [],
+    "tennisCourt": []
+}
 // eslint-disable-next-line no-undef
 let socket = io("/");
 
@@ -115,7 +123,7 @@ function initMap() {
         showAllPaths();
         showPath(selectedPath);
     });
-    document.getElementById("hidePaths").addEventListener('click', () => { hidePeriodPaths() });
+    document.getElementById("hidePaths").addEventListener('click', () => { hidePeriodPaths(); });
     document.getElementById("button1").addEventListener('click', () => { showPath(PERIOD0PATH) });
     document.getElementById("button2").addEventListener('click', () => { showPath(PERIOD1PATH) });
     document.getElementById("button3").addEventListener('click', () => { showPath(PERIOD2PATH) });
@@ -123,6 +131,8 @@ function initMap() {
     document.getElementById("button5").addEventListener('click', () => { showPath(PERIOD4PATH) });
     document.getElementById("button6").addEventListener('click', () => { showPath(PERIOD5PATH) });
     
+    document.getElementById("cafe4Button").addEventListener('click', () => { hideAllMarkers(); focusOnBuilding("Cafe 4") });
+    document.getElementById("cafe5Button").addEventListener('click', () => { hideAllMarkers(); focusOnBuilding("Cafe 5") });
     document.getElementById("adminButton").addEventListener('click', () => { showMarkersOfBuilding(ADMIN) });
     document.getElementById("bldg2button").addEventListener('click', () => { showMarkersOfBuilding(2) });
     document.getElementById("bldg3button").addEventListener('click', () => { showMarkersOfBuilding(3) });
@@ -139,7 +149,7 @@ function initMap() {
     document.getElementById("floorOneBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 1) });
     document.getElementById("floorTwoBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 2) });
     document.getElementById("floorThreeBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 3) });
-    document.getElementById("resetButton").addEventListener('click', () => { showMarkersOfBuilding(RESET_BUILDINGS) });
+    document.getElementById("resetButton").addEventListener('click', () => { resetMap(); });
 
     document.getElementById("classBldgButton").addEventListener('click', () => { showOutlinesOfBuilding("bldgs") });
     document.getElementById("cafeButton").addEventListener('click', () => { showOutlinesOfBuilding("cafe") });
@@ -284,18 +294,27 @@ function showOutlinesOfBuilding(buildingType, reset) {
     map.setZoom(18);
 }
 
-function showStairway(stairway) {
-    let stairwayList = locationOutlines["stairs"];
-    for (var stairwayEntry in stairwayList) {
-        if (stairwayEntry == stairway) {
-            stairwayList[stairwayEntry].setMap(map);
-        }
-        else {
-            stairwayList[stairwayEntry].setMap(null);
-        }
-    }
-}
-
 socket.on("loadLocationCoords", (coordsData) => {
     createInfoMarkers(coordsData);
+    onSearchedItem("Collins, Jeff--5201")
 });
+
+function onSearchedItem(item) {
+    if (typeof(item.split("--")[1]) != "undefined") {
+        hideAllMarkers();
+        let roomNumber = item.split("--")[1];
+        for (var marker in markers) {
+            if (markers[marker].getLabel() == roomNumber) {
+                markers[marker].setMap(map);
+                map.setCenter(markers[marker].getPosition());
+                map.setZoom(19);
+            }
+        }
+        // function for checking if the room has a teacher and then hits the listener for the side info panel
+    }
+    else {
+        // the item is not a classroom. therefore, focus on the building.
+        // ex. the item that would be caught in this else statement
+        // would be gym or pavilion or pac. 
+    }
+}

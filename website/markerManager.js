@@ -144,6 +144,24 @@ function deleteSelectedMarker() {
     }
 }
 
+function showAllMarkers() {
+    for (var marker in markers) {
+        markers[marker].setMap(map);
+    }
+    for (var marker in locationMarkers) {
+        locationMarkers[marker].setMap(map);
+    }
+}
+
+function hideAllMarkers() {
+    for (var marker in markers) {
+        markers[marker].setMap(null);
+    }
+    for (var marker in locationMarkers) {
+        locationMarkers[marker].setMap(null);
+    }
+}
+
 function createCurrentPosMarker() {
     // current position marker
     let currentMarker = new google.maps.Marker({
@@ -200,8 +218,12 @@ function createInfoMarkers(locationCoords) {
 }
 
 /* Part of Filters for building markers 
-    Could be redundant because of the function below */
+    Could be redundant because of the function below 
+    Don't know why you want to see all the markers as doing so would
+    just have overlappting markers. Either way, the option is here ig*/
 function showMarkersOfBuilding(buildingNumber) {
+    hideAllMarkers();
+    focusOnMarkerAtClassroomBuilding(buildingNumber);
     if ((buildingNumber >= 2 && buildingNumber <= 6) || buildingNumber == 8) {
         for (var marker in markers) {
             if (markers[marker].getLabel().charAt(0) == buildingNumber) {
@@ -214,15 +236,14 @@ function showMarkersOfBuilding(buildingNumber) {
     }
     // reset number
     else if (buildingNumber == -1) {
-        for (var marker in markers) {
-            markers[marker].setMap(map);
-        }
+        showAllMarkers();
     }
-    focusOnMarkerAtBuilding(buildingNumber);
 }
 
 /* Part of Filters for building markers for each floor*/
 function showMarkersOfBuildingAtFloor(buildingNumber, floorNumber) {
+    hideAllMarkers();
+    focusOnMarkerAtClassroomBuilding(buildingNumber);
     for (var marker in markers) {
         let markerBuildingNumber = markers[marker].getLabel().charAt(0);
         let markerFloorNumber = markers[marker].getLabel().charAt(1);
@@ -234,15 +255,33 @@ function showMarkersOfBuildingAtFloor(buildingNumber, floorNumber) {
             markers[marker].setMap(map);
         }
     }
-    focusOnMarkerAtBuilding(buildingNumber);
 }
 
-function focusOnMarkerAtBuilding(buildingNumber) {
+function focusOnMarkerAtClassroomBuilding(buildingNumber) {
     for (var buildingCenterMarker in locationMarkers) {
         let markerLabelLength = locationMarkers[buildingCenterMarker].getLabel().length;
-        if (locationMarkers[buildingCenterMarker].getLabel().charAt(markerLabelLength - 1) == buildingNumber || buildingNumber == -1) {
-            map.setCenter((buildingNumber > 0) ? locationMarkers[buildingCenterMarker].getPosition() : westHighCoords);
-            map.setZoom((buildingNumber > 0) ? 19 : 18);
+        if (locationMarkers[buildingCenterMarker].getLabel().charAt(0) == 'B' &&
+            locationMarkers[buildingCenterMarker].getLabel().charAt(markerLabelLength - 1) == buildingNumber || buildingNumber == -1) {
+            map.setCenter(locationMarkers[buildingCenterMarker].getPosition());
+            map.setZoom(19);
+            break;
         }
     }
+}
+
+function focusOnBuilding(building) {
+    for (var buildingCenterMarker in locationMarkers) {
+        if (locationMarkers[buildingCenterMarker].getLabel() == building) {
+            locationMarkers[buildingCenterMarker].setMap(map);
+            map.setCenter(locationMarkers[buildingCenterMarker].getPosition());
+            map.setZoom(19);
+            break;
+        }
+    }
+}
+
+function resetMap() {
+    showAllMarkers();
+    map.setZoom(18);
+    map.setCenter(westHighCoords);
 }

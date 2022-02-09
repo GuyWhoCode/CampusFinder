@@ -44,9 +44,24 @@ function updateSelectedPathOpacity() {
 
 function showStairsOnPath(path) {
     let shortestPath = classPaths[path][1];
+    let stairs;
     for (let node in shortestPath.path) {
         if (shortestPath.path[node].charAt(0) == 'S') {
-            showStairway(shortestPath.path[node]);
+            stairs = shortestPath.path[node];
+            break;
+        }
+    }
+    updateStairways(stairs);
+}
+
+function updateStairways(stairway) {
+    let stairwayList = locationOutlines["stairs"];
+    for (var stairwayEntry in stairwayList) {
+        if (stairwayEntry != stairway) {
+            stairwayList[stairwayEntry].setMap(null);
+        }
+        else {
+            stairwayList[stairwayEntry].setMap(map);
         }
     }
 }
