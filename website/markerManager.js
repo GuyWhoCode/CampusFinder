@@ -257,6 +257,14 @@ function showMarkersOfBuildingAtFloor(buildingNumber, floorNumber) {
     }
 }
 
+function showMarkersOfOtherBuilding(building) {
+    for (var marker in markers) {
+        if (markers[marker].getLabel().split(" ")[0] == building) {
+            markers[marker].setMap(map);
+        }
+    }
+}
+
 function focusOnMarkerAtClassroomBuilding(buildingNumber) {
     for (var buildingCenterMarker in locationMarkers) {
         let markerLabelLength = locationMarkers[buildingCenterMarker].getLabel().length;

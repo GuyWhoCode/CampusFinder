@@ -2,7 +2,7 @@
 
 /* debug enables and disables intermediate nodes */
 var debugLogs = false;
-var intermediateNodesEnabled = true;
+var intermediateNodesEnabled = false;
 var locationOutlinesEnabled = true;
 var buildingLabelsEnabled = true;
 
@@ -140,7 +140,11 @@ function initMap() {
     document.getElementById("bldg5button").addEventListener('click', () => { showMarkersOfBuilding(5) });
     document.getElementById("bldg6button").addEventListener('click', () => { showMarkersOfBuilding(6) });
     document.getElementById("bldg8button").addEventListener('click', () => { showMarkersOfBuilding(8) });
-    
+    document.getElementById("gymButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Gym") });
+    document.getElementById("pavilionButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Pavilion") });
+    document.getElementById("pacButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("PAC") });
+    document.getElementById("stadiumButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Stadium") });
+    document.getElementById("fieldButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Field") });
 
     document.getElementById("floorOneBldg4").addEventListener('click', () => { showMarkersOfBuildingAtFloor(4, 1) });
     document.getElementById("floorTwoBldg4").addEventListener('click', () => { showMarkersOfBuildingAtFloor(4, 2) });
@@ -215,7 +219,7 @@ socket.on("loadNodes", (nodeData) => {
         );
         
       } else {
-        // Browser doesn't support Geolocation
+        // Browser doesn't support Geolocation or user denied the app from getting location
         alert("Error: Your browser doesn't support geolocation.");
       }
 });
@@ -296,7 +300,7 @@ function showOutlinesOfBuilding(buildingType, reset) {
 
 socket.on("loadLocationCoords", (coordsData) => {
     createInfoMarkers(coordsData);
-    onSearchedItem("Collins, Jeff--5201")
+    // onSearchedItem("Collins, Jeff--5201")
 });
 
 function onSearchedItem(item) {
