@@ -135,6 +135,7 @@ const createUserProfile = pfp => {
 getRedirectResult(auth)
 .then((result) => {
     // The signed-in user info.
+    if (result === null) return;
     const user = result.user
     
     createUserProfile(user.photoURL)

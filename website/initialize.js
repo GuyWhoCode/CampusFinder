@@ -27,7 +27,6 @@ betaInformationModal.show()
 // TEMP
 
 const initializeTeacherAutocomplete = teacherData => {
-    console.log("I am being called!")
     teacherData.map(val => {
         if (val.name !== undefined) {
             let name = document.createElement("option")
@@ -113,10 +112,6 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
     })
 }
 // Added to adjust for the mobile view of making the Search button work
-
-document.getElementById("logo").addEventListener("click", () => {
-    window.open("https://whs.tusd.org/", "_blank")
-})
 
 document.getElementById("changeClasses").addEventListener("click", () => sessionStorage.getItem("email") !== null ? window.location = "/class" : classDenialModal.show())
 if (sessionStorage.darkMode === "false") {

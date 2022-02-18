@@ -3,6 +3,8 @@ body {
     padding: 0;
     background-color: #303030;
     color: #FFFFFF;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 p {
     margin: 0;
@@ -36,6 +38,7 @@ p {
     display: flex;
     flex-direction: column;
     width: 100vw;
+    overflow-x: none;
 }
 .description {
     text-align: start;

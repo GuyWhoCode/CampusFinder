@@ -107,6 +107,13 @@ html, body {
 #userInfo {
   color: white;
 }
+#WHSIcon {
+    display: flex;
+    margin: auto;
+}
+#WHSwebsite {
+    float: left;
+}
 @media (min-width: 768px) {
     #searchButton {
         display: block;
@@ -122,5 +129,8 @@ html, body {
     }
     #logo {
         max-width: 4em;
+    }
+    #WHSIcon {
+        margin: auto 0;
     }
 }

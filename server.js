@@ -138,8 +138,6 @@ dbClient.connect(async () => {
                     "name": `${data.LastName}, ${data.FirstName}`,
                     "room": existingRoomEntry[0].room, 
                     "extn": parseInt(data.Ext)
-                    // "dept": ["English"],
-                    // "conf": [3],
                     // "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989517/dda2e0f8-dfd5-11e9-bf31-0a312aeb55d8/optimizations/2048"
                 }})
                 // Updates an existing teacher entry by changing the teacher associated with a classroom number
@@ -149,8 +147,6 @@ dbClient.connect(async () => {
                 "name": `${data.LastName}, ${data.FirstName}`,
                 "room": parseInt(data.Rm), 
                 "extn": parseInt(data.Ext)
-                // "dept": ["English"],
-                // "conf": [3],
                 // "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989517/dda2e0f8-dfd5-11e9-bf31-0a312aeb55d8/optimizations/2048"
             })
 
