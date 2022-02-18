@@ -3,8 +3,7 @@ const shortestDistanceNode = (distances, visited) => {
 	let shortest = null;
 
 	for (let node in distances) {
-		let currentIsShortest =
-			shortest === null || distances[node] < distances[shortest];
+		let currentIsShortest = shortest === null || distances[node] < distances[shortest];
 		if (currentIsShortest && !visited.includes(node)) {
 			shortest = node;
 		}
@@ -42,13 +41,13 @@ const findShortestPath = (graph, startNode, endNode) => {
 				continue;
 			} else {
 				// save the distance from the start node to the child node
-				let newdistance = distance + children[child];
+				let newDistance = distance + children[child];
 				// if there's no recorded distance from the start node to the child node in the distances object
 				// or if the recorded distance is shorter than the previously stored distance from the start node to the child node
 				// save the distance to the object
 				// record the path
-				if (!distances[child] || distances[child] > newdistance) {
-					distances[child] = newdistance;
+				if (!distances[child] || distances[child] > newDistance) {
+					distances[child] = newDistance;
 					parents[child] = node;
 				}
 			}

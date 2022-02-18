@@ -171,13 +171,12 @@ function createCurrentPosMarker() {
         map,
     });
 
-    // dragging the current position marker makes the (almost) shortest path from
-    // the current position to the selected node
-    currentMarker.addListener("position_changed", (event) => {
+    // dragging the current position marker makes the (almost) shortest path from the current position to the selected node
+    currentMarker.addListener("position_changed", () => {
         currentLat = currentMarker.getPosition().lat();
         currentLng = currentMarker.getPosition().lng();
         findClosestNodeToCurrentPos();
-        if (lines != null) {
+        if (lines !== null) {
             lines.setMap(null);
             lines = null;
         }

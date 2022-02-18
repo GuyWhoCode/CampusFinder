@@ -34,14 +34,13 @@ const PERIOD5PATH = 5;
 let selectedPath = PERIOD0PATH;
 let lines = null;
 
-/* For current position */
+// For current position 
 var currentLat;
 var currentLng;
 var closestNodeToCurrentPos = null;
 
 let nodes = {};
 let graph = {};
-let editMode = false; // editMode can be deleted for user site
 
 let selectedNode = "Main Entrance";
 let selectedNodeImage = "./Don-Cheadle (2).png"; // maybe change these icons to ones more appropriate
@@ -53,6 +52,7 @@ let altNamesClassrooms = {
     "baseballField": [],
     "tennisCourt": []
 }
+
 // eslint-disable-next-line no-undef
 let socket = io("/");
 
@@ -61,29 +61,24 @@ function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: westHighCoords,
         zoom: 18,
+        restriction: {
+            latLngBounds: {
+                north: 33.849826,
+                south: 33.843603,
+                west: -118.373926,
+                east: -118.363444,
+            },
+            strictBounds: false,
+        },
         mapTypeId: 'satellite',
-        tilt: 0
+        tilt: 0,
+        gestureHandling: "greedy",
     });
 
-    /* Adds marker on click
-        Click listener can be deleted for user site. */
-    map.addListener("click", (event) => {
-        createMarkerClick(event);
-    });
-
-    /* All of this keydown listener except for numLock can be deleted for user site */
+    // All of this keydown listener except for numLock can be deleted for user site
     document.getElementById("map").addEventListener("keydown", function(event) {
-        if (event.key == "Delete") {
-            deleteSelectedMarker();
-        }
-        /* Saves all nodes to nodes.json */
-        else if (event.key == "Enter") {
-            var jsonData = JSON.stringify(nodes, null, "\t");
-            socket.emit("saveNodes", jsonData);
-            console.log("Saved JSON");
-        }
-        /* Prints nodes (coordinates) and graph (distances) */
-        else if (event.key == "Shift") {
+        // Prints nodes (coordinates) and graph (distances)
+        if (event.key === "Shift") {
             console.log(nodes);
             console.log(graph);
             // console.log(markersMap);
@@ -98,9 +93,10 @@ function initMap() {
             createPeriodPaths();
             showPath(PERIOD0PATH);
 
+
             if (debugLogs) {
                 console.log(shortestPath.distance);
-                for (var i = 0; i < shortestPath.path.length; i++) {
+                for (let i = 0; i < shortestPath.path.length; i++) {
                     console.log(shortestPath.path[i]);
                 }
             }
@@ -160,7 +156,7 @@ function initMap() {
     document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other"); showStairway("S3"); });
     document.getElementById("resetOutlines").addEventListener('click', () => { showOutlinesOfBuilding("", true) });
 
-    /* Loads in all nodes from nodes.json into memory */
+    // Loads in all nodes from nodes.json into memory
     socket.emit("requestNodes");
     
     if (locationOutlinesEnabled) {
@@ -226,6 +222,7 @@ socket.on("loadNodes", (nodeData) => {
 
 /*  Calculates the distance in meters between two points with the latitude and longitude of each
     https://www.movable-type.co.uk/scripts/latlong.html */
+
 function distance(lat1, lon1, lat2, lon2) {
     const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180, Δλ = (lon2-lon1) * Math.PI/180, R = 6371e3;
     const x = Δλ * Math.cos((φ1+φ2)/2);
@@ -256,6 +253,7 @@ function createBuildingOutlines(locationOutlinesCoords) {
                 color = "#fc03df";
                 break;
         }
+
         for (var location in locationOutlinesCoords[category]) {
             locationOutlinesRow[location] = new google.maps.Polygon({
                 paths: locationOutlinesCoords[category][location],
@@ -322,3 +320,36 @@ function onSearchedItem(item) {
         // would be gym or pavilion or pac. 
     }
 }
+
+socket.on("nodeSelected", room => {
+    markers.map(val => {
+        val.setAnimation(null);
+        val.setIcon(null);
+        // eslint-disable-next-line eqeqeq
+        if (val.getLabel() == room) {
+            let markerLat = val.getPosition().lat();
+            let markerLng = val.getPosition().lng();
+            map.setCenter({lat: markerLat, lng: markerLng})
+            map.setZoom(19)
+            val.setAnimation(google.maps.Animation.BOUNCE);
+            val.setIcon(selectedNodeImage);
+        }
+    })
+    // Triggers when user clicks on the Show Room as a result of the Search Result
+})
+
+socket.on("showSwimmingPool", () => {
+    markers.map(val => {
+        val.setAnimation(null);
+        val.setIcon(null);
+        if (val.getLabel() === "Swimming Pool") {
+            let markerLat = val.getPosition().lat();
+            let markerLng = val.getPosition().lng();
+            map.setCenter({lat: markerLat, lng: markerLng})
+            map.setZoom(20)
+            val.setAnimation(google.maps.Animation.BOUNCE);
+            val.setIcon(selectedNodeImage);
+        }
+    })
+    // Egg of Easter.
+})

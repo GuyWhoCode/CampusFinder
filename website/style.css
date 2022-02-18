@@ -5,6 +5,7 @@ html, body {
     font-family: 'Roboto', sans-serif;
     background-color: #303030;
     color: #FFFFFF;
+    overflow: hidden;
 }
 /* debugMap, the entire div and its buttons, should be removed for user site */
 #debugMap {
@@ -24,14 +25,14 @@ html, body {
     background-color: #544726;
     font-size: 1.5em;
     display: grid;
-    grid-template-columns: 20% auto 10%;
+    grid-template-columns: repeat(3, auto);
 }
 #userPFP {
     border-radius: 50%;
     max-width: 2.5em;
     margin-right: 3%;
 }
-.offcanvas {
+.offcanvas, .modal {
     color: #000000;
 }
 #goBottom {
@@ -40,6 +41,7 @@ html, body {
     left: 20%; 
 }
 #searchButton {
+    background-color: #e9d283;
     width: 50%;
 }
 .classListing {
@@ -56,16 +58,17 @@ html, body {
     transition-duration: 0s;
 }
 #logo {
-    max-width: 4em;
+    max-width: 3em;
     display: flex;
     float: right;
     cursor: pointer;
+    margin: auto 0;
 }
 #searchButton {
     display: none;
 }
 #searchBox {
-    width: 10em;
+    width: 9em;
     align-self: center;
     justify-self: center;
 }
@@ -85,9 +88,7 @@ html, body {
     padding: 0;
 }
 #teacherSelection {
-    overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
 }
 #infoBoxPreview {
     display: grid;
@@ -112,6 +113,16 @@ html, body {
     display: block;
     margin: 0 auto;
 }
+#userInfo {
+  color: white;
+}
+#WHSIcon {
+    display: flex;
+    margin: auto;
+}
+#WHSwebsite {
+    float: left;
+}
 @media (min-width: 768px) {
     #searchButton {
         display: block;
@@ -121,5 +132,14 @@ html, body {
     }
     #mainSearch::placeholder {
         font-size: 1.2rem;
+    }
+    #navbar {
+        grid-template-columns: 20% auto 10%;
+    }
+    #logo {
+        max-width: 4em;
+    }
+    #WHSIcon {
+        margin: auto 0;
     }
 }

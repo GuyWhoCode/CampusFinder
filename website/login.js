@@ -22,6 +22,12 @@ const initializeClassList = classes => {
             let teacherRoom = document.createElement("button")
             teacherRoom.className = "btn btn-info teacherRoom"
             teacherRoom.innerHTML = "Go to Room " + teacherValue[1]
+            teacherRoom.addEventListener("click", () => {
+                socket.emit("requestNodeInfo", {"room": teacherValue[1], "origin": "sidebar"})
+                // eslint-disable-next-line no-undef
+                let classSearchResult = new bootstrap.Offcanvas(document.getElementById("classSearchResult"))
+                classSearchResult.hide()
+            })
             classContainer.appendChild(teacherRoom)
             classListElm.appendChild(classContainer)
         }
@@ -30,18 +36,22 @@ const initializeClassList = classes => {
 }
 
 socket.on("userData", data => {
-    if (data.periods === undefined || data.periods === {}) {
-        return classListElm.innerHTML = "Add classes with the Change Classes button below!"
-    }
     sessionStorage.setObject("userClasses", data.periods)
     if (!data.darkModeOn) {
         darkMode = false
         document.getElementById("navbar").style.backgroundColor = "#e9d283"
+        document.getElementById("searchButton").style.backgroundColor = "#554826"
+        document.getElementById("searchButton").style.color = "#FFFFFF"
+        document.getElementById("quickLinks").className = "dropdown-menu dropdown-menu-end"
         document.body.style.backgroundColor = "#FFFFFF"
         document.body.style.color = "#000000"
         // Light Mode initialization
     }
-    sessionStorage.darkMode = darkMode
+    sessionStorage.darkMode = data.darkModeOn
+
+    if (data.periods === undefined || data.periods === {} || Object.values(data.periods).length === 0) {
+        return classListElm.innerHTML = "Add classes with the Change Classes button below!"
+    }
     initializeClassList(data.periods)
 })
 // Initializes the class list when the user has logged in and saves it locally; also initializes theme
@@ -86,7 +96,7 @@ const createUserProfile = pfp => {
 
             let login = document.createElement("a")
             login.id = "login"
-            login.innerHTML = "Login"
+            login.innerHTML = "Login with Google"
             login.className = "dropdown-item"
             loginElm.appendChild(login)
 
@@ -98,12 +108,16 @@ const createUserProfile = pfp => {
             sessionStorage.clear()
 
             document.getElementById("navbar").style.backgroundColor = "#554826"
+            document.getElementById("searchButton").style.backgroundColor = "#e9d283"
+            document.getElementById("searchButton").style.color = "#000000"
+            document.getElementById("quickLinks").className = "dropdown-menu dropdown-menu-end dropdown-menu-dark"
             document.body.style.backgroundColor = "#303030"
             document.body.style.color = "#FFFFFF"
+            document.getElementById("userInfo").style.color = "#FFFFFF"
             // Dark Mode re-initialization for default theme
 
             classListElm.innerHTML = "Login to see saved classes and add new ones!"
-            userInfoElm.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32px" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16"><path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"></path><path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"></path></svg>User'
+            userInfoElm.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32px" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16"><path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"></path><path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"></path></svg>'
             // Sign out successful
         })
     })
@@ -120,10 +134,8 @@ const createUserProfile = pfp => {
 
 getRedirectResult(auth)
 .then((result) => {
-    // This gives you a Google Access Token. You can use it to access Google APIs.
-    const credential = GoogleAuthProvider.credentialFromResult(result)
-    const token = credential.accessToken
     // The signed-in user info.
+    if (result === null) return;
     const user = result.user
     
     createUserProfile(user.photoURL)
@@ -134,15 +146,7 @@ getRedirectResult(auth)
     
     socket.emit("userLogin", user)
     // Sends an internal socket request to the server-side to be stored
-}).catch((error) => {
-    // Handle Errors here.
-    const errorCode = error.code
-    const errorMessage = error.message
-    // The email of the user's account used.
-    const email = error.email
-    // The AuthCredential type that was used.
-    const credential = GoogleAuthProvider.credentialFromError(error)
-});
+})
 
 if (sessionStorage.getItem("email") !== null) {
     createUserProfile(sessionStorage.getItem("userPic"), sessionStorage.getItem("username"))

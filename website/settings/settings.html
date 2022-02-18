@@ -49,10 +49,29 @@
                 </div>
             </div>
         </section>
-        
     </section>
 
+    <br>
+    <button type="button" class="btn btn-danger" id="deleteAccountBtn">Delete Account</button>
+    <div class="modal fade" tabindex="-1" aria-labelledby="deleteAccount" aria-hidden="true" id="deletionModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAccount">Delete Account Confirmation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body"><b>WARNING:</b> This will delete the classes and preferences associated with this account. <br> Are you sure you want to delete your account?</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="confirmDeletionAccount">Confirm Deletion</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Delete Account Message with Bootstrap Modal -->
 
+
+    <br> <br>
     <button type="button" class="btn btn-primary" id="updatePreferences">Update Preferences</button>
     <div class="modal fade" tabindex="-1" aria-labelledby="confirmSettings" aria-hidden="true" id="confirmationModal">
         <div class="modal-dialog">
@@ -72,6 +91,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js" defer></script>
-    <script src="./settings.js"></script>
+    <script src="./settings.js" defer></script>
 </body>
 </html>
