@@ -38,13 +38,20 @@ app.get("/settings", function(request, response) {
 });
 // Express.js setup to initialize different routes of the webpage.
 
-
 const socket = require("socket.io")(server, { pingTimeout: 60000 })
 dbClient.connect(async () => {
     console.log("Connected to database!")
     socket.on('connection', io => {
         console.log("I have a connection to the website!")
-
+        io.on("saveNodes", (nodes) => {
+            fs.writeFile("nodes.json", nodes, function(err) {
+                if (err) {
+                    console.log(err);
+                }
+            });
+        })
+		// saves nodes to nodes.json
+      
         io.on("requestNodes", () => {
             let nodes = fileReader.readFileSync("./nodes.json", "utf8")
             socket.emit("loadNodes", JSON.parse(nodes))
@@ -54,6 +61,11 @@ dbClient.connect(async () => {
         io.on("requestOutlines", () => {
             let outlineCoords = fileReader.readFileSync("./outlineCoords.json", "utf8")
             socket.emit("loadOutlines", JSON.parse(outlineCoords))
+        })
+
+        io.on("requestLocationCoords", () => {
+            let locationCoords = fileReader.readFileSync("./locationCoords.json", "utf8")
+            socket.emit("loadLocationCoords", JSON.parse(locationCoords))
         })
 
         io.on("requestNodeInfo", nodeInfo => {

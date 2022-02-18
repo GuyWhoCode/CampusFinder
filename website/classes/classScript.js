@@ -27,8 +27,6 @@ let teachers = localStorage.getObject("teacherList")
 // Initializes autocomplete feature by referencing local storage of teacher list
 let debug = false
 
-
-
 Object.values(document.getElementsByClassName("classSelector")).map((elm, index) => {
     teachers.map(val => {
         if (val.name !== undefined) {

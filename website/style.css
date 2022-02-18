@@ -7,8 +7,17 @@ html, body {
     color: #FFFFFF;
     overflow: hidden;
 }
+/* debugMap, the entire div and its buttons, should be removed for user site */
+#debugMap {
+    display: grid;
+    grid-template-areas: 'left right';
+    /* grid-template-columns: repeat(2, 1fr); */
+    grid-template-rows: 80px;
+}
 #map {
-    height: 92vh;
+    height: 90vh;
+    width: 1290px; /* remove this for user site*/
+    color: #000000
 }
 #navbar {
     margin: 0;

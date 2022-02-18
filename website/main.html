@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="./style.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
     <script src="./pathfinding.js"></script>
+    <script src="./drawnPathsManager.js"></script>
     <script src="./markerManager.js"></script>
     <script src="./map.js"></script>
 </head>
@@ -76,7 +77,59 @@
         </div>
     </div>
     <!-- Bootstrap Classes Sidebar -->
-    <div id="map"></div>	
+    
+    <input type="search" id="nameOfNode">
+    <!-- <h1>Shift: Print Graph | Enter: Save graph to JSON | Backspace: Load graph from JSON | Control: Display shortest path</h1> -->
+    <!-- <h2 id="selectedNode">Selected Node: Edit Mode: </h2> -->
+    <div id="debugMap">
+        <div id="buttons">
+            <button type="button" id="showPaths">Show Paths</button>
+            <button type="button" id="hidePaths">Hide Paths</button>
+            <button type="button" id="button1">Path 1</button>
+            <button type="button" id="button2">Path 2</button>
+            <button type="button" id="button3">Path 3</button>
+            <button type="button" id="button4">Path 4</button>
+            <button type="button" id="button5">Path 5</button>
+            <button type="button" id="button6">Path 6</button>
+
+            <br></br>
+
+            <button type="button" id="cafe4Button">Cafe 4</button>
+            <button type="button" id="cafe5Button">Cafe 5</button>
+            <button type="button" id="adminButton">Admin</button>
+            <button type="button" id="bldg2button">Building 2</button>
+            <button type="button" id="bldg3button">Building 3</button>
+            <button type="button" id="bldg4button">Building 4</button>
+            <button type="button" id="bldg5button">Building 5</button>
+            <button type="button" id="bldg6button">Building 6</button>
+            <button type="button" id="bldg8button">Building 8</button>
+            <button type="button" id="gymButton">Gym</button>
+            <button type="button" id="pavilionButton">Pavilion</button>
+            <button type="button" id="pacButton">PAC</button>
+            <button type="button" id="stadiumButton">Stadium</button>
+            <button type="button" id="fieldButton">Field</button>
+
+            <br></br>
+
+            <button type="button" id="floorOneBldg4">1st Floor Building 4</button>
+            <button type="button" id="floorTwoBldg4">2nd Floor Building 4</button>
+            <button type="button" id="floorOneBldg5">1st Floor Building 5</button>
+            <button type="button" id="floorTwoBldg5">2nd Floor Building 5</button>
+            <button type="button" id="floorOneBldg3">1st Floor Building 3</button>
+            <button type="button" id="floorTwoBldg3">2nd Floor Building 3</button>
+            <button type="button" id="floorThreeBldg3">3rd Floor Building 3</button>
+            <button type="button" id="resetButton">Reset Markers</button>
+
+            <br></br>
+
+            <button type="button" id="classBldgButton">Class Buildings</button>
+            <button type="button" id="cafeButton">Cafeterias</button>
+            <button type="button" id="otherButton">Other Buildings</button>
+            <button type="button" id="resetOutlines">Reset Outlines</button>
+        </div>
+        <div id="map"></div>
+    </div>
+    <!-- Eventually, at the end, div debugMap should just resolve to the div with map -->
     
     <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="classSearchResult" aria-labelledby="searchResultArea">        
         <div class="offcanvas-header">
@@ -119,7 +172,6 @@
         </div>
     </div>
     <!-- Bootstrap Search Result for Classes Sidebar -->
-
 
     <div class="modal fade" tabindex="-1" aria-labelledby="classDenialModal" aria-hidden="true" id="classDenialModal">
         <div class="modal-dialog">

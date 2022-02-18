@@ -1,12 +1,37 @@
 /* eslint-disable no-unused-vars */
 
-// debug enables and disables intermediate nodes 
-var debug = false;
+/* debug enables and disables intermediate nodes */
+var debugLogs = false;
+var intermediateNodesEnabled = false;
+var locationOutlinesEnabled = true;
+var buildingLabelsEnabled = true;
+
+Storage.prototype.setObject = function(key, value) {
+    this.setItem(key, JSON.stringify(value));
+}
+
+Storage.prototype.getObject = function(key) {
+    return JSON.parse(this.getItem(key));
+}
+
+sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--5201', 1: 'Reyes, Pete--5200', 2: 'Charlin-Wade, Kathryn--5100', 3: 'Jin, Jason--3101', 4: 'Cerda, Becky--6100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--4210' })
 
 let map;
-const westHighCoords = { lat: 33.8468, lng: -118.3689 };
+let westHighCoords = { lat: 33.846586, lng: -118.367709 };
 let markers = [];
-let locationOutlines = [];
+let locationMarkers = [];
+let locationOutlines = {};
+const ADMIN = 10;
+const RESET_BUILDINGS = -1;
+
+let classPaths = [];
+const PERIOD0PATH = 0;
+const PERIOD1PATH = 1;
+const PERIOD2PATH = 2;
+const PERIOD3PATH = 3;
+const PERIOD4PATH = 4;
+const PERIOD5PATH = 5;
+let selectedPath = PERIOD0PATH;
 let lines = null;
 
 // For current position 
@@ -18,10 +43,19 @@ let nodes = {};
 let graph = {};
 
 let selectedNode = "Main Entrance";
-const selectedNodeImage = "./Don-Cheadle (2).png"; // maybe change these icons to ones more appropriate
-const neighborNodeImage = "./parking_lot_maps.png";
+let selectedNodeImage = "./Don-Cheadle (2).png"; // maybe change these icons to ones more appropriate
+let neighborNodeImage = "./parking_lot_maps.png";
+
+let altNamesClassrooms = {
+    "studentActivities": "4139C",
+    "ASB": "5107",
+    "baseballField": [],
+    "tennisCourt": []
+}
+
 // eslint-disable-next-line no-undef
 let socket = io("/");
+
 
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
@@ -47,67 +81,148 @@ function initMap() {
         if (event.key === "Shift") {
             console.log(nodes);
             console.log(graph);
-            // Draws the shortest path from closestNodeToCurrentPos to Main Entrance
+            // console.log(markersMap);
+        }
+        /* Draws the shortest path from closestNodeToCurrentPos to Main Entrance */
+        else if (event.key == "Control") {
+            // closest node to main entrance
+            // let shortestPath = findShortestPath(graph, "8104", "Main Entrance");
 
-        } else if (event.key === "Control") {
-            let shortestPath = findShortestPath(graph, closestNodeToCurrentPos, "Main Entrance");
+            // maps path from one period to the next
+            // find a way so that paths don't just overlap and just cross each other
+            createPeriodPaths();
+            showPath(PERIOD0PATH);
 
-            if (debug) {
+
+            if (debugLogs) {
                 console.log(shortestPath.distance);
                 for (let i = 0; i < shortestPath.path.length; i++) {
                     console.log(shortestPath.path[i]);
                 }
             }
-            // Deletes the previous path before creating another path 
-            if (lines !== null) {
-                lines.setMap(null);
-                lines = null;
-            }
-            lines = drawLines(shortestPath);
-            // Toggles location outlines visibility
-
-        } else if (event.key === "NumLock") {
-            if (locationOutlines[0].getMap() === null) {
-                for (let outline in locationOutlines) {
-                    locationOutlines[outline].setMap(map);
-                }
-                return;
-            }
-            for (var outline in locationOutlines) {
-                locationOutlines[outline].setMap(null);
-            }
+        }
+        /* Toggles Edit Mode, which lets you change the neighbors of a selected node */
+        else if (event.key == "CapsLock") {
+            editMode = !editMode;
+            updateNeighborVisibility();
+        }
+        else if (event.key == "NumLock") {
         }
     });
     createCurrentPosMarker();
+    
+    /* Temporarily testing for different selectors/filters. These would be buttons, but more organized of course.  */
+    document.getElementById("showPaths").addEventListener('click', () => {
+        if (classPaths.length == 0) {
+            createPeriodPaths();
+        }
+        showAllPaths();
+        showPath(selectedPath);
+    });
+    document.getElementById("hidePaths").addEventListener('click', () => { hidePeriodPaths(); });
+    document.getElementById("button1").addEventListener('click', () => { showPath(PERIOD0PATH) });
+    document.getElementById("button2").addEventListener('click', () => { showPath(PERIOD1PATH) });
+    document.getElementById("button3").addEventListener('click', () => { showPath(PERIOD2PATH) });
+    document.getElementById("button4").addEventListener('click', () => { showPath(PERIOD3PATH) });
+    document.getElementById("button5").addEventListener('click', () => { showPath(PERIOD4PATH) });
+    document.getElementById("button6").addEventListener('click', () => { showPath(PERIOD5PATH) });
+    
+    document.getElementById("cafe4Button").addEventListener('click', () => { hideAllMarkers(); focusOnBuilding("Cafe 4") });
+    document.getElementById("cafe5Button").addEventListener('click', () => { hideAllMarkers(); focusOnBuilding("Cafe 5") });
+    document.getElementById("adminButton").addEventListener('click', () => { showMarkersOfBuilding(ADMIN) });
+    document.getElementById("bldg2button").addEventListener('click', () => { showMarkersOfBuilding(2) });
+    document.getElementById("bldg3button").addEventListener('click', () => { showMarkersOfBuilding(3) });
+    document.getElementById("bldg4button").addEventListener('click', () => { showMarkersOfBuilding(4) });
+    document.getElementById("bldg5button").addEventListener('click', () => { showMarkersOfBuilding(5) });
+    document.getElementById("bldg6button").addEventListener('click', () => { showMarkersOfBuilding(6) });
+    document.getElementById("bldg8button").addEventListener('click', () => { showMarkersOfBuilding(8) });
+    document.getElementById("gymButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Gym") });
+    document.getElementById("pavilionButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Pavilion") });
+    document.getElementById("pacButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("PAC") });
+    document.getElementById("stadiumButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Stadium") });
+    document.getElementById("fieldButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Field") });
+
+    document.getElementById("floorOneBldg4").addEventListener('click', () => { showMarkersOfBuildingAtFloor(4, 1) });
+    document.getElementById("floorTwoBldg4").addEventListener('click', () => { showMarkersOfBuildingAtFloor(4, 2) });
+    document.getElementById("floorOneBldg5").addEventListener('click', () => { showMarkersOfBuildingAtFloor(5, 1) });
+    document.getElementById("floorTwoBldg5").addEventListener('click', () => { showMarkersOfBuildingAtFloor(5, 2) });
+    document.getElementById("floorOneBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 1) });
+    document.getElementById("floorTwoBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 2) });
+    document.getElementById("floorThreeBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 3) });
+    document.getElementById("resetButton").addEventListener('click', () => { resetMap(); });
+
+    document.getElementById("classBldgButton").addEventListener('click', () => { showOutlinesOfBuilding("bldgs") });
+    document.getElementById("cafeButton").addEventListener('click', () => { showOutlinesOfBuilding("cafe") });
+    document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other"); showStairway("S3"); });
+    document.getElementById("resetOutlines").addEventListener('click', () => { showOutlinesOfBuilding("", true) });
 
     // Loads in all nodes from nodes.json into memory
     socket.emit("requestNodes");
-    socket.emit("requestOutlines");
-}
-
-// Code sample from https://developers.google.com/maps/documentation/javascript/examples/polyline-simple 
-function drawLines(shortestPath) {
-    let routeCoordinates = [];
-    routeCoordinates.push({ lat: currentLat, lng: currentLng })
-
-    for (let i = 0; i < shortestPath.path.length; i++) {
-        let node = shortestPath.path[i];
-        routeCoordinates.push({ lat: nodes[node]["lat"], lng: nodes[node]["lng"] });
+    
+    if (locationOutlinesEnabled) {
+        socket.emit("requestOutlines");
     }
-    let drawnPath = new google.maps.Polyline({
-        path: routeCoordinates,
-        geodesic: true,
-        strokeColor: "#FF0000",
-        strokeOpacity: 1.0,
-        strokeWeight: 2,
-      });
-
-    drawnPath.setMap(map);
-    return drawnPath;
+    if (buildingLabelsEnabled) {
+        socket.emit("requestLocationCoords");
+    }
 }
 
-// Calculates the distance in meters between two points with the latitude and longitude of each
-// https://www.movable-type.co.uk/scripts/latlong.html
+/* Takes parsed node json data from server.js socket and loads it into nodes and graph dataset */
+socket.on("loadNodes", (nodeData) => {
+    nodes = nodeData;
+    for (var node in nodes) {
+        // changes all rooms' isRoom flag to true
+        // everything from here to the next comment can be removed for user site
+        nodes[node]["isRoom"] = false;
+        if (node.length > 3) {
+            nodes[node]["isRoom"] = true;
+        }
+        //
+
+        graph[node] = {};
+        // loads each node and its neighbors into the graph
+        for (var neighbor = 0; neighbor < nodes[node]["neighbors"].length; neighbor++) {
+            graph[node][nodes[node]["neighbors"][neighbor]] = google.maps.geometry.spherical.computeDistanceBetween( { lat: nodes[node]["lat"], lng: nodes[node]["lng"] }, { lat: nodes[nodes[node]["neighbors"][neighbor]]["lat"], lng: nodes[nodes[node]["neighbors"][neighbor]]["lng"] } );
+        }
+        if (nodes[node].isRoom || intermediateNodesEnabled) {
+            createMarker(node);
+        }
+    }
+    // If there is a neighbor for a node, that neighbor's neighbor will be the node.
+    // Ex. A is a neighbor of B, but B is not defined as a neighbor of A
+    // These for loops will make B a neighbor of A
+    for (var node in graph) {
+        for (var neighbor in graph[node]) {
+            graph[neighbor][node] = graph[node][neighbor];
+        }
+    }
+
+    /* Code sample from https://developers.google.com/maps/documentation/javascript/geolocation
+       Gets current Location and the node closest to the current location
+    */
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            currentLat = position.coords.latitude;
+            currentLng = position.coords.longitude;
+            findClosestNodeToCurrentPos();
+            // shortestPath
+            // drawLines()
+          },
+          () => {
+            alert("Error: The Geolocation service failed.");
+          }
+        );
+        
+      } else {
+        // Browser doesn't support Geolocation or user denied the app from getting location
+        alert("Error: Your browser doesn't support geolocation.");
+      }
+});
+
+/*  Calculates the distance in meters between two points with the latitude and longitude of each
+    https://www.movable-type.co.uk/scripts/latlong.html */
+
 function distance(lat1, lon1, lat2, lon2) {
     const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180, Δλ = (lon2-lon1) * Math.PI/180, R = 6371e3;
     const x = Δλ * Math.cos((φ1+φ2)/2);
@@ -116,8 +231,13 @@ function distance(lat1, lon1, lat2, lon2) {
     return d;
 }
 
+socket.on("loadOutlines", (coordsData) => {
+    createBuildingOutlines(coordsData);
+});
+
 function createBuildingOutlines(locationOutlinesCoords) {
-    for (let category in locationOutlinesCoords) {
+    for (var category in locationOutlinesCoords) {
+        let locationOutlinesRow = {};
         let color;
         switch (category) {
             case "bldgs":
@@ -129,9 +249,13 @@ function createBuildingOutlines(locationOutlinesCoords) {
             case "other":
                 color = "#d7e336";
                 break;
+            case "stairs":
+                color = "#fc03df";
+                break;
         }
-        for (let location in locationOutlinesCoords[category]) {
-            locationOutlines.push(new google.maps.Polygon({
+
+        for (var location in locationOutlinesCoords[category]) {
+            locationOutlinesRow[location] = new google.maps.Polygon({
                 paths: locationOutlinesCoords[category][location],
                 strokeColor: color,
                 strokeOpacity: 0.8,
@@ -139,90 +263,63 @@ function createBuildingOutlines(locationOutlinesCoords) {
                 fillColor: color,
                 fillOpacity: 0.25,
                 map: map
-            }));
+            });
         }
+        locationOutlines[category] = locationOutlinesRow;
     }
 }
 
-
-// Takes parsed node json data from server.js socket and loads it into nodes and graph dataset
-socket.on("loadNodes", (nodeData) => {
-    nodes = nodeData;
-    for (let node in nodes) {
-        // changes all rooms' isRoom flag to true
-        // everything from here to the next comment can be removed for user site
-        nodes[node]["isRoom"] = false;
-        if (node.length > 2) nodes[node]["isRoom"] = true;
-        graph[node] = {};
-        // loads each node and its neighbors into the graph
-
-        for (let neighbor = 0; neighbor < nodes[node]["neighbors"].length; neighbor++) {
-            graph[node][nodes[node]["neighbors"][neighbor]] = distance(nodes[node]["lat"], nodes[node]["lng"], nodes[nodes[node]["neighbors"][neighbor]]["lat"], nodes[nodes[node]["neighbors"][neighbor]]["lng"]);
-        }
-
-
-        if (nodes[node]["isRoom"] || debug) {
-            let latitude = nodes[node]["lat"];
-            let longitude = nodes[node]["lng"];
-            let marker = new google.maps.Marker({
-                position: { lat: latitude, lng: longitude },
-                draggable: false,
-                animation: google.maps.Animation.DROP,
-                label: node,
-                map,
-            });
-        
-            marker.addListener("click", () => {
-                markers.map(val => {
-                    val.setAnimation(null);
-                    val.setIcon(null);
-                })
-                
-                marker.setAnimation(google.maps.Animation.BOUNCE);
-                marker.setIcon(selectedNodeImage);
-                selectedNode = marker.getLabel();
-            
-                socket.emit("requestNodeInfo", {"room": selectedNode, "origin": "map"})
-                // Sends an internal request to initialize.js to pull up the Bootstrap sidebar information about the teacher
-                // Triggers when the user clicks on a marker on the map
-            });
-        
-            markers.push(marker);
-            // GENERAL USE: Loads each marker as each node's coordinate and name
+// part of creating filters for outlines
+function showOutlinesOfBuilding(buildingType, reset) {
+    for (let locationType in locationOutlines) {
+        let locationsList = locationOutlines[locationType];
+        for (var location in locationsList) {
+            if (locationType == buildingType || reset) {
+                locationsList[location].setMap(map);
+            }
+            else {
+                locationsList[location].setMap(null);
+            }
         }
     }
-    // If there is a neighbor for a node, that neighbor's neighbor will be the node.
-    // Ex. A is a neighbor of B, but B is not defined as a neighbor of A
-    // These for loops will make B a neighbor of A
-    for (let node in graph) {
-        for (let neighbor in graph[node]) {
-            graph[neighbor][node] = graph[node][neighbor];
-        }
+    switch (buildingType) {
+        case "bldgs":
+            map.setCenter(westHighCoords);
+            break;
+        case "cafe":
+            map.setCenter( {lat: 33.846552, lng: -118.368392} );
+            break;
+        case "other":
+            map.setCenter( {lat: 33.847221, lng: -118.367507} );
+            break;
     }
+    map.setZoom(18);
+}
 
-    // Code sample from https://developers.google.com/maps/documentation/javascript/geolocation
-    // Gets current Location and the node closest to the current location
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            currentLat = position.coords.latitude;
-            currentLng = position.coords.longitude;
-            findClosestNodeToCurrentPos();
-          },
-          () => {
-              console.log("Error: The Geolocation service failed.");
-          }
-        );
-        
-      } else {
-        // Browser doesn't support Geolocation
-        console.log("Error: Your browser doesn't support geolocation.");
-      }
+socket.on("loadLocationCoords", (coordsData) => {
+    createInfoMarkers(coordsData);
+    // onSearchedItem("Collins, Jeff--5201")
 });
 
-socket.on("loadOutlines", coordsData => {
-    createBuildingOutlines(coordsData);
-});
+function onSearchedItem(item) {
+    if (typeof(item.split("--")[1]) != "undefined") {
+        hideAllMarkers();
+        let roomNumber = item.split("--")[1];
+        for (var marker in markers) {
+            if (markers[marker].getLabel() == roomNumber) {
+                markers[marker].setMap(map);
+                map.setCenter(markers[marker].getPosition());
+                map.setZoom(19);
+            }
+        }
+        // function for checking if the room has a teacher and then hits the listener for the side info panel
+    }
+    else {
+        // the item is not a classroom. therefore, focus on the building.
+        // ex. the item that would be caught in this else statement
+        // would be gym or pavilion or pac. 
+    }
+}
 
 socket.on("nodeSelected", room => {
     markers.map(val => {
