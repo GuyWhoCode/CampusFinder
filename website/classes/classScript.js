@@ -1,5 +1,12 @@
 // eslint-disable-next-line no-undef
-const classSocket = io()
+const classSocket = io("/")
+Storage.prototype.setObject = function(key, value) {
+    this.setItem(key, JSON.stringify(value));
+}
+
+Storage.prototype.getObject = function(key) {
+    return JSON.parse(this.getItem(key));
+}
 let classListElm = document.getElementById("classList")
 let confirmationScreen = document.getElementById("confirmationScreen")
 let confirmTitle = document.getElementById("confirmTitle")
@@ -11,25 +18,27 @@ let saveClassesMobileBtn = document.getElementById("saveClassesMobileBtn")
 let confirmationModal = new bootstrap.Modal(document.getElementById('confirmationClassModal'))
 // eslint-disable-next-line no-undef
 let confirmClassMobile = new bootstrap.Modal(document.getElementById('confirmClassMobile'))
-let confirmationDescription = document.getElementById("confirmationDescription")
+let confirmationDescription = document.getElementById("confirmationDescript9ion")
 let confirmationClassMessage = document.getElementById("confirmationClassMessage")
 let deletedClasses = []
 let periodsConfirmed = []
 let confirmationList = {}
-let teachers;
+let teachers = localStorage.getObject("teacherList")
+// Initializes autocomplete feature by referencing local storage of teacher list
+let debug = false
 
-classSocket.emit("requestTeacher")
-classSocket.on("teacherData", data => {
-    teachers = data
-    Object.values(document.getElementsByClassName("classSelector")).map((elm, index) => {
-        teachers.map(val => {
+
+
+Object.values(document.getElementsByClassName("classSelector")).map((elm, index) => {
+    teachers.map(val => {
+        if (val.name !== undefined) {
             let name = document.createElement("option")
             name.value = `${val.name} (${val.room})`
             document.getElementById("teacherNames" + index).appendChild(name)
-            // Adds autocomplete option element to datalist -- Enables autocomplete on inputs
-        })
+        }
+        // Weeds out the database update identifier 
     })
-    // Initializes autocomplete feature by sending an internal request through a socket to the server for teacher names
+    // Adds autocomplete option element to datalist -- Enables autocomplete on inputs
 })
 
 
@@ -240,7 +249,14 @@ const confirmClass = period => {
 Object.values(document.getElementsByClassName("submitClass")).map((val, index) => val.addEventListener("click", () => {confirmClass("Period " + index)}))
 // Adds button click to Submit Class button
 
-Object.values(document.getElementsByClassName("searchTeacher")).map((val, index) => val.addEventListener("submit", event => {event.preventDefault(), confirmClass("Period " + index)}))
+Object.values(document.getElementsByClassName("searchTeacher")).map((val, index) => {
+    if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf("like Mac") !== -1) {
+        val.addEventListener("keydown", event => { if (event.key === "Enter") confirmClass("Period " + index) })
+        // Adds keydown event listener for mobile that adds functionality to the Search button
+    } else {
+        val.addEventListener("submit", event => {event.preventDefault(), confirmClass("Period " + index)})
+    }
+})
 // Adds ability to hit enter on Class autocomplete forms
 
 Object.values(document.getElementsByClassName("submitClass premadeButton")).map(val => val.insertAdjacentHTML("afterend", '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-dash-circle-fill deleteClass" viewBox="0 0 16 16"> <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7z"/> </svg>'))
@@ -264,7 +280,11 @@ document.getElementById("homePage").addEventListener("click", ()=> {
 
 saveAllClasses.addEventListener("click", () => {
     if (Object.values(confirmationList).length >= 3) {
-        // classSocket.emit("saveTeacherSelection", confirmationList)
+        if (!debug) {
+            classSocket.emit("saveTeacherSelection", confirmationList)
+            sessionStorage.setObject("userClasses", confirmationList)
+            // Sets the session storage to the new class list so that the user can see the updated class list on home page
+        }
         confirmationClassMessage.innerHTML = "Success"
         confirmationDescription.innerHTML = "Your class selections have been saved."
         
@@ -294,21 +314,28 @@ saveClassesMobileBtn.addEventListener("click", () => {
     confirmationDescription.innerHTML = "Your class selections have been saved."
     confirmationModal.show()
 
-    // classSocket.emit("saveTeacherSelection", confirmationList)
-    // Shows success message and saves the classes for mobile
+    if (!debug) {
+        sessionStorage.setObject("userClasses", confirmationList)
+        // Sets the session storage to the new class list so that the user can see the updated class list on home page
+        classSocket.emit("saveTeacherSelection", confirmationList)
+        // Shows success message and saves the classes for mobile
+    } 
 })
+
 
 document.getElementById('confirmationClassModal').addEventListener("hidden.bs.modal", () => {
     window.location = "/home"
 })
 // Redirects the user home after the confirmation class modal is closed
 
-// if (sessionStorage.getItem("email") === null) {
-//     window.location = "/home"
-//     // If the user is not logged in, redirect them to the main screen.
-// } else {
-//     confirmationList["userEmail"] = sessionStorage.getItem("email")
-// }
+if (!debug) {
+    if (sessionStorage.getItem("email") === null) {
+        window.location = "/home"
+        // If the user is not logged in, redirect them to the main screen.
+    } else {
+        confirmationList["userEmail"] = sessionStorage.getItem("email")
+    }
+}
  
 if (sessionStorage.darkMode === "false") {
     document.getElementById("toolBar").style.backgroundColor = "#e9d283"

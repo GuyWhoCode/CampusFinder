@@ -131,6 +131,9 @@ h1 {
     display: block;
     margin: 0 auto;
 }
+#confirmationClassModal, #saveAllClassesMobile {
+    color: #000000;
+}
 /* Fancy Button generated from https://www.bestcssbuttongenerator.com/#/37 */
 
 @media (min-width: 768px) {

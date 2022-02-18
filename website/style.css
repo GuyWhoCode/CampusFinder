@@ -23,7 +23,7 @@ html, body {
     max-width: 2.5em;
     margin-right: 3%;
 }
-.offcanvas {
+.offcanvas, .modal {
     color: #000000;
 }
 #goBottom {
@@ -32,6 +32,7 @@ html, body {
     left: 20%; 
 }
 #searchButton {
+    background-color: #e9d283;
     width: 50%;
 }
 .classListing {
@@ -78,9 +79,7 @@ html, body {
     padding: 0;
 }
 #teacherSelection {
-    overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
 }
 #infoBoxPreview {
     display: grid;
@@ -108,6 +107,13 @@ html, body {
 #userInfo {
   color: white;
 }
+#WHSIcon {
+    display: flex;
+    margin: auto;
+}
+#WHSwebsite {
+    float: left;
+}
 @media (min-width: 768px) {
     #searchButton {
         display: block;
@@ -123,5 +129,8 @@ html, body {
     }
     #logo {
         max-width: 4em;
+    }
+    #WHSIcon {
+        margin: auto 0;
     }
 }

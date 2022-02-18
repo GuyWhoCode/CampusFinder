@@ -2,6 +2,9 @@ body {
     margin: 0;
     padding: 0;
 }
+h1 {
+    text-align: center;
+}
 .horizontal {
     display: flex;
     flex-direction: row;
@@ -18,7 +21,7 @@ body {
 .preview {
     display: flex;
     flex-direction: column;
-    width: 20vw;
+    width: 75%;
     align-content: center;
     justify-content: center;
     border: 5px solid black;
@@ -34,16 +37,32 @@ body {
     display: flex;
     justify-content: space-around;
     background-color: lightgray;
+    flex-direction: column;
     /* height: 50vh; */
 }
 #lightNav {
     background-color: #e9d283;
 }
+#deleteAccountBtn {
+    display: block;
+    margin: 0 auto;
+}
 .hoverSelect {
     display: flex;
     height: 45vh;
-    width: 25vw;
+    width: 100vw;
     align-content: center;
     justify-content: center;
     cursor: pointer;
+}
+@media (min-width: 768px) {
+    #themeChooser {
+        flex-direction: row;
+    }
+    .hoverSelect {
+        width: 25vw;
+    }
+    .preview {
+        width: 20vw;
+    }
 }

@@ -1,39 +1,62 @@
 body {
     margin: 0;
     padding: 0;
+    background-color: #303030;
+    color: #FFFFFF;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 p {
     margin: 0;
 }
-.founders {
-    background-position: center;
-    width: 20vw;
-    overflow: hidden;
-    background-size: cover;
-    float: right;
-    border-radius: 40%;
-}
-#founderTwoPFP {
-    grid-area: 1 / 2;
-    margin: 0;
-}
-#description {
-    margin: 5%;
-}
-section {
-    display: grid;
-    grid-template-columns: 23vw auto;
-    grid-template-rows: auto auto;
-}
-#founderTwo {
-    grid-template-columns: auto 23vw;
-    grid-template-rows: auto auto;
-}
-.founderTitle, #alignCenter {
+#alignCenter {
     text-align: center;
+}
+.pageElement {
+    background-color: #464647;
+}
+.founderInfo {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    margin: 3% 0;
+}
+.founders {
+    border-radius: 40%;
+    margin: 0 auto;
+    transition: width 0.3s;
+}
+.founders:hover {
+    width: 60%;
 }
 .founderPics {
     display: flex;
     flex-direction: column;
+    margin: 0 auto;
+}
+#founderPanel {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    overflow-x: none;
+}
+.description {
+    text-align: start;
+}
+.founderTitle {
+    text-align: end;
+}
+#missionStatement {
+    display: grid;
+    grid-template-columns: 40% 60%;
     margin-left: 5%;
+}
+@media (min-width: 768px) {
+    #founderPanel {
+        display: grid;
+        grid-template-columns: repeat(3, 33.3%);
+    }
+    .founderInfo {
+        margin: 0 1.5%;
+    }
 }
