@@ -16,6 +16,7 @@ Storage.prototype.getObject = function(key) {
 
 sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--5201', 1: 'Reyes, Pete--5200', 2: 'Charlin-Wade, Kathryn--5100', 3: 'Jin, Jason--3101', 4: 'Cerda, Becky--6100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--4210' })
 
+let alreadyLoaded;
 let map;
 let westHighCoords = { lat: 33.846586, lng: -118.367709 };
 let markers = [];
@@ -169,6 +170,14 @@ function initMap() {
 
 /* Takes parsed node json data from server.js socket and loads it into nodes and graph dataset */
 socket.on("loadNodes", (nodeData) => {
+    createNodes(nodeData);
+});
+
+function createNodes(nodeData) {
+    // to prevent reloading of nodes
+    if (alreadyLoaded) return;
+    alreadyLoaded = true;
+
     nodes = nodeData;
     for (var node in nodes) {
         // changes all rooms' isRoom flag to true
@@ -218,7 +227,7 @@ socket.on("loadNodes", (nodeData) => {
         // Browser doesn't support Geolocation or user denied the app from getting location
         alert("Error: Your browser doesn't support geolocation.");
       }
-});
+}
 
 /*  Calculates the distance in meters between two points with the latitude and longitude of each
     https://www.movable-type.co.uk/scripts/latlong.html */

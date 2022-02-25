@@ -257,11 +257,14 @@ function showMarkersOfBuildingAtFloor(buildingNumber, floorNumber) {
 }
 
 function showMarkersOfOtherBuilding(building) {
+    let buildingMarkers = []
     for (var marker in markers) {
         if (markers[marker].getLabel().split(" ")[0] == building) {
             markers[marker].setMap(map);
+            buildingMarkers.push(markers[marker]);
         }
     }
+    focusOnOtherBuildingWithMarkers(buildingMarkers[0], buildingMarkers[1]);
 }
 
 function focusOnMarkerAtClassroomBuilding(buildingNumber) {
@@ -285,6 +288,15 @@ function focusOnBuilding(building) {
             break;
         }
     }
+}
+
+function focusOnOtherBuildingWithMarkers(m1, m2) {
+    let latBetweenMarkers = m1.getPosition().lat() - m2.getPosition().lat();
+    let newLat = m1.getPosition().lat() - latBetweenMarkers/2;
+    let lngBetweenMarkers = m1.getPosition().lng() - m2.getPosition().lng();
+    let newLng = m1.getPosition().lng() - lngBetweenMarkers/2;
+    map.setCenter({lat: newLat, lng: newLng});
+    map.setZoom(19)
 }
 
 function resetMap() {
