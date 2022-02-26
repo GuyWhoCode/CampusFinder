@@ -1,10 +1,12 @@
 /* eslint-disable no-unused-vars */
 
 /* debug enables and disables intermediate nodes */
-var debugLogs = false;
-var intermediateNodesEnabled = false;
-var locationOutlinesEnabled = true;
-var buildingLabelsEnabled = true;
+let debugLogs = false;
+let intermediateNodesEnabled = false;
+let locationOutlinesEnabled = true;
+let buildingLabelsEnabled = true;
+let hiddenPaths = false;
+let editMode = false;
 
 Storage.prototype.setObject = function(key, value) {
     this.setItem(key, JSON.stringify(value));
@@ -25,13 +27,7 @@ const ADMIN = 10;
 const RESET_BUILDINGS = -1;
 
 let classPaths = [];
-const PERIOD0PATH = 0;
-const PERIOD1PATH = 1;
-const PERIOD2PATH = 2;
-const PERIOD3PATH = 3;
-const PERIOD4PATH = 4;
-const PERIOD5PATH = 5;
-let selectedPath = PERIOD0PATH;
+let selectedPath = 0;
 let lines = null;
 
 // For current position 
@@ -84,15 +80,13 @@ function initMap() {
             // console.log(markersMap);
         }
         /* Draws the shortest path from closestNodeToCurrentPos to Main Entrance */
-        else if (event.key == "Control") {
+        else if (event.key === "Control") {
             // closest node to main entrance
             // let shortestPath = findShortestPath(graph, "8104", "Main Entrance");
 
             // maps path from one period to the next
             // find a way so that paths don't just overlap and just cross each other
             createPeriodPaths();
-            showPath(PERIOD0PATH);
-
 
             if (debugLogs) {
                 console.log(shortestPath.distance);
@@ -102,59 +96,67 @@ function initMap() {
             }
         }
         /* Toggles Edit Mode, which lets you change the neighbors of a selected node */
-        else if (event.key == "CapsLock") {
+        else if (event.key === "CapsLock") {
             editMode = !editMode;
             updateNeighborVisibility();
-        }
-        else if (event.key == "NumLock") {
         }
     });
     createCurrentPosMarker();
     
-    /* Temporarily testing for different selectors/filters. These would be buttons, but more organized of course.  */
-    document.getElementById("showPaths").addEventListener('click', () => {
-        if (classPaths.length == 0) {
-            createPeriodPaths();
-        }
-        showAllPaths();
-        showPath(selectedPath);
-    });
-    document.getElementById("hidePaths").addEventListener('click', () => { hidePeriodPaths(); });
-    document.getElementById("button1").addEventListener('click', () => { showPath(PERIOD0PATH) });
-    document.getElementById("button2").addEventListener('click', () => { showPath(PERIOD1PATH) });
-    document.getElementById("button3").addEventListener('click', () => { showPath(PERIOD2PATH) });
-    document.getElementById("button4").addEventListener('click', () => { showPath(PERIOD3PATH) });
-    document.getElementById("button5").addEventListener('click', () => { showPath(PERIOD4PATH) });
-    document.getElementById("button6").addEventListener('click', () => { showPath(PERIOD5PATH) });
-    
-    document.getElementById("cafe4Button").addEventListener('click', () => { hideAllMarkers(); focusOnBuilding("Cafe 4") });
-    document.getElementById("cafe5Button").addEventListener('click', () => { hideAllMarkers(); focusOnBuilding("Cafe 5") });
-    document.getElementById("adminButton").addEventListener('click', () => { showMarkersOfBuilding(ADMIN) });
-    document.getElementById("bldg2button").addEventListener('click', () => { showMarkersOfBuilding(2) });
-    document.getElementById("bldg3button").addEventListener('click', () => { showMarkersOfBuilding(3) });
-    document.getElementById("bldg4button").addEventListener('click', () => { showMarkersOfBuilding(4) });
-    document.getElementById("bldg5button").addEventListener('click', () => { showMarkersOfBuilding(5) });
-    document.getElementById("bldg6button").addEventListener('click', () => { showMarkersOfBuilding(6) });
-    document.getElementById("bldg8button").addEventListener('click', () => { showMarkersOfBuilding(8) });
-    document.getElementById("gymButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Gym") });
-    document.getElementById("pavilionButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Pavilion") });
-    document.getElementById("pacButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("PAC") });
-    document.getElementById("stadiumButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Stadium") });
-    document.getElementById("fieldButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Field") });
-
-    document.getElementById("floorOneBldg4").addEventListener('click', () => { showMarkersOfBuildingAtFloor(4, 1) });
-    document.getElementById("floorTwoBldg4").addEventListener('click', () => { showMarkersOfBuildingAtFloor(4, 2) });
-    document.getElementById("floorOneBldg5").addEventListener('click', () => { showMarkersOfBuildingAtFloor(5, 1) });
-    document.getElementById("floorTwoBldg5").addEventListener('click', () => { showMarkersOfBuildingAtFloor(5, 2) });
-    document.getElementById("floorOneBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 1) });
-    document.getElementById("floorTwoBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 2) });
-    document.getElementById("floorThreeBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 3) });
+    document.getElementById("hidePaths").addEventListener('click', () => { hidePeriodPaths(); hiddenPaths = true})
+    document.getElementById("resetOutlines").addEventListener('click', () => { showOutlinesOfBuilding("", true) });
     document.getElementById("resetButton").addEventListener('click', () => { resetMap(); });
 
+    document.getElementById("showNextPath").addEventListener('click', () => {
+        if (hiddenPaths) {
+            showAllPaths()
+            hiddenPaths = false
+        }
+        // If the paths were previously hidden, re-initialize all of the paths again
+
+        updateSelectedPathOpacity()
+        selectedPath += 1 
+        if (selectedPath === 6) {
+            selectedPath = 0
+        }
+    });
+    
+    document.getElementById("showPreviousPath").addEventListener('click', () => {
+        if (hiddenPaths) {
+            showAllPaths()
+            hiddenPaths = false
+        }
+        // If the paths were previously hidden, re-initialize all of the paths again
+
+        updateSelectedPathOpacity();
+        selectedPath -= 1 
+        if (selectedPath === -1) {
+            selectedPath = 5
+        }
+    });
+    
+    document.getElementById("cafe4Button").addEventListener('click', () => { focusOnBuilding(locationMarkers, map, "Cafe 4") });
+    document.getElementById("cafe5Button").addEventListener('click', () => { focusOnBuilding(locationMarkers, map, "Cafe 5") });
+    document.getElementById("adminButton").addEventListener('click', () => { showMarkersOfBuilding(ADMIN) });
+    document.getElementById("gymButton").addEventListener('click', () => { showMarkersOfOtherBuilding(markers, map, "Gym") });
+    document.getElementById("pavilionButton").addEventListener('click', () => { showMarkersOfOtherBuilding(markers, map, "Pavilion") });
+    document.getElementById("pacButton").addEventListener('click', () => { showMarkersOfOtherBuilding(markers, map, "PAC") });
+    document.getElementById("stadiumButton").addEventListener('click', () => { showMarkersOfOtherBuilding(markers, map, "Stadium") });
+    document.getElementById("fieldButton").addEventListener('click', () => { showMarkersOfOtherBuilding(markers, map, "Field") });
     document.getElementById("classBldgButton").addEventListener('click', () => { showOutlinesOfBuilding("bldgs") });
     document.getElementById("cafeButton").addEventListener('click', () => { showOutlinesOfBuilding("cafe") });
     document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other"); showStairway("S3"); });
-    document.getElementById("resetOutlines").addEventListener('click', () => { showOutlinesOfBuilding("", true) });
+    // OTHER BUILDING SELECTORS
+    
+    Object.values(document.getElementsByClassName("building")).map((val, index) => val.addEventListener("click", () => index + 2 === 7 ? showMarkersOfBuilding(8) : showMarkersOfBuilding(index + 2)))
+    // CLASSROOM BUILDING SELECTORS: Loops through every button that has the class of 'building' and assigns a click event listener to show markers of that specific building by adding 2 to the interation index
+    
+    Object.values(document.getElementsByClassName("floor")).map(val => {
+        let floorNumber = val.id.split("Bldg")[0].split("floor")[1]
+        let buildingNumber = val.id.split("Bldg")[1]
+        val.addEventListener("click", () => {showMarkersOfBuildingAtFloor(buildingNumber, floorNumber)})
+    })
+    // FLOOR SELECTOR: Loops through every item in the floor selector. Gets building and floor number based on the button's ID through string manipulation
 
     // Loads in all nodes from nodes.json into memory
     socket.emit("requestNodes");
@@ -170,18 +172,18 @@ function initMap() {
 /* Takes parsed node json data from server.js socket and loads it into nodes and graph dataset */
 socket.on("loadNodes", (nodeData) => {
     nodes = nodeData;
-    for (var node in nodes) {
+    for (let node in nodes) {
         // changes all rooms' isRoom flag to true
         // everything from here to the next comment can be removed for user site
         nodes[node]["isRoom"] = false;
         if (node.length > 3) {
             nodes[node]["isRoom"] = true;
         }
-        //
+        
 
         graph[node] = {};
         // loads each node and its neighbors into the graph
-        for (var neighbor = 0; neighbor < nodes[node]["neighbors"].length; neighbor++) {
+        for (let neighbor = 0; neighbor < nodes[node]["neighbors"].length; neighbor++) {
             graph[node][nodes[node]["neighbors"][neighbor]] = google.maps.geometry.spherical.computeDistanceBetween( { lat: nodes[node]["lat"], lng: nodes[node]["lng"] }, { lat: nodes[nodes[node]["neighbors"][neighbor]]["lat"], lng: nodes[nodes[node]["neighbors"][neighbor]]["lng"] } );
         }
         if (nodes[node].isRoom || intermediateNodesEnabled) {
@@ -191,7 +193,7 @@ socket.on("loadNodes", (nodeData) => {
     // If there is a neighbor for a node, that neighbor's neighbor will be the node.
     // Ex. A is a neighbor of B, but B is not defined as a neighbor of A
     // These for loops will make B a neighbor of A
-    for (var node in graph) {
+    for (let node in graph) {
         for (var neighbor in graph[node]) {
             graph[neighbor][node] = graph[node][neighbor];
         }
@@ -236,7 +238,7 @@ socket.on("loadOutlines", (coordsData) => {
 });
 
 function createBuildingOutlines(locationOutlinesCoords) {
-    for (var category in locationOutlinesCoords) {
+    for (let category in locationOutlinesCoords) {
         let locationOutlinesRow = {};
         let color;
         switch (category) {
@@ -302,11 +304,11 @@ socket.on("loadLocationCoords", (coordsData) => {
 });
 
 function onSearchedItem(item) {
-    if (typeof(item.split("--")[1]) != "undefined") {
+    if (typeof(item.split("--")[1]) !== "undefined") {
         hideAllMarkers();
         let roomNumber = item.split("--")[1];
         for (var marker in markers) {
-            if (markers[marker].getLabel() == roomNumber) {
+            if (markers[marker].getLabel() === roomNumber) {
                 markers[marker].setMap(map);
                 map.setCenter(markers[marker].getPosition());
                 map.setZoom(19);
@@ -353,3 +355,10 @@ socket.on("showSwimmingPool", () => {
     })
     // Egg of Easter.
 })
+
+window.onload = function () {
+    if (classPaths.length === 0) {
+        createPeriodPaths();
+    }
+    // Loads the classroom pathing file AFTER the entire page has been loaded. Function is reliant on all nodes on the map being loaded before determining the shortest path possible.
+}   

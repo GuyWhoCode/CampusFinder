@@ -50,7 +50,7 @@
                 <li><a class="dropdown-item" data-bs-toggle="offcanvas" href="#classesSidebar" role="button" aria-controls="classesSidebar">View Classes</a></li>
                 <li><a class="dropdown-item" href="/admin">Admin Dashboard</a></li>
                 <li><a class="dropdown-item" href="/settings">Preferences</a></li>
-                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#betaInformationModal">Beta Information</a></li>
+                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#betaInformationModal" href="">Beta Information</a></li>
                 <!-- TEMP for Beta Information -->
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" id="loginElm">Login with Google</a></li>
@@ -78,59 +78,60 @@
     </div>
     <!-- Bootstrap Classes Sidebar -->
     
-    <input type="search" id="nameOfNode">
+    <!-- <input type="search" id="nameOfNode"> -->
     <!-- <h1>Shift: Print Graph | Enter: Save graph to JSON | Backspace: Load graph from JSON | Control: Display shortest path</h1> -->
     <!-- <h2 id="selectedNode">Selected Node: Edit Mode: </h2> -->
-    <div id="debugMap">
-        <div id="buttons">
-            <button type="button" id="showPaths">Show Paths</button>
-            <button type="button" id="hidePaths">Hide Paths</button>
-            <button type="button" id="button1">Path 1</button>
-            <button type="button" id="button2">Path 2</button>
-            <button type="button" id="button3">Path 3</button>
-            <button type="button" id="button4">Path 4</button>
-            <button type="button" id="button5">Path 5</button>
-            <button type="button" id="button6">Path 6</button>
-
-            <br></br>
-
-            <button type="button" id="cafe4Button">Cafe 4</button>
-            <button type="button" id="cafe5Button">Cafe 5</button>
-            <button type="button" id="adminButton">Admin</button>
-            <button type="button" id="bldg2button">Building 2</button>
-            <button type="button" id="bldg3button">Building 3</button>
-            <button type="button" id="bldg4button">Building 4</button>
-            <button type="button" id="bldg5button">Building 5</button>
-            <button type="button" id="bldg6button">Building 6</button>
-            <button type="button" id="bldg8button">Building 8</button>
-            <button type="button" id="gymButton">Gym</button>
-            <button type="button" id="pavilionButton">Pavilion</button>
-            <button type="button" id="pacButton">PAC</button>
-            <button type="button" id="stadiumButton">Stadium</button>
-            <button type="button" id="fieldButton">Field</button>
-
-            <br></br>
-
-            <button type="button" id="floorOneBldg4">1st Floor Building 4</button>
-            <button type="button" id="floorTwoBldg4">2nd Floor Building 4</button>
-            <button type="button" id="floorOneBldg5">1st Floor Building 5</button>
-            <button type="button" id="floorTwoBldg5">2nd Floor Building 5</button>
-            <button type="button" id="floorOneBldg3">1st Floor Building 3</button>
-            <button type="button" id="floorTwoBldg3">2nd Floor Building 3</button>
-            <button type="button" id="floorThreeBldg3">3rd Floor Building 3</button>
-            <button type="button" id="resetButton">Reset Markers</button>
-
-            <br></br>
-
-            <button type="button" id="classBldgButton">Class Buildings</button>
-            <button type="button" id="cafeButton">Cafeterias</button>
-            <button type="button" id="otherButton">Other Buildings</button>
-            <button type="button" id="resetOutlines">Reset Outlines</button>
-        </div>
-        <div id="map"></div>
-    </div>
-    <!-- Eventually, at the end, div debugMap should just resolve to the div with map -->
     
+    <button id="showNextPath">Show Next Path</button>
+    <button id="showPreviousPath">Previous Path</button>
+    <button id="hidePaths">Hide Paths</button>
+    <button id="resetButton">Reset Markers</button>
+    <button id="resetOutlines">Reset Outlines</button>
+    <br>
+
+    <div class="btn-group dropup" id="floorSelectorDropdown">
+        <button type="button" style="color: white;" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Select Floor</button>
+        <div class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+            <button class="dropdown-item floor" type="button" id="floor1Bldg4">1st Floor Building 4</button>
+            <button class="dropdown-item floor" type="button" id="floor2Bldg4">2nd Floor Building 4</button>
+            <button class="dropdown-item floor" type="button" id="floor1Bldg5">1st Floor Building 5</button>
+            <button class="dropdown-item floor" type="button" id="floor2Bldg5">2nd Floor Building 5</button>
+            <button class="dropdown-item floor" type="button" id="floor1Bldg3">1st Floor Building 3</button>
+            <button class="dropdown-item floor" type="button" id="floor2Bldg3">2nd Floor Building 3</button>
+            <button class="dropdown-item floor" type="button" id="floor3Bldg3">3rd Floor Building 3</button>
+        </div>
+    </div>
+    <!-- Bootstrap Dropdown for Floor Selector -->
+
+    <br>
+    <div class="btn-group dropup" id="buildingDropDown">
+        <button type="button" style="color: white;" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Select Building</button>
+        <div class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+            <button class="dropdown-item" type="button" id="cafe4Button">Cafe 4</button>
+            <button class="dropdown-item" type="button" id="cafe5Button">Cafe 5</button>
+            <button class="dropdown-item" type="button" id="adminButton">Admin</button>
+            <button class="dropdown-item building" type="button" id="bldg2button">Building 2</button>
+            <button class="dropdown-item building" type="button" id="bldg3button">Building 3</button>
+            <button class="dropdown-item building" type="button" id="bldg4button">Building 4</button>
+            <button class="dropdown-item building" type="button" id="bldg5button">Building 5</button>
+            <button class="dropdown-item building" type="button" id="bldg6button">Building 6</button>
+            <button class="dropdown-item building" type="button" id="bldg8button">Building 8</button>
+            <button class="dropdown-item" type="button" id="gymButton">Gym</button>
+            <button class="dropdown-item" type="button" id="pavilionButton">Pavilion</button>
+            <button class="dropdown-item" type="button" id="pacButton">PAC</button>
+            <button class="dropdown-item" type="button" id="stadiumButton">Stadium</button>
+            <button class="dropdown-item" type="button" id="fieldButton">Field</button>
+            <button class="dropdown-item" type="button" id="classBldgButton">All Class Buildings</button>
+            <button class="dropdown-item" type="button" id="cafeButton">All Cafeterias</button>
+            <button class="dropdown-item" type="button" id="otherButton">Other Buildings</button>
+        </div>
+    </div>
+    <!-- Bootstrap Dropdown for buildings -->
+    
+    <div id="map"></div>
+    <!-- Loads Google Map -->
+
+
     <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="classSearchResult" aria-labelledby="searchResultArea">        
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="searchResultArea">Search Result</h5>
@@ -173,6 +174,7 @@
     </div>
     <!-- Bootstrap Search Result for Classes Sidebar -->
 
+
     <div class="modal fade" tabindex="-1" aria-labelledby="classDenialModal" aria-hidden="true" id="classDenialModal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -191,6 +193,7 @@
     </div>
     <!-- Error message from Bootstrap Modal when user is not logged in -->
 
+
     <div class="modal fade" tabindex="-1" aria-labelledby="betaInformationModal" aria-hidden="true" id="betaInformationModal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -199,10 +202,10 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Hello voluntary (hopefully) beta tester. Welcome to Campus Finder, an application that helps students navigate their way through campus. This application is a year-long project for the Engineering, Design, and Development (EDD) class, where there's only eight of us total!
+                    Hello (hopefully) voluntary beta tester. Welcome to Campus Finder, an application that helps students navigate their way through campus. This application is a year-long project for the Engineering, Design, and Development (EDD) class of eight students total!
                     <br>
                     <br>
-                    Since we intend on students at West to use our app, it's only fair that we have the current students conduct tests beyond our internal ones. If you need to bring this page back again, simply click on the User icon in the top right and select "Beta Information." Here's what we want you to do:
+                    Our intention is to have current students conduct tests beyond our internal ones. To return to this page later, simply click on the User icon in the top right and select "Beta Information." Beta Tester Tasks:
                     <br>
                     <ol>
                         <li>Search for a teacher with the search bar and see if their room location is relatively accurate</li>
@@ -214,7 +217,7 @@
                     <br>
                     Thanks,
                     <br>
-                    The Campus Finder Team: Jason A., Ian, and Jay
+                    The Campus Finder Team: Jason A., Ian D., and Jay M.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -222,8 +225,8 @@
             </div>
         </div>
     </div>
-    
     <!-- TEMP Temporary message telling beta testers what to do -->
+
 
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCaLWlcr-27e1s6xXMQuXczqfE-Yore6XY&libraries=geometry&callback=initMap"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>

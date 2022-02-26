@@ -3,6 +3,7 @@ require("dotenv").config()
 const mongoClient = require('mongodb').MongoClient
 const dbClient = new mongoClient(process.env.uri);
 const fileReader = require("graceful-fs")
+const fs = require("fs")
 
 const express = require("express");
 const app = express();
@@ -39,7 +40,7 @@ app.get("/settings", function(request, response) {
 // Express.js setup to initialize different routes of the webpage.
 
 const socket = require("socket.io")(server, { pingTimeout: 60000 })
-dbClient.connect(async () => {
+// dbClient.connect(async () => {
     console.log("Connected to database!")
     socket.on('connection', io => {
         console.log("I have a connection to the website!")
@@ -203,5 +204,5 @@ dbClient.connect(async () => {
         })
 
     })
-})
+// })
 // Database instance initialized before the socket makes a connection with the client-side website to lower the amount of connections established to the database

@@ -154,6 +154,7 @@ function showAllMarkers() {
 }
 
 function hideAllMarkers() {
+    console.log("I am being run!")
     for (var marker in markers) {
         markers[marker].setMap(null);
     }
@@ -247,19 +248,21 @@ function showMarkersOfBuildingAtFloor(buildingNumber, floorNumber) {
         let markerBuildingNumber = markers[marker].getLabel().charAt(0);
         let markerFloorNumber = markers[marker].getLabel().charAt(1);
 
+        // eslint-disable-next-line eqeqeq
         if (markerBuildingNumber == buildingNumber && markerFloorNumber == floorNumber) {
-            markers[marker].setMap(null);
+            markers[marker].setMap(map);
         }
         else {
-            markers[marker].setMap(map);
+            markers[marker].setMap(null);
         }
     }
 }
 
-function showMarkersOfOtherBuilding(building) {
-    for (var marker in markers) {
-        if (markers[marker].getLabel().split(" ")[0] == building) {
-            markers[marker].setMap(map);
+function showMarkersOfOtherBuilding(markerList, mapInstance, building) {
+    hideAllMarkers();
+    for (let marker in markerList) {
+        if (markerList[marker].getLabel().split(" ")[0] === building) {
+            markerList[marker].setMap(mapInstance);
         }
     }
 }
@@ -267,21 +270,32 @@ function showMarkersOfOtherBuilding(building) {
 function focusOnMarkerAtClassroomBuilding(buildingNumber) {
     for (var buildingCenterMarker in locationMarkers) {
         let markerLabelLength = locationMarkers[buildingCenterMarker].getLabel().length;
-        if (locationMarkers[buildingCenterMarker].getLabel().charAt(0) == 'B' &&
-            locationMarkers[buildingCenterMarker].getLabel().charAt(markerLabelLength - 1) == buildingNumber || buildingNumber == -1) {
+        if (locationMarkers[buildingCenterMarker].getLabel().charAt(0) === 'B' &&
+            locationMarkers[buildingCenterMarker].getLabel().charAt(markerLabelLength - 1) === buildingNumber || buildingNumber === -1) {
             map.setCenter(locationMarkers[buildingCenterMarker].getPosition());
             map.setZoom(19);
             break;
         }
     }
+    // markerLocations, mapInstance,
+    // for (var buildingCenterMarker in markerLocations) {
+    //     let markerLabelLength = markerLocations[buildingCenterMarker].getLabel().length;
+    //     if (markerLocations[buildingCenterMarker].getLabel().charAt(0) === 'B' &&
+    //         markerLocations[buildingCenterMarker].getLabel().charAt(markerLabelLength - 1) === buildingNumber || buildingNumber === -1) {
+    //         mapInstance.setCenter(markerLocations[buildingCenterMarker].getPosition());
+    //         mapInstance.setZoom(19);
+    //         break;
+    //     }
+    // }
 }
 
-function focusOnBuilding(building) {
-    for (var buildingCenterMarker in locationMarkers) {
-        if (locationMarkers[buildingCenterMarker].getLabel() == building) {
-            locationMarkers[buildingCenterMarker].setMap(map);
-            map.setCenter(locationMarkers[buildingCenterMarker].getPosition());
-            map.setZoom(19);
+function focusOnBuilding(markerLocations, mapInstance, building) {
+    hideAllMarkers();
+    for (var buildingCenterMarker in markerLocations) {
+        if (markerLocations[buildingCenterMarker].getLabel() === building) {
+            markerLocations[buildingCenterMarker].setMap(mapInstance);
+            mapInstance.setCenter(markerLocations[buildingCenterMarker].getPosition());
+            mapInstance.setZoom(19);
             break;
         }
     }
