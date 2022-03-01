@@ -290,12 +290,18 @@ function focusOnBuilding(building) {
     }
 }
 
+function findCenter(m1Lat, m1Lng, m2Lat, m2Lng) {
+    let latBetweenMarkers = m1Lat - m2Lat;
+    let newLat = m1Lat - latBetweenMarkers/2;
+    let lngBetweenMarkers = m1Lng - m2Lng;
+    let newLng = m1Lng - lngBetweenMarkers/2;
+
+    return {lat: newLat, lng: newLng};
+}
+
 function focusOnOtherBuildingWithMarkers(m1, m2) {
-    let latBetweenMarkers = m1.getPosition().lat() - m2.getPosition().lat();
-    let newLat = m1.getPosition().lat() - latBetweenMarkers/2;
-    let lngBetweenMarkers = m1.getPosition().lng() - m2.getPosition().lng();
-    let newLng = m1.getPosition().lng() - lngBetweenMarkers/2;
-    map.setCenter({lat: newLat, lng: newLng});
+    let newCenter = findCenter(m1.getPosition().lat(), m1.getPosition().lng(), m2.getPosition().lat(), m2.getPosition().lng());
+    map.setCenter(newCenter);
     map.setZoom(19)
 }
 

@@ -3,6 +3,7 @@ require("dotenv").config()
 const mongoClient = require('mongodb').MongoClient
 const dbClient = new mongoClient(process.env.uri);
 const fileReader = require("graceful-fs")
+const fs = require("fs")
 
 const express = require("express");
 const app = express();

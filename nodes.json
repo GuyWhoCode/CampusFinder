@@ -755,20 +755,10 @@
 		"neighbors": [],
 		"isRoom": true
 	},
-	"Mr. Holt's Stomping Grounds": {
-		"lat": 33.848250426616666,
-		"lng": -118.36898124196345,
-		"neighbors": [
-			"N",
-			"W"
-		],
-		"isRoom": true
-	},
 	"Swimming Pool": {
 		"lat": 33.84525302073764,
 		"lng": -118.3681254437801,
 		"neighbors": [
-			"Mr. Holt's Stomping Grounds"
 		],
 		"isRoom": true
 	},
@@ -1156,7 +1146,8 @@
 		"neighbors": [
 			"AS",
 			"N",
-			"AU"
+			"AU",
+			"Field 2"
 		],
 		"isRoom": false
 	},
@@ -1168,7 +1159,8 @@
 			"M",
 			"AS",
 			"AT",
-			"N"
+			"N",
+			"Field 1"
 		],
 		"isRoom": false
 	},
@@ -1305,7 +1297,10 @@
 		"lng": -118.36833003878868,
 		"neighbors": [
 			"BD",
-			"BE"
+			"BE",
+			"FE",
+			"Gym 2",
+			"Portable 1"
 		],
 		"isRoom": true
 	},
@@ -1744,10 +1739,23 @@
 		],
 		"isRoom": false
 	},
-	"": {
-		"lat": 33.848185684765845,
-		"lng": -118.37013686609174,
-		"neighbors": [],
+	"FF": {
+		"lat": 33.84754339421414,
+		"lng": -118.37027195970721,
+		"neighbors": [
+			"Field 4",
+			"Tennis Courts"
+		],
+		"isRoom": false
+	},
+	"FE": {
+		"lat": 33.84768757172994,
+		"lng": -118.3683319545962,
+		"neighbors": [
+			"Stadium 2",
+			"Stadium 1",
+			"Tennis Courts"
+		],
 		"isRoom": false
 	},
 	"Tennis Courts": {
@@ -1757,27 +1765,29 @@
 		"isRoom": true
 	},
 	"Field 1": {
-		"lat": 33.84577050802247,
+		"lat": 33.84574377584191,
 		"lng": -118.36937298856934,
 		"neighbors": [],
-		"isRoom": false
+		"isRoom": true
 	},
 	"Field 2": {
 		"lat": 33.846937805083385,
 		"lng": -118.36937835298737,
 		"neighbors": [],
-		"isRoom": false
+		"isRoom": true
 	},
 	"Field 3": {
 		"lat": 33.846482596733956,
 		"lng": -118.370934034216,
 		"neighbors": [],
-		"isRoom": false
+		"isRoom": true
 	},
 	"Field 4": {
 		"lat": 33.8475073154758,
 		"lng": -118.37091794096192,
-		"neighbors": [],
-		"isRoom": false
+		"neighbors": [
+			"FF"
+		],
+		"isRoom": true
 	}
 }

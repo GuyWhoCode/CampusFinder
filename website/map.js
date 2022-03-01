@@ -2,7 +2,7 @@
 
 /* debug enables and disables intermediate nodes */
 var debugLogs = false;
-var intermediateNodesEnabled = false;
+var intermediateNodesEnabled = true;
 var locationOutlinesEnabled = true;
 var buildingLabelsEnabled = true;
 
@@ -34,6 +34,12 @@ const PERIOD4PATH = 4;
 const PERIOD5PATH = 5;
 let selectedPath = PERIOD0PATH;
 let lines = null;
+
+const NORMAL_MAP_MODE = 0;
+const CURRENT_POS_MODE = 1;
+let currentMode = NORMAL_MAP_MODE;
+
+let editMode = false;
 
 // For current position 
 var currentLat;
@@ -76,6 +82,12 @@ function initMap() {
         gestureHandling: "greedy",
     });
 
+    /* Adds marker on click
+        Click listener can be deleted for user site. */
+    map.addListener("click", (event) => {
+        createMarkerClick(event);
+    });
+
     // All of this keydown listener except for numLock can be deleted for user site
     document.getElementById("map").addEventListener("keydown", function(event) {
         // Prints nodes (coordinates) and graph (distances)
@@ -84,11 +96,16 @@ function initMap() {
             console.log(graph);
             // console.log(markersMap);
         }
+        else if (event.key == "Delete") {
+            deleteSelectedMarker();
+        }
+        else if (event.key == "Enter") {
+            var jsonData = JSON.stringify(nodes, null, "\t");
+            socket.emit("saveNodes", jsonData);
+            console.log("Saved JSON");
+        }
         /* Draws the shortest path from closestNodeToCurrentPos to Main Entrance */
         else if (event.key == "Control") {
-            // closest node to main entrance
-            // let shortestPath = findShortestPath(graph, "8104", "Main Entrance");
-
             // maps path from one period to the next
             // find a way so that paths don't just overlap and just cross each other
             createPeriodPaths();
@@ -154,7 +171,7 @@ function initMap() {
 
     document.getElementById("classBldgButton").addEventListener('click', () => { showOutlinesOfBuilding("bldgs") });
     document.getElementById("cafeButton").addEventListener('click', () => { showOutlinesOfBuilding("cafe") });
-    document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other"); showStairway("S3"); });
+    document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other") });
     document.getElementById("resetOutlines").addEventListener('click', () => { showOutlinesOfBuilding("", true) });
 
     // Loads in all nodes from nodes.json into memory
@@ -349,13 +366,13 @@ socket.on("nodeSelected", room => {
 
 socket.on("showSwimmingPool", () => {
     markers.map(val => {
-        val.setAnimation(null);
-        val.setIcon(null);
+        val.setMap(null);
         if (val.getLabel() === "Swimming Pool") {
             let markerLat = val.getPosition().lat();
             let markerLng = val.getPosition().lng();
             map.setCenter({lat: markerLat, lng: markerLng})
-            map.setZoom(20)
+            map.setZoom(20);
+            val.setMap(map);
             val.setAnimation(google.maps.Animation.BOUNCE);
             val.setIcon(selectedNodeImage);
         }

@@ -62,6 +62,12 @@ function updateStairways(stairway) {
         }
         else {
             stairwayList[stairwayEntry].setMap(map);
+            let firstMarker = stairwayList[stairwayEntry].getPaths().getAt(0).getAt(0);
+            let secondMarker = stairwayList[stairwayEntry].getPaths().getAt(0).getAt(2);
+            let newCenter = findCenter(firstMarker.lat(), firstMarker.lng(), secondMarker.lat(), secondMarker.lng());
+            // tells you that there is a stairway that needs to be used
+            map.setCenter(newCenter);
+            map.setZoom(19);
         }
     }
 }
