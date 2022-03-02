@@ -30,7 +30,7 @@ html, body {
 #goBottom {
     position: absolute;
     bottom: 0;
-    left: 20%; 
+    left: 30%; 
 }
 #searchButton {
     background-color: #e9d283;
@@ -48,13 +48,6 @@ html, body {
 .navbarItem, .navbarItem:hover, .nav-link:focus {
     color: #FFFFFF;
     transition-duration: 0s;
-}
-#logo {
-    max-width: 3em;
-    display: flex;
-    float: right;
-    cursor: pointer;
-    margin: auto 0;
 }
 #searchButton {
     display: none;
@@ -101,19 +94,61 @@ html, body {
     flex-direction: column;
     text-align: end;
 }
-#goClass {
+#goClass, #menuToggle {
     display: block;
     margin: 0 auto;
 }
+#menuIcon {
+    width: 36px;
+    cursor: pointer;
+}
 #userInfo {
-  color: white;
+    color: white;
 }
-#WHSIcon {
-    display: flex;
-    margin: auto;
+.menuOption {
+    display: grid;
+    grid-template-columns: 30% 70%;
+    background-color: #bebebe;
+    margin: 5% auto;
+    height: 8vh;
+    width: 100%;
+    align-items: center;
+    justify-items: center;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    transition: background-color 0.5s 0.3s;
+    cursor: pointer;
+    text-decoration: none;
+    color: #000000;
 }
-#WHSwebsite {
-    float: left;
+.menuOption:hover {
+    background-color: #8d8a8a;
+    text-decoration: none;
+    color: #000000;
+}
+.optionText {
+    margin: 0;
+}
+#menuSelector {
+    display: grid;
+    grid-template-rows: repeat(5, auto);
+}
+.mapDropdown {
+    position: absolute;
+    z-index: 5;
+    bottom: 0vh;
+    background-color: #303030;
+    border-radius: 10%;
+}
+#buildingDropDown {
+    right: 15em;
+}
+#floorSelectorDropdown {
+    right: 5em;
+}
+.mapDropdownButton {
+    color:#FFFFFF;
 }
 @media (min-width: 768px) {
     #searchButton {
@@ -128,10 +163,10 @@ html, body {
     #navbar {
         grid-template-columns: 20% auto 10%;
     }
-    #logo {
-        max-width: 4em;
+    #menuToggle {
+        margin-left: 5%;
     }
-    #WHSIcon {
-        margin: auto 0;
+    #menuIcon {
+        width: 48px;
     }
 }

@@ -19,6 +19,8 @@ let teacherImg = document.getElementById("teacherImg")
 // eslint-disable-next-line no-undef
 let classSearchResult = new bootstrap.Offcanvas(document.getElementById("classSearchResult"))
 // eslint-disable-next-line no-undef
+let mainMenuSidebar = new bootstrap.Offcanvas(document.getElementById("menuSidebar"))
+// eslint-disable-next-line no-undef
 let classDenialModal = new bootstrap.Modal(document.getElementById('classDenialModal'))
 
 // eslint-disable-next-line no-undef
@@ -113,7 +115,7 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
 }
 // Added to adjust for the mobile view of making the Search button work
 
-document.getElementById("changeClasses").addEventListener("click", () => sessionStorage.getItem("email") !== null ? window.location = "/class" : classDenialModal.show())
+Object.values(document.getElementsByClassName("changeClasses")).map(val => val.addEventListener("click", () => sessionStorage.getItem("email") !== null ? window.location = "/class" : classDenialModal.show()))
 if (sessionStorage.darkMode === "false") {
     document.getElementById("navbar").style.backgroundColor = "#e9d283"
     document.getElementById("searchButton").style.backgroundColor = "#554826"
@@ -130,3 +132,7 @@ if (localStorage.getObject("teacherList") !== null) {
     teachers = localStorage.getObject("teacherList")
     // Uses the local teacher list to initialize teacher autocomplete
 }
+
+document.getElementById("menuToggle").addEventListener("click", () => {
+    mainMenuSidebar.show()
+})

@@ -16,8 +16,6 @@ Storage.prototype.getObject = function(key) {
     return JSON.parse(this.getItem(key));
 }
 
-sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--5201', 1: 'Reyes, Pete--5200', 2: 'Charlin-Wade, Kathryn--5100', 3: 'Jin, Jason--3101', 4: 'Cerda, Becky--6100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--4210' })
-
 let map;
 let westHighCoords = { lat: 33.846586, lng: -118.367709 };
 let markers = [];
@@ -34,8 +32,6 @@ let lines = null;
 var currentLat;
 var currentLng;
 var closestNodeToCurrentPos = null;
-
-let nodes = {};
 let graph = {};
 
 let selectedNode = "Main Entrance";
@@ -52,6 +48,90 @@ let altNamesClassrooms = {
 // eslint-disable-next-line no-undef
 let socket = io("/");
 
+function createBuildingOutlines(locationOutlinesCoords) {
+    for (let category in locationOutlinesCoords) {
+        let locationOutlinesRow = {};
+        let color;
+        switch (category) {
+            case "bldgs":
+                color = "#5557f2";
+                break;
+            case "cafe":
+                color = "#50d455";
+                break;
+            case "other":
+                color = "#d7e336";
+                break;
+            case "stairs":
+                color = "#fc03df";
+                break;
+        }
+
+        for (var location in locationOutlinesCoords[category]) {
+            locationOutlinesRow[location] = new google.maps.Polygon({
+                paths: locationOutlinesCoords[category][location],
+                strokeColor: color,
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: color,
+                fillOpacity: 0.25,
+                map: map
+            });
+        }
+        locationOutlines[category] = locationOutlinesRow;
+    }
+}
+
+function loadNodesIntoMap(nodesList) {
+    for (let node in nodesList) {
+        // changes all rooms' isRoom flag to true
+        // everything from here to the next comment can be removed for user site
+        nodesList[node]["isRoom"] = false;
+        if (node.length > 3) {
+            nodesList[node]["isRoom"] = true;
+        }
+        
+
+        graph[node] = {};
+        // loads each node and its neighbors into the graph
+        for (let neighbor = 0; neighbor < nodesList[node]["neighbors"].length; neighbor++) {
+            graph[node][nodesList[node]["neighbors"][neighbor]] = google.maps.geometry.spherical.computeDistanceBetween( { lat: nodesList[node]["lat"], lng: nodesList[node]["lng"] }, { lat: nodesList[nodesList[node]["neighbors"][neighbor]]["lat"], lng: nodesList[nodesList[node]["neighbors"][neighbor]]["lng"] } );
+        }
+        if (nodesList[node].isRoom || intermediateNodesEnabled) {
+            createMarker(node);
+        }
+    }
+    // If there is a neighbor for a node, that neighbor's neighbor will be the node.
+    // Ex. A is a neighbor of B, but B is not defined as a neighbor of A
+    // These for loops will make B a neighbor of A
+    for (let node in graph) {
+        for (var neighbor in graph[node]) {
+            graph[neighbor][node] = graph[node][neighbor];
+        }
+    }
+
+    /* Code sample from https://developers.google.com/maps/documentation/javascript/geolocation
+       Gets current Location and the node closest to the current location
+    */
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            currentLat = position.coords.latitude;
+            currentLng = position.coords.longitude;
+            findClosestNodeToCurrentPos();
+            // shortestPath
+            // drawLines()
+          },
+          () => {
+            alert("Error: The Geolocation service failed.");
+          }
+        );
+        
+    } else {
+      // Browser doesn't support Geolocation or user denied the app from getting location
+      alert("Error: Your browser doesn't support geolocation.");
+    }
+}
 
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
@@ -158,69 +238,26 @@ function initMap() {
     })
     // FLOOR SELECTOR: Loops through every item in the floor selector. Gets building and floor number based on the button's ID through string manipulation
 
-    // Loads in all nodes from nodes.json into memory
-    socket.emit("requestNodes");
-    
-    if (locationOutlinesEnabled) {
-        socket.emit("requestOutlines");
+    if (localStorage.getItem("loadedMapInformation") === null) {
+        // If the map information is not cached yet, request for the data to be cached.
+        socket.emit("requestNodes");
+        
+        if (locationOutlinesEnabled) {
+            socket.emit("requestOutlines");
+        }
+        if (buildingLabelsEnabled) {
+            socket.emit("requestLocationCoords");
+        }
+        return localStorage.setItem("loadedMapInformation", true)
+        // Exits out of the code to prevent errors from occuring for the code below that runs when a cache exists
     }
-    if (buildingLabelsEnabled) {
-        socket.emit("requestLocationCoords");
-    }
+
+   
+    createBuildingOutlines(localStorage.getObject("outlineData"))
+    createInfoMarkers(localStorage.getObject("locationCoordsData"))
+    loadNodesIntoMap(localStorage.getObject("nodeData"))
+    // Initializes building outlines, classroom buildings, and classroom nodes with cached data
 }
-
-/* Takes parsed node json data from server.js socket and loads it into nodes and graph dataset */
-socket.on("loadNodes", (nodeData) => {
-    nodes = nodeData;
-    for (let node in nodes) {
-        // changes all rooms' isRoom flag to true
-        // everything from here to the next comment can be removed for user site
-        nodes[node]["isRoom"] = false;
-        if (node.length > 3) {
-            nodes[node]["isRoom"] = true;
-        }
-        
-
-        graph[node] = {};
-        // loads each node and its neighbors into the graph
-        for (let neighbor = 0; neighbor < nodes[node]["neighbors"].length; neighbor++) {
-            graph[node][nodes[node]["neighbors"][neighbor]] = google.maps.geometry.spherical.computeDistanceBetween( { lat: nodes[node]["lat"], lng: nodes[node]["lng"] }, { lat: nodes[nodes[node]["neighbors"][neighbor]]["lat"], lng: nodes[nodes[node]["neighbors"][neighbor]]["lng"] } );
-        }
-        if (nodes[node].isRoom || intermediateNodesEnabled) {
-            createMarker(node);
-        }
-    }
-    // If there is a neighbor for a node, that neighbor's neighbor will be the node.
-    // Ex. A is a neighbor of B, but B is not defined as a neighbor of A
-    // These for loops will make B a neighbor of A
-    for (let node in graph) {
-        for (var neighbor in graph[node]) {
-            graph[neighbor][node] = graph[node][neighbor];
-        }
-    }
-
-    /* Code sample from https://developers.google.com/maps/documentation/javascript/geolocation
-       Gets current Location and the node closest to the current location
-    */
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            currentLat = position.coords.latitude;
-            currentLng = position.coords.longitude;
-            findClosestNodeToCurrentPos();
-            // shortestPath
-            // drawLines()
-          },
-          () => {
-            alert("Error: The Geolocation service failed.");
-          }
-        );
-        
-      } else {
-        // Browser doesn't support Geolocation or user denied the app from getting location
-        alert("Error: Your browser doesn't support geolocation.");
-      }
-});
 
 /*  Calculates the distance in meters between two points with the latitude and longitude of each
     https://www.movable-type.co.uk/scripts/latlong.html */
@@ -231,44 +268,6 @@ function distance(lat1, lon1, lat2, lon2) {
     const y = (φ2-φ1);
     const d = Math.sqrt(x*x + y*y) * R;
     return d;
-}
-
-socket.on("loadOutlines", (coordsData) => {
-    createBuildingOutlines(coordsData);
-});
-
-function createBuildingOutlines(locationOutlinesCoords) {
-    for (let category in locationOutlinesCoords) {
-        let locationOutlinesRow = {};
-        let color;
-        switch (category) {
-            case "bldgs":
-                color = "#5557f2";
-                break;
-            case "cafe":
-                color = "#50d455";
-                break;
-            case "other":
-                color = "#d7e336";
-                break;
-            case "stairs":
-                color = "#fc03df";
-                break;
-        }
-
-        for (var location in locationOutlinesCoords[category]) {
-            locationOutlinesRow[location] = new google.maps.Polygon({
-                paths: locationOutlinesCoords[category][location],
-                strokeColor: color,
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: color,
-                fillOpacity: 0.25,
-                map: map
-            });
-        }
-        locationOutlines[category] = locationOutlinesRow;
-    }
 }
 
 // part of creating filters for outlines
@@ -298,11 +297,6 @@ function showOutlinesOfBuilding(buildingType, reset) {
     map.setZoom(18);
 }
 
-socket.on("loadLocationCoords", (coordsData) => {
-    createInfoMarkers(coordsData);
-    // onSearchedItem("Collins, Jeff--5201")
-});
-
 function onSearchedItem(item) {
     if (typeof(item.split("--")[1]) !== "undefined") {
         hideAllMarkers();
@@ -322,6 +316,28 @@ function onSearchedItem(item) {
         // would be gym or pavilion or pac. 
     }
 }
+
+socket.on("loadNodes", (nodeData) => {
+    localStorage.setObject("nodeData", nodeData)
+    // Caches the outline data to reduce load on internal socket
+    loadNodesIntoMap(nodeData)
+});
+// Loads map nodes on socket request from internal server -- Ran when data is not cached
+
+socket.on("loadOutlines", (coordsData) => {
+    localStorage.setObject("outlineData", coordsData)
+    // Caches the outline data to reduce load on internal socket
+    createBuildingOutlines(coordsData);
+});
+// Loads building outlines on socket request from internal server -- Ran when data is not cached
+
+socket.on("loadLocationCoords", (locationCoords) => {
+    localStorage.setObject("locationCoordsData", locationCoords)
+    // Caches the outline data to reduce load on internal socket
+    createInfoMarkers(locationCoords);
+    // onSearchedItem("Collins, Jeff--5201")
+});
+// Loads  on socket request from internal server -- Ran when data is not cached
 
 socket.on("nodeSelected", room => {
     markers.map(val => {

@@ -1,3 +1,4 @@
+const nodes = localStorage.getObject("nodeData")
 function createMarker(node) {
     // loads each marker as each node's coordinate and name
     var latitude = nodes[node]["lat"];
@@ -16,11 +17,7 @@ function createMarker(node) {
         if (editMode) {
             if (marker.getAnimation() != google.maps.Animation.BOUNCE) {
                 if (nodes[selectedNode]["neighbors"].includes(marker.getLabel())) {
-                    for (var i = 0; i < nodes[selectedNode]["neighbors"].length; i++) {
-                        if (marker.getLabel() == nodes[selectedNode]["neighbors"][i]) {
-                            nodes[selectedNode]["neighbors"].splice(i, 1);
-                        }
-                    }
+                    nodes[selectedNode]["neighbors"].map((val, index) => marker.getLabel() == val ? nodes[selectedNode]["neighbors"].splice(index, 1) : undefined)
                 }
                 else {
                     nodes[selectedNode]["neighbors"].push(marker.getLabel())
@@ -40,7 +37,7 @@ function createMarker(node) {
     });
 
     /* Updates the marker's coordinates in the nodes when they are dragged, delete for user site*/
-    marker.addListener("position_changed", (event) => {
+    marker.addListener("position_changed", () => {
         if (marker.getLabel() in nodes) {
             nodes[marker.getLabel()]["lat"] = marker.getPosition().lat();
             nodes[marker.getLabel()]["lng"] = marker.getPosition().lng();
@@ -62,11 +59,11 @@ function createMarkerClick(event) {
     /*  Makes the marker bounce on click 
         If in edit mode, clicking on this marker will toggle whether or not the marker
         is a neighbor of the selected node (selected node denoted by Don Cheadle)*/
-    marker.addListener("click", (event) => {
+    marker.addListener("click", () => {
         if (editMode) {
             if (marker.getAnimation() != google.maps.Animation.BOUNCE) {
                 if (nodes[selectedNode]["neighbors"].includes(marker.getLabel())) {
-                    for (var i = 0; i < nodes[selectedNode]["neighbors"].length; i++) {
+                    for (let i = 0; i < nodes[selectedNode]["neighbors"].length; i++) {
                         if (marker.getLabel() == nodes[selectedNode]["neighbors"][i]) {
                             nodes[selectedNode]["neighbors"].splice(i, 1);
                         }
@@ -145,16 +142,15 @@ function deleteSelectedMarker() {
 }
 
 function showAllMarkers() {
-    for (var marker in markers) {
+    for (let marker in markers) {
         markers[marker].setMap(map);
     }
-    for (var marker in locationMarkers) {
+    for (let marker in locationMarkers) {
         locationMarkers[marker].setMap(map);
     }
 }
 
 function hideAllMarkers() {
-    console.log("I am being run!")
     for (var marker in markers) {
         markers[marker].setMap(null);
     }
@@ -208,9 +204,9 @@ function createInfoMarkers(locationCoords) {
         });
         marker.addListener("click", () => {
             infoWindow.open({
-              anchor: marker,
-              map,
-              shouldFocus: false,
+                anchor: marker,
+                map,
+                shouldFocus: false,
             });
           });
         locationMarkers.push(marker);
@@ -220,7 +216,7 @@ function createInfoMarkers(locationCoords) {
 /* Part of Filters for building markers 
     Could be redundant because of the function below 
     Don't know why you want to see all the markers as doing so would
-    just have overlappting markers. Either way, the option is here ig*/
+    just have overlapping markers. Either way, the option is here ig*/
 function showMarkersOfBuilding(buildingNumber) {
     hideAllMarkers();
     focusOnMarkerAtClassroomBuilding(buildingNumber);

@@ -4,6 +4,8 @@ let darkMode = true
 let classListElm = document.getElementById("classListElm")
 let quickLinks = document.getElementById("quickLinks")
 let userInfoElm = document.getElementById("userInfo")
+// eslint-disable-next-line no-undef
+let warningBeforeLogin = new bootstrap.Modal(document.getElementById('warningBeforeLogin'))
 
 const initializeClassList = classes => {
     classListElm.innerHTML = ""
@@ -53,6 +55,7 @@ socket.on("userData", data => {
         return classListElm.innerHTML = "Add classes with the Change Classes button below!"
     }
     initializeClassList(data.periods)
+    createPeriodPaths();
 })
 // Initializes the class list when the user has logged in and saves it locally; also initializes theme
 
@@ -74,6 +77,11 @@ import {GoogleAuthProvider, getAuth, signInWithRedirect, getRedirectResult, sign
 const provider = new GoogleAuthProvider()
 const auth = getAuth()
 document.getElementById("loginElm").addEventListener("click", () => {
+    warningBeforeLogin.show()
+    // Shows warning before login to notify users of potential issue
+})
+
+document.getElementById("confirmLogin").addEventListener("click", () => {
     signInWithRedirect(auth, provider)
     // Establish Firebase Google Login
 })
@@ -143,7 +151,7 @@ getRedirectResult(auth)
     sessionStorage.setItem("email", user.email)
     sessionStorage.setItem("userPic", user.photoURL)
     // Stores email, username, profile picture locally
-    
+
     socket.emit("userLogin", user)
     // Sends an internal socket request to the server-side to be stored
 })

@@ -73,13 +73,19 @@ function updateStairways(stairway) {
 
 /* Code sample from https://developers.google.com/maps/documentation/javascript/examples/polyline-simple */
 function drawLines(shortestPath, isCurrentPos) {
+    const nodes = localStorage.getObject("nodeData")
     let routeCoordinates = [];
+    
     if (isCurrentPos) {
         routeCoordinates.push({ lat: currentLat, lng: currentLng })
     }
     for (var i = 0; i < shortestPath.path.length; i++) {
         let node = shortestPath.path[i];
-        routeCoordinates.push({ lat: nodes[node]["lat"], lng: nodes[node]["lng"] });
+        if (nodes[node] === undefined) break;
+        // Edge case that prevents a random error in the console if a node is undefined
+
+        routeCoordinates.push({ lat: nodes[node].lat, lng: nodes[node].lng });
+
     }
     drawnPath = new google.maps.Polyline({
         path: routeCoordinates,
