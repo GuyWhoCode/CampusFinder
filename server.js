@@ -39,8 +39,30 @@ app.get("/settings", function(request, response) {
 });
 // Express.js setup to initialize different routes of the webpage.
 
+const {Document} = require("flexsearch");
+const searchIndex = new Document({
+    document: {
+        index: ["room"],
+        store: ["latitude", "longitude"]
+    }
+})
+// Initializes Flexsearch search index
+let nodeFile = JSON.parse(fileReader.readFileSync("./nodes.json", "utf8"))
+let roomNames = Object.keys(nodeFile)
+Object.values(nodeFile).map((roomInfo, index) => {
+    if (roomInfo.isRoom) {
+        searchIndex.add({
+            id: index,
+            latitude: roomInfo.lat,
+            longitude: roomInfo.lng,
+            room: roomNames[index]
+        })
+    }
+    // Adds rooms, not intermediate notes to the Search index of Flexsearch
+})
+
 const socket = require("socket.io")(server, { pingTimeout: 60000 })
-dbClient.connect(async () => {
+// dbClient.connect(async () => {
     console.log("Connected to database!")
     socket.on('connection', io => {
         console.log("I have a connection to the website!")
@@ -70,8 +92,11 @@ dbClient.connect(async () => {
         })
 
         io.on("requestNodeInfo", nodeInfo => {
+            // nodeInfo parsed as the following format: {"room": XXXX , "origin": "location"}
+            
             if (nodeInfo.origin === "sidebar") {
-                return socket.emit("nodeSelected", nodeInfo.room)
+                let searchResult = searchIndex.search(nodeInfo.room, { index: "room", enrich: true})[0].result[0].doc
+                return socket.emit("nodeSelected", searchResult)
                 // Node request from the sidebar creates a request to the map to display an animation showing where the classroom is
                 // Sidebar request comes from user-submitted classes sidebar
             }
@@ -202,7 +227,6 @@ dbClient.connect(async () => {
             userDB.deleteOne({"email": userEmail})
             // Deletes a user's profile from the database
         })
-
     })
-})
+// })
 // Database instance initialized before the socket makes a connection with the client-side website to lower the amount of connections established to the database

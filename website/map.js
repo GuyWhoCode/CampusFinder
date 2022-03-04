@@ -297,26 +297,6 @@ function showOutlinesOfBuilding(buildingType, reset) {
     map.setZoom(18);
 }
 
-function onSearchedItem(item) {
-    if (typeof(item.split("--")[1]) !== "undefined") {
-        hideAllMarkers();
-        let roomNumber = item.split("--")[1];
-        for (var marker in markers) {
-            if (markers[marker].getLabel() === roomNumber) {
-                markers[marker].setMap(map);
-                map.setCenter(markers[marker].getPosition());
-                map.setZoom(19);
-            }
-        }
-        // function for checking if the room has a teacher and then hits the listener for the side info panel
-    }
-    else {
-        // the item is not a classroom. therefore, focus on the building.
-        // ex. the item that would be caught in this else statement
-        // would be gym or pavilion or pac. 
-    }
-}
-
 socket.on("loadNodes", (nodeData) => {
     localStorage.setObject("nodeData", nodeData)
     // Caches the outline data to reduce load on internal socket
@@ -335,24 +315,13 @@ socket.on("loadLocationCoords", (locationCoords) => {
     localStorage.setObject("locationCoordsData", locationCoords)
     // Caches the outline data to reduce load on internal socket
     createInfoMarkers(locationCoords);
-    // onSearchedItem("Collins, Jeff--5201")
 });
 // Loads  on socket request from internal server -- Ran when data is not cached
 
-socket.on("nodeSelected", room => {
-    markers.map(val => {
-        val.setAnimation(null);
-        val.setIcon(null);
-        // eslint-disable-next-line eqeqeq
-        if (val.getLabel() == room) {
-            let markerLat = val.getPosition().lat();
-            let markerLng = val.getPosition().lng();
-            map.setCenter({lat: markerLat, lng: markerLng})
-            map.setZoom(19)
-            val.setAnimation(google.maps.Animation.BOUNCE);
-            val.setIcon(selectedNodeImage);
-        }
-    })
+socket.on("nodeSelected", roomCoords => {
+    map.setCenter({lat: roomCoords.latitude, lng: roomCoords.longitude})
+    map.setZoom(19)
+    // Sets the center of the map to the coordinates of the room
     // Triggers when user clicks on the Show Room as a result of the Search Result
 })
 

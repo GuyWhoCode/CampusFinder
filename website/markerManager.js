@@ -1,11 +1,16 @@
+// eslint-disable-next-line no-undef
+const mapSocket = io("/");
 const nodes = localStorage.getObject("nodeData")
+let previousClickedMarker;
 function createMarker(node) {
+    // Node returns string of node name -- classroom and building name
+    
     // loads each marker as each node's coordinate and name
     var latitude = nodes[node]["lat"];
     var longitude = nodes[node]["lng"];
     let marker = new google.maps.Marker({
         position: { lat: latitude, lng: longitude },
-        draggable: true,
+        draggable: false,
         animation: google.maps.Animation.DROP,
         label: node,
         map,
@@ -26,22 +31,19 @@ function createMarker(node) {
             }
         }
         else {
-            for (var i = 0; i < markers.length; i++) {
-                markers[i].setAnimation(null);
-                markers[i].setIcon(null);
-            }
             marker.setAnimation(google.maps.Animation.BOUNCE);
             marker.setIcon(selectedNodeImage);
             selectedNode = marker.getLabel();
+            mapSocket.emit("requestNodeInfo", {"room": marker.getLabel() , "origin": "map"})
+            
+            if (previousClickedMarker === undefined) {
+                return previousClickedMarker = marker
+            }
+            previousClickedMarker.setAnimation(null);
+            previousClickedMarker.setIcon(null);
+            previousClickedMarker = marker
         }
-    });
-
-    /* Updates the marker's coordinates in the nodes when they are dragged, delete for user site*/
-    marker.addListener("position_changed", () => {
-        if (marker.getLabel() in nodes) {
-            nodes[marker.getLabel()]["lat"] = marker.getPosition().lat();
-            nodes[marker.getLabel()]["lng"] = marker.getPosition().lng();
-        }
+        
     });
 
     markers.push(marker); // delete for user site. this list is used only for updateNeighborVisibility() and deleteSelectedMarker(), which will be deleted anyway
