@@ -34,7 +34,7 @@ function createMarker(node) {
             marker.setAnimation(google.maps.Animation.BOUNCE);
             marker.setIcon(selectedNodeImage);
             selectedNode = marker.getLabel();
-            mapSocket.emit("requestNodeInfo", {"room": marker.getLabel() , "origin": "map"})
+            mapSocket.emit("requestNodeInfo", {"room": node , "origin": "map"})
             
             if (previousClickedMarker === undefined) {
                 return previousClickedMarker = marker
@@ -46,7 +46,8 @@ function createMarker(node) {
         
     });
 
-    markers.push(marker); // delete for user site. this list is used only for updateNeighborVisibility() and deleteSelectedMarker(), which will be deleted anyway
+    markers[node] = marker
+    // Uses an object to prevent looping over the markers list when searching for a classroom or building
 }
 
 /* Delete this function for user site */
@@ -144,18 +145,14 @@ function deleteSelectedMarker() {
 }
 
 function showAllMarkers() {
-    for (let marker in markers) {
-        markers[marker].setMap(map);
-    }
+    Object.values(markers).map(marker => marker.setMap(map))
     for (let marker in locationMarkers) {
         locationMarkers[marker].setMap(map);
     }
 }
 
 function hideAllMarkers() {
-    for (var marker in markers) {
-        markers[marker].setMap(null);
-    }
+    Object.values(markers).map(marker => marker.setMap(null))
     for (var marker in locationMarkers) {
         locationMarkers[marker].setMap(null);
     }
@@ -223,14 +220,14 @@ function showMarkersOfBuilding(buildingNumber) {
     hideAllMarkers();
     focusOnMarkerAtClassroomBuilding(buildingNumber);
     if ((buildingNumber >= 2 && buildingNumber <= 6) || buildingNumber == 8) {
-        for (var marker in markers) {
-            if (markers[marker].getLabel().charAt(0) == buildingNumber) {
-                markers[marker].setMap(map);
+        Object.values(markers).map(marker => {
+            if (marker.getLabel().charAt(0) == buildingNumber) {
+                marker.setMap(map);
             }
             else {
-                markers[marker].setMap(null);
+                marker.setMap(null);
             }
-        }
+        })
     }
     // reset number
     else if (buildingNumber == -1) {
@@ -242,27 +239,27 @@ function showMarkersOfBuilding(buildingNumber) {
 function showMarkersOfBuildingAtFloor(buildingNumber, floorNumber) {
     hideAllMarkers();
     focusOnMarkerAtClassroomBuilding(buildingNumber);
-    for (var marker in markers) {
-        let markerBuildingNumber = markers[marker].getLabel().charAt(0);
-        let markerFloorNumber = markers[marker].getLabel().charAt(1);
+    Object.values(markers).map(marker => {
+        let markerBuildingNumber = marker.getLabel().charAt(0);
+        let markerFloorNumber = marker.getLabel().charAt(1);
 
         // eslint-disable-next-line eqeqeq
         if (markerBuildingNumber == buildingNumber && markerFloorNumber == floorNumber) {
-            markers[marker].setMap(map);
+            marker.setMap(map);
         }
         else {
-            markers[marker].setMap(null);
+           marker.setMap(null);
         }
-    }
+    })
 }
 
 function showMarkersOfOtherBuilding(markerList, mapInstance, building) {
     hideAllMarkers();
-    for (let marker in markerList) {
-        if (markerList[marker].getLabel().split(" ")[0] === building) {
-            markerList[marker].setMap(mapInstance);
+    Object.values(markerList).map(marker => {
+        if (marker.getLabel().split(" ")[0] === building) {
+            marker.setMap(mapInstance);
         }
-    }
+    })
 }
 
 function focusOnMarkerAtClassroomBuilding(buildingNumber) {

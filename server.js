@@ -95,8 +95,10 @@ const socket = require("socket.io")(server, { pingTimeout: 60000 })
             // nodeInfo parsed as the following format: {"room": XXXX , "origin": "location"}
             
             if (nodeInfo.origin === "sidebar") {
+                if (searchIndex.search(nodeInfo.room, { index: "room", enrich: true})[0] === undefined) return;
+                
                 let searchResult = searchIndex.search(nodeInfo.room, { index: "room", enrich: true})[0].result[0].doc
-                return socket.emit("nodeSelected", searchResult)
+                return socket.emit("nodeSelected", {"room": nodeInfo.room, "result": searchResult})
                 // Node request from the sidebar creates a request to the map to display an animation showing where the classroom is
                 // Sidebar request comes from user-submitted classes sidebar
             }
@@ -105,7 +107,8 @@ const socket = require("socket.io")(server, { pingTimeout: 60000 })
         })
         
         io.on("easterEgg", () => {
-            socket.emit("showSwimmingPool")
+            let searchResult = searchIndex.search("Swimming Pool", { index: "room", enrich: true})[0].result[0].doc
+            socket.emit("nodeSelected", {"room": "Swimming Pool", "result": searchResult})
         })
 
         io.on("requestTeacher", async(localData) => {

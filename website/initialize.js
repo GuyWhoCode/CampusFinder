@@ -16,6 +16,7 @@ let goClassSearch = document.getElementById("goClass")
 let teacherSelection = document.getElementById("teacherSelection")
 let roomNumber = document.getElementById("roomNumber")
 let teacherImg = document.getElementById("teacherImg")
+const classroomBuildings = ["Cafeteria 4", "Cafeteria 5", "Administration", "Building 2", "Building 3", "Building 4", "Building 5", "Building 6", "Building 8", "Gym", "Pavillion", "Performing Arts Center (PAC)", "Stadium", "Field"]
 // eslint-disable-next-line no-undef
 let classSearchResult = new bootstrap.Offcanvas(document.getElementById("classSearchResult"))
 // eslint-disable-next-line no-undef
@@ -38,6 +39,13 @@ const initializeTeacherAutocomplete = teacherData => {
         // Weeds out the database update identifier 
     })
     // Adds autocomplete option element to datalist -- Enables autocomplete on inputs
+
+    classroomBuildings.map(val => {
+        let name = document.createElement("option")
+        name.value = val
+        document.getElementById("teacherAutocomplete").appendChild(name)
+    })
+
 }
 
 mainSocket.emit("requestTeacher", localStorage.getObject("teacherList"))
@@ -75,9 +83,15 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
     // Special property that detects if the web app is running on iOS or Android when viewed
     searchBar.addEventListener("keydown", event => {
         if (event.key === "Enter") {
-            if (mainSearch.value.toLowerCase().trim() === "swimming pool") return mainSocket.emit("easterEgg")
+            let searchValue = mainSearch.value
+            if (searchValue.toLowerCase().trim() === "swimming pool") return mainSocket.emit("easterEgg")
 
-            let teacherName = mainSearch.value.split("(")[0].trim()
+            if (classroomBuildings.map(val => val === searchValue).filter(val => val === true).length === 1) {
+                console.log("I run!")
+                return mainSocket.emit("requestNodeInfo", {"room": searchValue , "origin": "sidebar"})
+                // Case when the building is searched
+            }
+            let teacherName = searchValue.split("(")[0].trim()
             let teacherInfo = findTeacherInfo(teacherName)
             if (teacherName === "" || teacherInfo === "") return;
             teacherSelection.innerHTML = flipName(teacherName)
@@ -95,9 +109,16 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
 } else {
     searchBar.addEventListener("submit", (event) => {
         event.preventDefault()
-        if (mainSearch.value.toLowerCase().trim() === "swimming pool") return mainSocket.emit("easterEgg")
+        let searchValue = mainSearch.value
+        if (searchValue.toLowerCase().trim() === "swimming pool") return mainSocket.emit("easterEgg")
         // Egg of the Easter
-        let teacherName = mainSearch.value.split("(")[0].trim()
+        if (classroomBuildings.map(val => val === searchValue).filter(val => val === true).length === 1) {
+            console.log("I run!")
+            return mainSocket.emit("requestNodeInfo", {"room": searchValue , "origin": "sidebar"})
+            // Case when the building is searched
+        }
+
+        let teacherName = searchValue.split("(")[0].trim()
         let teacherInfo = findTeacherInfo(teacherName)
         if (teacherName === "" || teacherInfo === "") return;
         teacherSelection.innerHTML = flipName(teacherName)
@@ -106,6 +127,7 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
         mainSearch.value = ""
         classSearchResult.show()
         goClassSearch.style.display = "block"
+        
         mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar"})
         // Snaps the map view on the center of the classroom marker zoomed in
         goClassSearch.addEventListener("click", () => {
@@ -121,6 +143,7 @@ if (sessionStorage.darkMode === "false") {
     document.getElementById("searchButton").style.backgroundColor = "#554826"
     document.getElementById("searchButton").style.color = "#FFFFFF"
     document.getElementById("quickLinks").className = "dropdown-menu dropdown-menu-end"
+    document.getElementsByClassName("mapOptions").map(item => item.className = "dropdown-menu dropdown-menu-end")
     document.body.style.backgroundColor = "#FFFFFF"
     document.body.style.color = "#000000"
     document.getElementById("userInfo").style.color = "#000000"

@@ -18,7 +18,7 @@ Storage.prototype.getObject = function(key) {
 
 let map;
 let westHighCoords = { lat: 33.846586, lng: -118.367709 };
-let markers = [];
+let markers = {};
 let locationMarkers = [];
 let locationOutlines = {};
 const ADMIN = 10;
@@ -27,6 +27,7 @@ const RESET_BUILDINGS = -1;
 let classPaths = [];
 let selectedPath = 0;
 let lines = null;
+let previousSearchedNode;
 
 // For current position 
 var currentLat;
@@ -316,29 +317,24 @@ socket.on("loadLocationCoords", (locationCoords) => {
     // Caches the outline data to reduce load on internal socket
     createInfoMarkers(locationCoords);
 });
-// Loads  on socket request from internal server -- Ran when data is not cached
+// Loads on socket request from internal server -- Ran when data is not cached
 
-socket.on("nodeSelected", roomCoords => {
-    map.setCenter({lat: roomCoords.latitude, lng: roomCoords.longitude})
+socket.on("nodeSelected", searchResult => {
+    markers[searchResult.room].setAnimation(google.maps.Animation.BOUNCE);
+    markers[searchResult.room].setIcon(selectedNodeImage);
+    map.setCenter({lat: searchResult.result.latitude, lng: searchResult.result.longitude})
     map.setZoom(19)
+    
+    if (previousSearchedNode === undefined) {
+        return previousSearchedNode = markers[searchResult.room]
+    }
+    previousSearchedNode.setAnimation(null);
+    previousSearchedNode.setIcon(null);
+    previousSearchedNode = markers[searchResult.room]
+    // Stores the previous node to remove the animination when doing another search
+
     // Sets the center of the map to the coordinates of the room
     // Triggers when user clicks on the Show Room as a result of the Search Result
-})
-
-socket.on("showSwimmingPool", () => {
-    markers.map(val => {
-        val.setAnimation(null);
-        val.setIcon(null);
-        if (val.getLabel() === "Swimming Pool") {
-            let markerLat = val.getPosition().lat();
-            let markerLng = val.getPosition().lng();
-            map.setCenter({lat: markerLat, lng: markerLng})
-            map.setZoom(20)
-            val.setAnimation(google.maps.Animation.BOUNCE);
-            val.setIcon(selectedNodeImage);
-        }
-    })
-    // Egg of Easter.
 })
 
 window.onload = function () {
