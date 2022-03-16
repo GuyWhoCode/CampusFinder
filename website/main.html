@@ -79,12 +79,22 @@
     <!-- Bootstrap Classes Sidebar -->
     
     <input type="search" id="nameOfNode">
-    <p>STarting marker</p>
-    <p>ending marker</p>
-    <!-- <h1>Shift: Print Graph | Enter: Save graph to JSON | Backspace: Load graph from JSON | Control: Display shortest path</h1> -->
-    <!-- <h2 id="selectedNode">Selected Node: Edit Mode: </h2> -->
+
     <div id="debugMap">
         <div id="buttons">
+            <p id="startingMarker">Starting marker</p>
+            <p id="endingMarker">Ending marker</p>
+
+            <button type="button" id="normalMode">Normal Mode</button>
+            <button type="button" id="currentPosMode">Current Position Mode</button>
+            <button type="button" id="searchMode">Search Mode</button>
+
+            <button type="button" id="startChooser">Choose starting location</button>
+            <button type="button" id="endChooser">Choose ending location</button>
+            <button type="button" id="currentLocationChooser">Set start/end as current location</button>
+
+            <br></br>
+
             <button type="button" id="showPaths">Show Paths</button>
             <button type="button" id="hidePaths">Hide Paths</button>
             <button type="button" id="button1">Path 1</button>
