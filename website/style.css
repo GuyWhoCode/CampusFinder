@@ -49,9 +49,6 @@ html, body {
     color: #FFFFFF;
     transition-duration: 0s;
 }
-#searchButton {
-    display: none;
-}
 #searchBox {
     width: 9em;
     align-self: center;
@@ -100,10 +97,6 @@ html, body {
 }
 #menuIcon {
     width: 36px;
-    cursor: pointer;
-}
-#userInfo {
-    color: white;
 }
 .menuOption {
     display: grid;
@@ -134,21 +127,31 @@ html, body {
     display: grid;
     grid-template-rows: repeat(5, auto);
 }
-.mapDropdown {
+.mapDropdown, .pathSelector {
     position: absolute;
     z-index: 5;
-    bottom: 0vh;
+    bottom: 2vh;
     background-color: #303030;
     border-radius: 15px;
 }
-#buildingDropDown {
+.mapDropdownButton:hover, .pathSelector:hover, .mapDropdownButton, .pathSelector, #userInfo {
+    color: #FFFFFF;
+}
+#searchButton, .pathSelector {
+    display: none;
+}
+.leftBtnSelector {
     right: 15em;
 }
-#floorSelectorDropdown {
+.rightBtnSelector {
     right: 5em;
 }
-.mapDropdownButton {
-    color:#FFFFFF;
+#menuIcon:hover {
+    background-color: #888888;
+    border-radius: 30px;
+}
+.pointerElm {
+    cursor: pointer;
 }
 @media (min-width: 768px) {
     #searchButton {

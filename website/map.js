@@ -189,31 +189,34 @@ function initMap() {
     document.getElementById("resetButton").addEventListener('click', () => { resetMap(); });
 
     document.getElementById("showNextPath").addEventListener('click', () => {
-        if (hiddenPaths) {
-            showAllPaths()
-            hiddenPaths = false
-        }
-        // If the paths were previously hidden, re-initialize all of the paths again
-
         updateSelectedPathOpacity()
+        let userClasses = Object.keys(sessionStorage.getObject("userClasses"))
+        document.getElementById("periodPathName").innerHTML = `Path from Period ${userClasses[selectedPath]} to Period ${userClasses[selectedPath + 1]}`
+        // Uses the cached user classes to sync the period names and account for the possibility of having 0-5 periods and 1-6 periods.
+        
+        document.getElementById("fromClassroom").innerHTML = `From: ${classPaths[selectedPath][1].path[0]}`
+        document.getElementById("toClassroom").innerHTML = `To: ${classPaths[selectedPath][1].path[classPaths[selectedPath][1].path.length - 1]}`
+        // Uses the classPath list to determine the start and end location based on the generated node pathing algorithm
+
         selectedPath += 1 
-        if (selectedPath === 6) {
-            selectedPath = 0
-        }
+        if (selectedPath === 5) selectedPath = 0
+        
     });
     
     document.getElementById("showPreviousPath").addEventListener('click', () => {
-        if (hiddenPaths) {
-            showAllPaths()
-            hiddenPaths = false
-        }
-        // If the paths were previously hidden, re-initialize all of the paths again
+        let userClasses = Object.keys(sessionStorage.getObject("userClasses"))
+        document.getElementById("periodPathName").innerHTML = `Path from Period ${userClasses[selectedPath]} to Period ${userClasses[selectedPath - 1]}`
+        // Uses the cached user classes to sync the period names and account for the possibility of having 0-5 periods and 1-6 periods.
+        
+        document.getElementById("toClassroom").innerHTML = `To: ${classPaths[selectedPath][1].path[0]}`
+        document.getElementById("fromClassroom").innerHTML = `From: ${classPaths[selectedPath][1].path[classPaths[selectedPath][1].path.length - 1]}`
+        // Uses the classPath list to determine the start and end location based on the generated node pathing algorithm
+        // End node determined by getting the pathing list (classPaths[selectedPath][1].path) and getting the last entry (final classroom)
 
-        updateSelectedPathOpacity();
+        if (selectedPath === 0) selectedPath = 5
         selectedPath -= 1 
-        if (selectedPath === -1) {
-            selectedPath = 5
-        }
+        updateSelectedPathOpacity();
+        // BUG: Doesn't work as intended for the edge cases (5-6), (0-1)
     });
     
     document.getElementById("cafe4Button").addEventListener('click', () => { focusOnBuilding(locationMarkers, map, "Cafe 4") });
@@ -226,7 +229,7 @@ function initMap() {
     document.getElementById("fieldButton").addEventListener('click', () => { showMarkersOfOtherBuilding(markers, map, "Field") });
     document.getElementById("classBldgButton").addEventListener('click', () => { showOutlinesOfBuilding("bldgs") });
     document.getElementById("cafeButton").addEventListener('click', () => { showOutlinesOfBuilding("cafe") });
-    document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other"); showStairway("S3"); });
+    document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other");});
     // OTHER BUILDING SELECTORS
     
     Object.values(document.getElementsByClassName("building")).map((val, index) => val.addEventListener("click", () => index + 2 === 7 ? showMarkersOfBuilding(8) : showMarkersOfBuilding(index + 2)))
@@ -325,9 +328,8 @@ socket.on("nodeSelected", searchResult => {
     map.setCenter({lat: searchResult.result.latitude, lng: searchResult.result.longitude})
     map.setZoom(19)
     
-    if (previousSearchedNode === undefined) {
-        return previousSearchedNode = markers[searchResult.room]
-    }
+    if (previousSearchedNode === undefined) return previousSearchedNode = markers[searchResult.room]
+    
     previousSearchedNode.setAnimation(null);
     previousSearchedNode.setIcon(null);
     previousSearchedNode = markers[searchResult.room]

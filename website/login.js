@@ -94,13 +94,14 @@ const createUserProfile = pfp => {
     
     let signOutListElm = document.createElement("li")
     signOutListElm.id = "signOutElm"
+    signOutListElm.className = "pointerElm"
     signOutListElm.addEventListener("click", () => {
         signOut(auth).then(() => {
             document.getElementById("signOutElm").remove()
 
             let loginElm = document.createElement("li")
             loginElm.id = "loginElm"
-            loginElm.className = "nav-item"
+            loginElm.className = "nav-item pointerElm"
 
             let login = document.createElement("a")
             login.id = "login"

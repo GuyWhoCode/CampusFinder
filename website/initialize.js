@@ -10,6 +10,7 @@ Storage.prototype.getObject = function(key) {
 }
 
 let teachers;
+let debug = true;
 let searchBar = document.getElementById("searchBar")
 let mainSearch = document.getElementById("mainSearch")
 let goClassSearch = document.getElementById("goClass")
@@ -23,6 +24,8 @@ let classSearchResult = new bootstrap.Offcanvas(document.getElementById("classSe
 let mainMenuSidebar = new bootstrap.Offcanvas(document.getElementById("menuSidebar"))
 // eslint-disable-next-line no-undef
 let classDenialModal = new bootstrap.Modal(document.getElementById('classDenialModal'))
+// eslint-disable-next-line no-undef
+let classPathMenu = new bootstrap.Offcanvas(document.getElementById('classPathMenu'))
 
 // eslint-disable-next-line no-undef
 let betaInformationModal = new bootstrap.Modal(document.getElementById('betaInformationModal'))
@@ -87,7 +90,6 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
             if (searchValue.toLowerCase().trim() === "swimming pool") return mainSocket.emit("easterEgg")
 
             if (classroomBuildings.map(val => val === searchValue).filter(val => val === true).length === 1) {
-                console.log("I run!")
                 return mainSocket.emit("requestNodeInfo", {"room": searchValue , "origin": "sidebar"})
                 // Case when the building is searched
             }
@@ -113,7 +115,6 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
         if (searchValue.toLowerCase().trim() === "swimming pool") return mainSocket.emit("easterEgg")
         // Egg of the Easter
         if (classroomBuildings.map(val => val === searchValue).filter(val => val === true).length === 1) {
-            console.log("I run!")
             return mainSocket.emit("requestNodeInfo", {"room": searchValue , "origin": "sidebar"})
             // Case when the building is searched
         }
@@ -138,12 +139,14 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
 // Added to adjust for the mobile view of making the Search button work
 
 Object.values(document.getElementsByClassName("changeClasses")).map(val => val.addEventListener("click", () => sessionStorage.getItem("email") !== null ? window.location = "/class" : classDenialModal.show()))
+// Returns an error modal when the user attempts to change their class without logging in first
+
 if (sessionStorage.darkMode === "false") {
     document.getElementById("navbar").style.backgroundColor = "#e9d283"
     document.getElementById("searchButton").style.backgroundColor = "#554826"
     document.getElementById("searchButton").style.color = "#FFFFFF"
     document.getElementById("quickLinks").className = "dropdown-menu dropdown-menu-end"
-    document.getElementsByClassName("mapOptions").map(item => item.className = "dropdown-menu dropdown-menu-end")
+    Object.values(document.getElementsByClassName("mapOptions")).map(item => item.className = "dropdown-menu dropdown-menu-end")
     document.body.style.backgroundColor = "#FFFFFF"
     document.body.style.color = "#000000"
     document.getElementById("userInfo").style.color = "#000000"
@@ -158,4 +161,38 @@ if (localStorage.getObject("teacherList") !== null) {
 
 document.getElementById("menuToggle").addEventListener("click", () => {
     mainMenuSidebar.show()
+})
+
+document.getElementById("classPathMenuToggle").addEventListener("click", () => {
+    if (sessionStorage.getItem("email") !== null || debug) {
+        mainMenuSidebar.hide()
+        classPathMenu.show()
+        
+        if (hiddenPaths) {
+            showAllPaths()
+            hiddenPaths = false
+        }
+        // If the paths were previously hidden, re-initialize all of the paths again
+
+        updateSelectedPathOpacity()
+        document.getElementById("fromClassroom").innerHTML = `From: ${classPaths[selectedPath][1].path[0]}`
+        document.getElementById("toClassroom").innerHTML = `To: ${classPaths[selectedPath][1].path[classPaths[selectedPath][1].path.length - 1]}`
+        // Uses the classPath list to determine the start and end location based on the generated node pathing algorithm
+
+        document.getElementById("periodPathName").innerHTML = `Path from Period ${selectedPath} to Period ${selectedPath + 1}`
+        Object.values(document.getElementsByClassName("pathSelector")).map(val => val.style.display = "block")
+        Object.values(document.getElementsByClassName("mapDropdown")).map(val => val.style.display = "none")
+        
+        return selectedPath += 1 
+        // Initializes the first class path selection from Period 0 to Period 1
+    }
+
+    classDenialModal.show()
+    // Show the class denial modal when no email exists
+})
+
+document.getElementById('classPathMenu').addEventListener("hide.bs.offcanvas", () => {
+    Object.values(document.getElementsByClassName("pathSelector")).map(val => val.style.display = "none")
+    Object.values(document.getElementsByClassName("mapDropdown")).map(val => val.style.display = "block")
+    
 })

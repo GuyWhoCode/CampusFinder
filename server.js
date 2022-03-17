@@ -47,6 +47,7 @@ const searchIndex = new Document({
     }
 })
 // Initializes Flexsearch search index
+let totalIndex = 0;
 let nodeFile = JSON.parse(fileReader.readFileSync("./nodes.json", "utf8"))
 let roomNames = Object.keys(nodeFile)
 Object.values(nodeFile).map((roomInfo, index) => {
@@ -57,12 +58,26 @@ Object.values(nodeFile).map((roomInfo, index) => {
             longitude: roomInfo.lng,
             room: roomNames[index]
         })
+        totalIndex += 1
     }
     // Adds rooms, not intermediate notes to the Search index of Flexsearch
 })
 
+// let buildingFile = JSON.parse(fileReader.readFileSync("./locationCoords.json", "utf8"))
+// let buildingName = Object.keys(buildingFile)
+// Object.values(buildingFile).map((info, index) => {
+//     searchIndex.add({
+//         id: totalIndex + index,
+//         latitude: info.lat,
+//         longitude: info.lng,
+//         room: buildingName[index]
+//     })
+//     // Adds rooms, not intermediate notes to the Search index of Flexsearch
+// })
+// More testing needs to be done to use
+
 const socket = require("socket.io")(server, { pingTimeout: 60000 })
-// dbClient.connect(async () => {
+dbClient.connect(async () => {
     console.log("Connected to database!")
     socket.on('connection', io => {
         console.log("I have a connection to the website!")
@@ -231,5 +246,5 @@ const socket = require("socket.io")(server, { pingTimeout: 60000 })
             // Deletes a user's profile from the database
         })
     })
-// })
+})
 // Database instance initialized before the socket makes a connection with the client-side website to lower the amount of connections established to the database
