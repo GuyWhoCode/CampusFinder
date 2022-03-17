@@ -77,7 +77,7 @@ Object.values(nodeFile).map((roomInfo, index) => {
 // More testing needs to be done to use
 
 const socket = require("socket.io")(server, { pingTimeout: 60000 })
-dbClient.connect(async () => {
+// dbClient.connect(async () => {
     console.log("Connected to database!")
     socket.on('connection', io => {
         console.log("I have a connection to the website!")
@@ -157,7 +157,8 @@ dbClient.connect(async () => {
                     "url": userInfo[0].url,
                     "admin": userInfo[0].admin,
                     "darkModeOn": userInfo[0].darkModeOn,
-                    "periods": selection
+                    "periods": selection,
+                    "accountCreated": userInfo[0].accountCreated,
                 }})
             // Updates the user profile with the periods from the class selection
         })
@@ -171,7 +172,8 @@ dbClient.connect(async () => {
                     "url": user.photoURL,
                     "admin": false,
                     "darkModeOn": true,
-                    "periods": {}
+                    "periods": {},
+                    "accountCreated": Date.now()
                 })
                 // If a user entry has not been created, create a new user entry into the database
                 socket.emit("userData", undefined)
@@ -217,7 +219,8 @@ dbClient.connect(async () => {
                     "url": userProfile[0].url,
                     "admin": userProfile[0].admin,
                     "darkModeOn": userSettings.darkMode,
-                    "periods": userProfile[0].periods
+                    "periods": userProfile[0].periods,
+                    "accountCreated": userProfile[0].accountCreated
                 }
             })
             // Saves settings from preferences page in database
@@ -234,7 +237,8 @@ dbClient.connect(async () => {
                     "url": doesUserExist[0].url,
                     "admin": userInfo.permission,
                     "darkModeOn": doesUserExist[0].darkModeOn,
-                    "periods": doesUserExist[0].periods
+                    "periods": doesUserExist[0].periods,
+                    "accountCreated": doesUserExist[0].accountCreated
                 }
             })
             // Empowers the user by updating the change privileges to the admin page
@@ -246,5 +250,5 @@ dbClient.connect(async () => {
             // Deletes a user's profile from the database
         })
     })
-})
+// })
 // Database instance initialized before the socket makes a connection with the client-side website to lower the amount of connections established to the database

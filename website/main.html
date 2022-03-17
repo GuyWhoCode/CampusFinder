@@ -114,7 +114,7 @@
     <!-- Main Menu Sidebar -->
 
     <div class="btn-group dropup mapDropdown rightBtnSelector" id="floorSelectorDropdown">
-        <button type="button" class="btn dropdown-toggle mapDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">Select Floor</button>
+        <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="selectFloorBtn">Select Floor</button>
         <div class="dropdown-menu dropdown-menu-end dropdown-menu-dark mapOptions">
             <button class="dropdown-item floor" type="button" id="floor1Bldg4">1st Floor Building 4</button>
             <button class="dropdown-item floor" type="button" id="floor2Bldg4">2nd Floor Building 4</button>
@@ -127,7 +127,9 @@
     </div>
     <!-- Bootstrap Dropdown for Floor Selector -->
 
-    <div class="btn-group dropup mapDropdown leftBtnSelector" id="buildingDropDown">
+    <button class="mapDropdown leftBtnSelector btn" id="resetSearch">Reset Search Selection</button>
+
+    <!-- <div class="btn-group dropup mapDropdown leftBtnSelector" id="buildingDropDown">
         <button type="button" class="btn dropdown-toggle mapDropdownButton" data-bs-toggle="dropdown" aria-expanded="false" id="buildingDropdownToggle">Select Building</button>
         <div class="dropdown-menu dropdown-menu-end dropdown-menu-dark mapOptions">
             <button class="dropdown-item" type="button" id="cafe4Button">Cafe 4</button>
@@ -148,7 +150,7 @@
             <button class="dropdown-item" type="button" id="cafeButton">All Cafeterias</button>
             <button class="dropdown-item" type="button" id="otherButton">Other Buildings</button>
         </div>
-    </div>
+    </div> -->
     <!-- Bootstrap Dropdown for buildings -->
     
     <button class="leftBtnSelector pathSelector btn" id="showNextPath">Show Next Path</button>
@@ -214,8 +216,6 @@
             <p class="fs-1">Note: The Path is highlighted in Red.</p>
             <button id="showAllPaths">Show All Paths</button>
             <button id="hidePaths">Hide Paths</button>
-            <button id="resetButton">Reset Markers</button>
-            <button id="resetOutlines">Reset Outlines</button>
         </div>
     </div>
     <!-- Class Path Bootstrap Sidebar -->

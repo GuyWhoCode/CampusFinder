@@ -185,8 +185,10 @@ function initMap() {
     createCurrentPosMarker();
     
     document.getElementById("hidePaths").addEventListener('click', () => { hidePeriodPaths(); hiddenPaths = true})
-    document.getElementById("resetOutlines").addEventListener('click', () => { showOutlinesOfBuilding("", true) });
-    document.getElementById("resetButton").addEventListener('click', () => { resetMap(); });
+    document.getElementById("resetSearch").addEventListener('click', () => {
+        resetMap()
+        showOutlinesOfBuilding("", true)
+    })
 
     document.getElementById("showNextPath").addEventListener('click', () => {
         updateSelectedPathOpacity()
@@ -219,22 +221,6 @@ function initMap() {
         // BUG: Doesn't work as intended for the edge cases (5-6), (0-1)
     });
     
-    document.getElementById("cafe4Button").addEventListener('click', () => { focusOnBuilding(locationMarkers, map, "Cafe 4") });
-    document.getElementById("cafe5Button").addEventListener('click', () => { focusOnBuilding(locationMarkers, map, "Cafe 5") });
-    document.getElementById("adminButton").addEventListener('click', () => { showMarkersOfBuilding(ADMIN) });
-    document.getElementById("gymButton").addEventListener('click', () => { showMarkersOfOtherBuilding(markers, map, "Gym") });
-    document.getElementById("pavilionButton").addEventListener('click', () => { showMarkersOfOtherBuilding(markers, map, "Pavilion") });
-    document.getElementById("pacButton").addEventListener('click', () => { showMarkersOfOtherBuilding(markers, map, "PAC") });
-    document.getElementById("stadiumButton").addEventListener('click', () => { showMarkersOfOtherBuilding(markers, map, "Stadium") });
-    document.getElementById("fieldButton").addEventListener('click', () => { showMarkersOfOtherBuilding(markers, map, "Field") });
-    document.getElementById("classBldgButton").addEventListener('click', () => { showOutlinesOfBuilding("bldgs") });
-    document.getElementById("cafeButton").addEventListener('click', () => { showOutlinesOfBuilding("cafe") });
-    document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other");});
-    // OTHER BUILDING SELECTORS
-    
-    Object.values(document.getElementsByClassName("building")).map((val, index) => val.addEventListener("click", () => index + 2 === 7 ? showMarkersOfBuilding(8) : showMarkersOfBuilding(index + 2)))
-    // CLASSROOM BUILDING SELECTORS: Loops through every button that has the class of 'building' and assigns a click event listener to show markers of that specific building by adding 2 to the interation index
-    
     Object.values(document.getElementsByClassName("floor")).map(val => {
         let floorNumber = val.id.split("Bldg")[0].split("floor")[1]
         let buildingNumber = val.id.split("Bldg")[1]
@@ -262,6 +248,11 @@ function initMap() {
     loadNodesIntoMap(localStorage.getObject("nodeData"))
     // Initializes building outlines, classroom buildings, and classroom nodes with cached data
 }
+
+// this is IIFE - i.e. runs immediately
+// (() => {
+//     window.initMap = initMap;
+// })();
 
 /*  Calculates the distance in meters between two points with the latitude and longitude of each
     https://www.movable-type.co.uk/scripts/latlong.html */

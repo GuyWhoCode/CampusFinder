@@ -47,6 +47,15 @@ socket.on("userData", data => {
         document.getElementById("quickLinks").className = "dropdown-menu dropdown-menu-end"
         document.body.style.backgroundColor = "#FFFFFF"
         document.body.style.color = "#000000"
+        let style = document.createElement('style');
+        if (style.styleSheet) {
+            style.styleSheet.cssText = "#menuIcon:hover{ background-color: #FFFFFF }";
+        } else {
+            style.appendChild(document.createTextNode("#menuIcon:hover{ background-color: #FFFFFF }"));
+        }
+        document.getElementsByTagName('head')[0].appendChild(style);
+        // Changes the styling of the hover element. Based on https://stackoverflow.com/questions/11371550/change-hover-css-properties-with-javascript
+    
         // Light Mode initialization
     }
     sessionStorage.darkMode = data.darkModeOn
@@ -123,6 +132,16 @@ const createUserProfile = pfp => {
             document.body.style.backgroundColor = "#303030"
             document.body.style.color = "#FFFFFF"
             document.getElementById("userInfo").style.color = "#FFFFFF"
+
+            let style = document.createElement('style');
+            if (style.styleSheet) {
+                style.styleSheet.cssText = "#menuIcon:hover{ background-color: #756335 }";
+            } else {
+                style.appendChild(document.createTextNode("#menuIcon:hover{ background-color: #756335 }"));
+            }
+            document.getElementsByTagName('head')[0].appendChild(style);
+            // Changes the styling of the hover element. Based on https://stackoverflow.com/questions/11371550/change-hover-css-properties-with-javascript
+
             // Dark Mode re-initialization for default theme
 
             classListElm.innerHTML = "Login to see saved classes and add new ones!"

@@ -134,7 +134,7 @@ html, body {
     background-color: #303030;
     border-radius: 15px;
 }
-.mapDropdownButton:hover, .pathSelector:hover, .mapDropdownButton, .pathSelector, #userInfo {
+.leftBtnSelector:hover, .rightBtnSelector:hover, .mapDropdown, .pathSelector, #userInfo, #selectFloorBtn {
     color: #FFFFFF;
 }
 #searchButton, .pathSelector {
@@ -147,7 +147,7 @@ html, body {
     right: 5em;
 }
 #menuIcon:hover {
-    background-color: #888888;
+    background-color: #756335;
     border-radius: 30px;
 }
 .pointerElm {

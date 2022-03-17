@@ -27,6 +27,26 @@ let classDenialModal = new bootstrap.Modal(document.getElementById('classDenialM
 // eslint-disable-next-line no-undef
 let classPathMenu = new bootstrap.Offcanvas(document.getElementById('classPathMenu'))
 
+const buildingOptions = {
+    "Cafeteria 4": focusOnBuilding(locationMarkers, map, "Cafe 4"),
+    "Cafeteria 5": focusOnBuilding(locationMarkers, map, "Cafe 5"), 
+    "Administration": showMarkersOfBuilding(ADMIN), 
+    "Building 2": showMarkersOfBuilding(2), 
+    "Building 3": showMarkersOfBuilding(3), 
+    "Building 4": showMarkersOfBuilding(4), 
+    "Building 5": showMarkersOfBuilding(5), 
+    "Building 6": showMarkersOfBuilding(6), 
+    "Building 8": showMarkersOfBuilding(8), 
+    "Gym": showMarkersOfOtherBuilding(markers, map, "Gym"), 
+    "Pavillion": showMarkersOfOtherBuilding(markers, map, "Pavilion"), 
+    "Performing Arts Center (PAC)": showMarkersOfOtherBuilding(markers, map, "PAC"), 
+    "Stadium": showMarkersOfOtherBuilding(markers, map, "Stadium"), 
+    "Field": showMarkersOfOtherBuilding(markers, map, "Field")
+}
+    // document.getElementById("classBldgButton").addEventListener('click', () => { showOutlinesOfBuilding("bldgs") });
+    // document.getElementById("cafeButton").addEventListener('click', () => { showOutlinesOfBuilding("cafe") });
+    // document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other");});
+    
 // eslint-disable-next-line no-undef
 let betaInformationModal = new bootstrap.Modal(document.getElementById('betaInformationModal'))
 betaInformationModal.show()
@@ -88,9 +108,10 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
         if (event.key === "Enter") {
             let searchValue = mainSearch.value
             if (searchValue.toLowerCase().trim() === "swimming pool") return mainSocket.emit("easterEgg")
+            // Egg of the Easter
 
-            if (classroomBuildings.map(val => val === searchValue).filter(val => val === true).length === 1) {
-                return mainSocket.emit("requestNodeInfo", {"room": searchValue , "origin": "sidebar"})
+            if (buildingOptions[searchValue] !== undefined) {
+                return buildingOptions[searchValue]
                 // Case when the building is searched
             }
             let teacherName = searchValue.split("(")[0].trim()
@@ -114,8 +135,9 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
         let searchValue = mainSearch.value
         if (searchValue.toLowerCase().trim() === "swimming pool") return mainSocket.emit("easterEgg")
         // Egg of the Easter
-        if (classroomBuildings.map(val => val === searchValue).filter(val => val === true).length === 1) {
-            return mainSocket.emit("requestNodeInfo", {"room": searchValue , "origin": "sidebar"})
+        
+        if (buildingOptions[searchValue] !== undefined) {
+            return buildingOptions[searchValue]
             // Case when the building is searched
         }
 
@@ -150,6 +172,16 @@ if (sessionStorage.darkMode === "false") {
     document.body.style.backgroundColor = "#FFFFFF"
     document.body.style.color = "#000000"
     document.getElementById("userInfo").style.color = "#000000"
+    
+    let style = document.createElement('style');
+    if (style.styleSheet) {
+        style.styleSheet.cssText = "#menuIcon:hover{ background-color: #FFFFFF }";
+    } else {
+        style.appendChild(document.createTextNode("#menuIcon:hover{ background-color: #FFFFFF }"));
+    }
+    document.getElementsByTagName('head')[0].appendChild(style);
+    // Changes the styling of the hover element. Based on https://stackoverflow.com/questions/11371550/change-hover-css-properties-with-javascript
+
 }
 // Initializes light mode based on cached session storage
 
