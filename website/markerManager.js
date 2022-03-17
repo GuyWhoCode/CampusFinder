@@ -216,7 +216,7 @@ function createInfoMarkers(locationCoords) {
     Could be redundant because of the function below 
     Don't know why you want to see all the markers as doing so would
     just have overlapping markers. Either way, the option is here ig*/
-function showMarkersOfBuilding(buildingNumber) {
+let showMarkersOfBuilding = buildingNumber => {
     hideAllMarkers();
     focusOnMarkerAtClassroomBuilding(buildingNumber);
     if ((buildingNumber >= 2 && buildingNumber <= 6) || buildingNumber == 8) {
@@ -253,7 +253,7 @@ function showMarkersOfBuildingAtFloor(buildingNumber, floorNumber) {
     })
 }
 
-function showMarkersOfOtherBuilding(markerList, mapInstance, building) {
+let showMarkersOfOtherBuilding = (markerList, mapInstance, building) => {
     hideAllMarkers();
     Object.values(markerList).map(marker => {
         if (marker.getLabel().split(" ")[0] === building) {
@@ -284,7 +284,7 @@ function focusOnMarkerAtClassroomBuilding(buildingNumber) {
     // }
 }
 
-function focusOnBuilding(markerLocations, mapInstance, building) {
+let focusOnBuilding = (markerLocations, mapInstance, building) => {
     hideAllMarkers();
     for (var buildingCenterMarker in markerLocations) {
         if (markerLocations[buildingCenterMarker].getLabel() === building) {

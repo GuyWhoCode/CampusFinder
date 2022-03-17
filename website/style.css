@@ -137,7 +137,7 @@ html, body {
 .leftBtnSelector:hover, .rightBtnSelector:hover, .mapDropdown, .pathSelector, #userInfo, #selectFloorBtn {
     color: #FFFFFF;
 }
-#searchButton, .pathSelector {
+#searchButton, .pathSelector, #buildingCarousel {
     display: none;
 }
 .leftBtnSelector {

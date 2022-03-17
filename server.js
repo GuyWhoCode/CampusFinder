@@ -77,7 +77,7 @@ Object.values(nodeFile).map((roomInfo, index) => {
 // More testing needs to be done to use
 
 const socket = require("socket.io")(server, { pingTimeout: 60000 })
-// dbClient.connect(async () => {
+dbClient.connect(async () => {
     console.log("Connected to database!")
     socket.on('connection', io => {
         console.log("I have a connection to the website!")
@@ -250,5 +250,5 @@ const socket = require("socket.io")(server, { pingTimeout: 60000 })
             // Deletes a user's profile from the database
         })
     })
-// })
+})
 // Database instance initialized before the socket makes a connection with the client-side website to lower the amount of connections established to the database

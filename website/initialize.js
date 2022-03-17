@@ -17,7 +17,10 @@ let goClassSearch = document.getElementById("goClass")
 let teacherSelection = document.getElementById("teacherSelection")
 let roomNumber = document.getElementById("roomNumber")
 let teacherImg = document.getElementById("teacherImg")
-const classroomBuildings = ["Cafeteria 4", "Cafeteria 5", "Administration", "Building 2", "Building 3", "Building 4", "Building 5", "Building 6", "Building 8", "Gym", "Pavillion", "Performing Arts Center (PAC)", "Stadium", "Field"]
+let buildingCarousel = document.getElementById("buildingCarousel")
+let infoBoxPreview = document.getElementById("infoBoxPreview")
+let goClass = document.getElementById("goClass")
+const classroomBuildings = ["Cafeteria 4", "Cafeteria 5", "Administration", "Building 2", "Building 3", "Building 4", "Building 5", "Building 6", "Building 8", "Gym", "Pavillion", "Performing Arts Center (PAC)", "Stadium", "Field", "All Buildings", "All Cafeterias", "Other"]
 // eslint-disable-next-line no-undef
 let classSearchResult = new bootstrap.Offcanvas(document.getElementById("classSearchResult"))
 // eslint-disable-next-line no-undef
@@ -27,26 +30,22 @@ let classDenialModal = new bootstrap.Modal(document.getElementById('classDenialM
 // eslint-disable-next-line no-undef
 let classPathMenu = new bootstrap.Offcanvas(document.getElementById('classPathMenu'))
 
-const buildingOptions = {
-    "Cafeteria 4": focusOnBuilding(locationMarkers, map, "Cafe 4"),
-    "Cafeteria 5": focusOnBuilding(locationMarkers, map, "Cafe 5"), 
-    "Administration": showMarkersOfBuilding(ADMIN), 
-    "Building 2": showMarkersOfBuilding(2), 
-    "Building 3": showMarkersOfBuilding(3), 
-    "Building 4": showMarkersOfBuilding(4), 
-    "Building 5": showMarkersOfBuilding(5), 
-    "Building 6": showMarkersOfBuilding(6), 
-    "Building 8": showMarkersOfBuilding(8), 
-    "Gym": showMarkersOfOtherBuilding(markers, map, "Gym"), 
-    "Pavillion": showMarkersOfOtherBuilding(markers, map, "Pavilion"), 
-    "Performing Arts Center (PAC)": showMarkersOfOtherBuilding(markers, map, "PAC"), 
-    "Stadium": showMarkersOfOtherBuilding(markers, map, "Stadium"), 
-    "Field": showMarkersOfOtherBuilding(markers, map, "Field")
-}
-    // document.getElementById("classBldgButton").addEventListener('click', () => { showOutlinesOfBuilding("bldgs") });
-    // document.getElementById("cafeButton").addEventListener('click', () => { showOutlinesOfBuilding("cafe") });
-    // document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other");});
-    
+// const buildingOptions = {
+//     "Cafeteria 4": focusOnBuilding(locationMarkers, map, "Cafe 4"),
+//     "Cafeteria 5": focusOnBuilding(locationMarkers, map, "Cafe 5"), 
+//     "Administration": showMarkersOfBuilding(ADMIN), 
+//     "Building 2": showMarkersOfBuilding(2), 
+//     "Building 3": showMarkersOfBuilding(3), 
+//     "Building 4": showMarkersOfBuilding(4), 
+//     "Building 5": showMarkersOfBuilding(5), 
+//     "Building 6": showMarkersOfBuilding(6), 
+//     "Building 8": showMarkersOfBuilding(8), 
+//     "Gym": showMarkersOfOtherBuilding(markers, map, "Gym"), 
+//     "Pavillion": showMarkersOfOtherBuilding(markers, map, "Pavilion"), 
+//     "Performing Arts Center (PAC)": showMarkersOfOtherBuilding(markers, map, "PAC"), 
+//     "Stadium": showMarkersOfOtherBuilding(markers, map, "Stadium"), 
+//     "Field": showMarkersOfOtherBuilding(markers, map, "Field")
+// }
 // eslint-disable-next-line no-undef
 let betaInformationModal = new bootstrap.Modal(document.getElementById('betaInformationModal'))
 betaInformationModal.show()
@@ -102,60 +101,113 @@ const findTeacherInfo = teacherName => {
     return teacherInfo
 }
 
+const searchForBuilding = () => {
+    let searchValue = mainSearch.value
+    if (searchValue.toLowerCase().trim() === "swimming pool") {
+        mainSearch.value = ""
+        return mainSocket.emit("easterEgg")
+        // Egg of the Easter
+    }
+    
+    if (classroomBuildings.map(val => val === searchValue).filter(val => val === true).length === 1) {
+        mainSearch.value = ""
+        buildingCarousel.style.display = "block"
+        infoBoxPreview.style.display = "none"
+        goClass.style.display = "none"
+        classSearchResult.show()
+        switch (searchValue) {
+            case "Cafeteria 4": 
+                focusOnBuilding(locationMarkers, map, "Cafe 4")
+                break;
+            case "Cafeteria 5": 
+                focusOnBuilding(locationMarkers, map, "Cafe 5")
+                break;
+            case "Administration": 
+                showMarkersOfBuilding(ADMIN)
+                break;
+            case "Building 2": 
+                showMarkersOfBuilding(2)
+                break; 
+            case "Building 3": 
+                showMarkersOfBuilding(3)
+                break; 
+            case "Building 4": 
+                showMarkersOfBuilding(4)
+                break; 
+            case "Building 5": 
+                showMarkersOfBuilding(5)
+                break; 
+            case "Building 6": 
+                showMarkersOfBuilding(6)
+                break; 
+            case "Building 8": 
+                showMarkersOfBuilding(8)
+                break; 
+            case "Gym": 
+                showMarkersOfOtherBuilding(markers, map, "Gym")
+                break;
+            case "Pavillion": 
+                showMarkersOfOtherBuilding(markers, map, "Pavilion")
+                break;
+            case "Performing Arts Center (PAC)": 
+                showMarkersOfOtherBuilding(markers, map, "PAC")
+                break;
+            case "Stadium": 
+                showMarkersOfOtherBuilding(markers, map, "Stadium")
+                break;
+            case "Field": 
+                showMarkersOfOtherBuilding(markers, map, "Field")
+                break;
+            case "All Buildings": 
+                showOutlinesOfBuilding("bldgs")
+                break;
+            case "All Cafeterias": 
+                showOutlinesOfBuilding("cafe")
+                break;
+            case "Other": 
+                showOutlinesOfBuilding("other")
+                break;
+        
+        }
+        return;
+        // Case when the building is searched
+    }
+
+    // if (buildingOptions[searchValue] !== undefined) {
+    //     return buildingOptions[searchValue]
+    //     // Case when the building is searched in module form
+    // }
+    let teacherName = searchValue.split("(")[0].trim()
+    let teacherInfo = findTeacherInfo(teacherName)
+    if (teacherName === "" || teacherInfo === "") return;
+    teacherSelection.innerHTML = flipName(teacherName)
+    roomNumber.innerHTML = "Room " + teacherInfo.room 
+    teacherImg.src = teacherInfo.image
+    mainSearch.value = ""
+    classSearchResult.show()
+    mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar"})
+    // Snaps the map view on the center of the classroom marker zoomed in
+
+    goClassSearch.addEventListener("click", () => {
+        mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar"})
+    })
+}
+
+
 if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf("like Mac") !== -1) {
     // Special property that detects if the web app is running on iOS or Android when viewed
     searchBar.addEventListener("keydown", event => {
         if (event.key === "Enter") {
-            let searchValue = mainSearch.value
-            if (searchValue.toLowerCase().trim() === "swimming pool") return mainSocket.emit("easterEgg")
-            // Egg of the Easter
-
-            if (buildingOptions[searchValue] !== undefined) {
-                return buildingOptions[searchValue]
-                // Case when the building is searched
-            }
-            let teacherName = searchValue.split("(")[0].trim()
-            let teacherInfo = findTeacherInfo(teacherName)
-            if (teacherName === "" || teacherInfo === "") return;
-            teacherSelection.innerHTML = flipName(teacherName)
-            roomNumber.innerHTML = "Room " + teacherInfo.room 
-            teacherImg.src = teacherInfo.image
-            mainSearch.value = ""
             mainSearch.blur()
             // Special attribute that hides the mobile keyboard by removing input focus 
-            classSearchResult.show()
-            goClassSearch.addEventListener("click", () => {
-                mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar"})
-            })
+
+            searchForBuilding()
         }
     })
 } else {
     searchBar.addEventListener("submit", (event) => {
         event.preventDefault()
-        let searchValue = mainSearch.value
-        if (searchValue.toLowerCase().trim() === "swimming pool") return mainSocket.emit("easterEgg")
-        // Egg of the Easter
-        
-        if (buildingOptions[searchValue] !== undefined) {
-            return buildingOptions[searchValue]
-            // Case when the building is searched
-        }
-
-        let teacherName = searchValue.split("(")[0].trim()
-        let teacherInfo = findTeacherInfo(teacherName)
-        if (teacherName === "" || teacherInfo === "") return;
-        teacherSelection.innerHTML = flipName(teacherName)
-        roomNumber.innerHTML = "Room " + teacherInfo.room 
-        teacherImg.src = teacherInfo.image
-        mainSearch.value = ""
-        classSearchResult.show()
-        goClassSearch.style.display = "block"
-        
-        mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar"})
-        // Snaps the map view on the center of the classroom marker zoomed in
-        goClassSearch.addEventListener("click", () => {
-            mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar"})
-        })
+        searchForBuilding()
     })
 }
 // Added to adjust for the mobile view of making the Search button work
@@ -226,5 +278,10 @@ document.getElementById("classPathMenuToggle").addEventListener("click", () => {
 document.getElementById('classPathMenu').addEventListener("hide.bs.offcanvas", () => {
     Object.values(document.getElementsByClassName("pathSelector")).map(val => val.style.display = "none")
     Object.values(document.getElementsByClassName("mapDropdown")).map(val => val.style.display = "block")
-    
+})
+
+document.getElementById('classSearchResult').addEventListener("hide.bs.offcanvas", () => {
+    buildingCarousel.style.display = "none"
+    infoBoxPreview.style.display = "block"
+    goClass.style.display = "block"
 })
