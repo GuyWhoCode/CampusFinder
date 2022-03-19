@@ -206,19 +206,19 @@ function initMap() {
     });
     
     document.getElementById("showPreviousPath").addEventListener('click', () => {
-        let userClasses = Object.keys(sessionStorage.getObject("userClasses"))
-        document.getElementById("periodPathName").innerHTML = `Path from Period ${userClasses[selectedPath]} to Period ${userClasses[selectedPath - 1]}`
-        // Uses the cached user classes to sync the period names and account for the possibility of having 0-5 periods and 1-6 periods.
+        if (selectedPath === 0) selectedPath = 5
+        selectedPath -= 1 
         
         document.getElementById("toClassroom").innerHTML = `To: ${classPaths[selectedPath][1].path[0]}`
         document.getElementById("fromClassroom").innerHTML = `From: ${classPaths[selectedPath][1].path[classPaths[selectedPath][1].path.length - 1]}`
         // Uses the classPath list to determine the start and end location based on the generated node pathing algorithm
         // End node determined by getting the pathing list (classPaths[selectedPath][1].path) and getting the last entry (final classroom)
 
-        if (selectedPath === 0) selectedPath = 5
-        selectedPath -= 1 
+        let userClasses = Object.keys(sessionStorage.getObject("userClasses"))
+        document.getElementById("periodPathName").innerHTML = `Path from Period ${userClasses[selectedPath + 1]} to Period ${userClasses[selectedPath]}`
+        // Uses the cached user classes to sync the period names and account for the possibility of having 0-5 periods and 1-6 periods.
+        
         updateSelectedPathOpacity();
-        // BUG: Doesn't work as intended for the edge cases (5-6), (0-1)
     });
     
     Object.values(document.getElementsByClassName("floor")).map(val => {
