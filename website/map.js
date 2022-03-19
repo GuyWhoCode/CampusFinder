@@ -16,6 +16,7 @@ Storage.prototype.getObject = function(key) {
     return JSON.parse(this.getItem(key));
 }
 
+let alreadyLoaded;
 let map;
 let westHighCoords = { lat: 33.846586, lng: -118.367709 };
 let markers = {};
@@ -28,6 +29,17 @@ let classPaths = [];
 let selectedPath = 0;
 let lines = null;
 let previousSearchedNode;
+
+const NORMAL_MAP_MODE = 0;
+const CURRENT_POS_MODE = 1;
+const SEARCH_MODE = 2;
+let currentMode = CURRENT_POS_MODE;
+let startChooser = true;
+
+let startingMarker = null;
+let endingMarker = null;
+
+let editMode = false;
 
 // For current position 
 var currentLat;
@@ -84,6 +96,10 @@ function createBuildingOutlines(locationOutlinesCoords) {
 }
 
 function loadNodesIntoMap(nodesList) {
+    // to prevent reloading of nodes
+    if (alreadyLoaded) return;
+    alreadyLoaded = true;
+  
     for (let node in nodesList) {
         // changes all rooms' isRoom flag to true
         // everything from here to the next comment can be removed for user site
@@ -110,28 +126,6 @@ function loadNodesIntoMap(nodesList) {
             graph[neighbor][node] = graph[node][neighbor];
         }
     }
-
-    /* Code sample from https://developers.google.com/maps/documentation/javascript/geolocation
-       Gets current Location and the node closest to the current location
-    */
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            currentLat = position.coords.latitude;
-            currentLng = position.coords.longitude;
-            findClosestNodeToCurrentPos();
-            // shortestPath
-            // drawLines()
-          },
-          () => {
-            alert("Error: The Geolocation service failed.");
-          }
-        );
-        
-    } else {
-      // Browser doesn't support Geolocation or user denied the app from getting location
-      alert("Error: Your browser doesn't support geolocation.");
-    }
 }
 
 function initMap() {
@@ -152,6 +146,12 @@ function initMap() {
         gestureHandling: "greedy",
     });
 
+    /* Adds marker on click
+        Click listener can be deleted for user site. */
+    map.addListener("click", (event) => {
+        createMarkerClick(event);
+    });
+
     // All of this keydown listener except for numLock can be deleted for user site
     document.getElementById("map").addEventListener("keydown", function(event) {
         // Prints nodes (coordinates) and graph (distances)
@@ -160,11 +160,16 @@ function initMap() {
             console.log(graph);
             // console.log(markersMap);
         }
+        else if (event.key == "Delete") {
+            deleteSelectedMarker();
+        }
+        else if (event.key == "Enter") {
+            var jsonData = JSON.stringify(nodes, null, "\t");
+            socket.emit("saveNodes", jsonData);
+            console.log("Saved JSON");
+        }
         /* Draws the shortest path from closestNodeToCurrentPos to Main Entrance */
-        else if (event.key === "Control") {
-            // closest node to main entrance
-            // let shortestPath = findShortestPath(graph, "8104", "Main Entrance");
-
+        else if (event.key == "Control") {
             // maps path from one period to the next
             // find a way so that paths don't just overlap and just cross each other
             createPeriodPaths();
@@ -181,8 +186,16 @@ function initMap() {
             editMode = !editMode;
             updateNeighborVisibility();
         }
+
+        /* Draws the shortest path from the selected starting marker to the selected ending marker */
+        else if (event.key == "NumLock") {
+            if (lines !== null) {
+                lines.setMap(null);
+                lines = null;
+            }
+            lines = drawLines(findShortestPath(graph, startingMarker, endingMarker));
+        }
     });
-    createCurrentPosMarker();
     
     document.getElementById("hidePaths").addEventListener('click', () => { hidePeriodPaths(); hiddenPaths = true})
     document.getElementById("resetSearch").addEventListener('click', () => {
@@ -227,6 +240,7 @@ function initMap() {
         val.addEventListener("click", () => {showMarkersOfBuildingAtFloor(buildingNumber, floorNumber)})
     })
     // FLOOR SELECTOR: Loops through every item in the floor selector. Gets building and floor number based on the button's ID through string manipulation
+    // createButtons();
 
     if (localStorage.getItem("loadedMapInformation") === null) {
         // If the map information is not cached yet, request for the data to be cached.
@@ -241,8 +255,8 @@ function initMap() {
         return localStorage.setItem("loadedMapInformation", true)
         // Exits out of the code to prevent errors from occuring for the code below that runs when a cache exists
     }
+}
 
-   
     createBuildingOutlines(localStorage.getObject("outlineData"))
     createInfoMarkers(localStorage.getObject("locationCoordsData"))
     loadNodesIntoMap(localStorage.getObject("nodeData"))
@@ -253,6 +267,62 @@ function initMap() {
 // (() => {
 //     window.initMap = initMap;
 // })();
+
+// function createButtons() {
+    // document.getElementById("normalMode").addEventListener('click', () => { updateMapMode(NORMAL_MAP_MODE); });
+    // document.getElementById("currentPosMode").addEventListener('click', () => { updateMapMode(CURRENT_POS_MODE); });
+    // document.getElementById("searchMode").addEventListener('click', () => { updateMapMode(SEARCH_MODE); });
+
+    // document.getElementById("startChooser").addEventListener('click', () => { startChooser = true; });
+    // document.getElementById("endChooser").addEventListener('click', () => { startChooser = false; });
+    // document.getElementById("currentLocationChooser").addEventListener('click', () => {
+
+    // } );
+// }
+
+function updateMapMode(mapMode) {
+    currentMode = mapMode; 
+    switch (currentMode) {
+        case NORMAL_MAP_MODE:
+            hideAllMarkers();
+            showLocationMarkers();
+            showAllMarkers();
+            break;
+        case CURRENT_POS_MODE:
+            hideAllMarkers();
+            askLocationPermission();
+            // createCurrentPosMarker();
+            break;
+        case SEARCH_MODE:
+            hideAllMarkers();
+            showRoomMarkers();
+            break;
+    }
+}
+
+function askLocationPermission() {
+    /* Code sample from https://developers.google.com/maps/documentation/javascript/geolocation
+       Gets current Location and the node closest to the current location
+    */
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+        (position) => {
+            currentLat = position.coords.latitude;
+            currentLng = position.coords.longitude;
+            createCurrentPosMarker();
+            findClosestNodeToCurrentPos();
+        },
+        () => {
+            alert("Error: The Geolocation service failed or location was not enabled.");
+        }
+    );
+    
+    } else {
+        // Browser doesn't support Geolocation
+        alert("Error: Your browser doesn't support geolocation.");
+    }
+}
+
 
 /*  Calculates the distance in meters between two points with the latitude and longitude of each
     https://www.movable-type.co.uk/scripts/latlong.html */
