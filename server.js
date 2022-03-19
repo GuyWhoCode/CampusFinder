@@ -39,6 +39,43 @@ app.get("/settings", function(request, response) {
 });
 // Express.js setup to initialize different routes of the webpage.
 
+const {Document} = require("flexsearch");
+const searchIndex = new Document({
+    document: {
+        index: ["room"],
+        store: ["latitude", "longitude"]
+    }
+})
+// Initializes Flexsearch search index
+let totalIndex = 0;
+let nodeFile = JSON.parse(fileReader.readFileSync("./nodes.json", "utf8"))
+let roomNames = Object.keys(nodeFile)
+Object.values(nodeFile).map((roomInfo, index) => {
+    if (roomInfo.isRoom) {
+        searchIndex.add({
+            id: index,
+            latitude: roomInfo.lat,
+            longitude: roomInfo.lng,
+            room: roomNames[index]
+        })
+        totalIndex += 1
+    }
+    // Adds rooms, not intermediate notes to the Search index of Flexsearch
+})
+
+// let buildingFile = JSON.parse(fileReader.readFileSync("./locationCoords.json", "utf8"))
+// let buildingName = Object.keys(buildingFile)
+// Object.values(buildingFile).map((info, index) => {
+//     searchIndex.add({
+//         id: totalIndex + index,
+//         latitude: info.lat,
+//         longitude: info.lng,
+//         room: buildingName[index]
+//     })
+//     // Adds rooms, not intermediate notes to the Search index of Flexsearch
+// })
+// More testing needs to be done to use
+
 const socket = require("socket.io")(server, { pingTimeout: 60000 })
 dbClient.connect(async () => {
     console.log("Connected to database!")
@@ -70,8 +107,13 @@ dbClient.connect(async () => {
         })
 
         io.on("requestNodeInfo", nodeInfo => {
+            // nodeInfo parsed as the following format: {"room": XXXX , "origin": "location"}
+            
             if (nodeInfo.origin === "sidebar") {
-                return socket.emit("nodeSelected", nodeInfo.room)
+                if (searchIndex.search(nodeInfo.room, { index: "room", enrich: true})[0] === undefined) return;
+                
+                let searchResult = searchIndex.search(nodeInfo.room, { index: "room", enrich: true})[0].result[0].doc
+                return socket.emit("nodeSelected", {"room": nodeInfo.room, "result": searchResult})
                 // Node request from the sidebar creates a request to the map to display an animation showing where the classroom is
                 // Sidebar request comes from user-submitted classes sidebar
             }
@@ -80,7 +122,8 @@ dbClient.connect(async () => {
         })
         
         io.on("easterEgg", () => {
-            socket.emit("showSwimmingPool")
+            let searchResult = searchIndex.search("Swimming Pool", { index: "room", enrich: true})[0].result[0].doc
+            socket.emit("nodeSelected", {"room": "Swimming Pool", "result": searchResult})
         })
 
         io.on("requestTeacher", async(localData) => {
@@ -114,7 +157,8 @@ dbClient.connect(async () => {
                     "url": userInfo[0].url,
                     "admin": userInfo[0].admin,
                     "darkModeOn": userInfo[0].darkModeOn,
-                    "periods": selection
+                    "periods": selection,
+                    "accountCreated": userInfo[0].accountCreated,
                 }})
             // Updates the user profile with the periods from the class selection
         })
@@ -128,7 +172,8 @@ dbClient.connect(async () => {
                     "url": user.photoURL,
                     "admin": false,
                     "darkModeOn": true,
-                    "periods": {}
+                    "periods": {},
+                    "accountCreated": Date.now()
                 })
                 // If a user entry has not been created, create a new user entry into the database
                 socket.emit("userData", undefined)
@@ -174,7 +219,8 @@ dbClient.connect(async () => {
                     "url": userProfile[0].url,
                     "admin": userProfile[0].admin,
                     "darkModeOn": userSettings.darkMode,
-                    "periods": userProfile[0].periods
+                    "periods": userProfile[0].periods,
+                    "accountCreated": userProfile[0].accountCreated
                 }
             })
             // Saves settings from preferences page in database
@@ -191,7 +237,8 @@ dbClient.connect(async () => {
                     "url": doesUserExist[0].url,
                     "admin": userInfo.permission,
                     "darkModeOn": doesUserExist[0].darkModeOn,
-                    "periods": doesUserExist[0].periods
+                    "periods": doesUserExist[0].periods,
+                    "accountCreated": doesUserExist[0].accountCreated
                 }
             })
             // Empowers the user by updating the change privileges to the admin page
@@ -202,7 +249,6 @@ dbClient.connect(async () => {
             userDB.deleteOne({"email": userEmail})
             // Deletes a user's profile from the database
         })
-
     })
 })
 // Database instance initialized before the socket makes a connection with the client-side website to lower the amount of connections established to the database

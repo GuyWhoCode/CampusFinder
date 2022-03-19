@@ -4,6 +4,8 @@ let darkMode = true
 let classListElm = document.getElementById("classListElm")
 let quickLinks = document.getElementById("quickLinks")
 let userInfoElm = document.getElementById("userInfo")
+// eslint-disable-next-line no-undef
+let warningBeforeLogin = new bootstrap.Modal(document.getElementById('warningBeforeLogin'))
 
 const initializeClassList = classes => {
     classListElm.innerHTML = ""
@@ -45,6 +47,15 @@ socket.on("userData", data => {
         document.getElementById("quickLinks").className = "dropdown-menu dropdown-menu-end"
         document.body.style.backgroundColor = "#FFFFFF"
         document.body.style.color = "#000000"
+        let style = document.createElement('style');
+        if (style.styleSheet) {
+            style.styleSheet.cssText = "#menuIcon:hover{ background-color: #FFFFFF }";
+        } else {
+            style.appendChild(document.createTextNode("#menuIcon:hover{ background-color: #FFFFFF }"));
+        }
+        document.getElementsByTagName('head')[0].appendChild(style);
+        // Changes the styling of the hover element. Based on https://stackoverflow.com/questions/11371550/change-hover-css-properties-with-javascript
+    
         // Light Mode initialization
     }
     sessionStorage.darkMode = data.darkModeOn
@@ -53,6 +64,7 @@ socket.on("userData", data => {
         return classListElm.innerHTML = "Add classes with the Change Classes button below!"
     }
     initializeClassList(data.periods)
+    createPeriodPaths();
 })
 // Initializes the class list when the user has logged in and saves it locally; also initializes theme
 
@@ -74,6 +86,11 @@ import {GoogleAuthProvider, getAuth, signInWithRedirect, getRedirectResult, sign
 const provider = new GoogleAuthProvider()
 const auth = getAuth()
 document.getElementById("loginElm").addEventListener("click", () => {
+    warningBeforeLogin.show()
+    // Shows warning before login to notify users of potential issue
+})
+
+document.getElementById("confirmLogin").addEventListener("click", () => {
     signInWithRedirect(auth, provider)
     // Establish Firebase Google Login
 })
@@ -86,13 +103,14 @@ const createUserProfile = pfp => {
     
     let signOutListElm = document.createElement("li")
     signOutListElm.id = "signOutElm"
+    signOutListElm.className = "pointerElm"
     signOutListElm.addEventListener("click", () => {
         signOut(auth).then(() => {
             document.getElementById("signOutElm").remove()
 
             let loginElm = document.createElement("li")
             loginElm.id = "loginElm"
-            loginElm.className = "nav-item"
+            loginElm.className = "nav-item pointerElm"
 
             let login = document.createElement("a")
             login.id = "login"
@@ -114,6 +132,16 @@ const createUserProfile = pfp => {
             document.body.style.backgroundColor = "#303030"
             document.body.style.color = "#FFFFFF"
             document.getElementById("userInfo").style.color = "#FFFFFF"
+
+            let style = document.createElement('style');
+            if (style.styleSheet) {
+                style.styleSheet.cssText = "#menuIcon:hover{ background-color: #756335 }";
+            } else {
+                style.appendChild(document.createTextNode("#menuIcon:hover{ background-color: #756335 }"));
+            }
+            document.getElementsByTagName('head')[0].appendChild(style);
+            // Changes the styling of the hover element. Based on https://stackoverflow.com/questions/11371550/change-hover-css-properties-with-javascript
+
             // Dark Mode re-initialization for default theme
 
             classListElm.innerHTML = "Login to see saved classes and add new ones!"
@@ -143,7 +171,7 @@ getRedirectResult(auth)
     sessionStorage.setItem("email", user.email)
     sessionStorage.setItem("userPic", user.photoURL)
     // Stores email, username, profile picture locally
-    
+
     socket.emit("userLogin", user)
     // Sends an internal socket request to the server-side to be stored
 })

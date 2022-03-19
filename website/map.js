@@ -1,10 +1,12 @@
 /* eslint-disable no-unused-vars */
 
 /* debug enables and disables intermediate nodes */
-var debugLogs = false;
-var intermediateNodesEnabled = false;
-var locationOutlinesEnabled = true;
-var buildingLabelsEnabled = true;
+let debugLogs = false;
+let intermediateNodesEnabled = false;
+let locationOutlinesEnabled = true;
+let buildingLabelsEnabled = true;
+let hiddenPaths = false;
+let editMode = false;
 
 Storage.prototype.setObject = function(key, value) {
     this.setItem(key, JSON.stringify(value));
@@ -14,26 +16,19 @@ Storage.prototype.getObject = function(key) {
     return JSON.parse(this.getItem(key));
 }
 
-sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--5201', 1: 'Reyes, Pete--5200', 2: 'Charlin-Wade, Kathryn--5100', 3: 'Jin, Jason--3101', 4: 'Cerda, Becky--6100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--4210' })
-
 let alreadyLoaded;
 let map;
 let westHighCoords = { lat: 33.846586, lng: -118.367709 };
-let markers = [];
+let markers = {};
 let locationMarkers = [];
 let locationOutlines = {};
 const ADMIN = 10;
 const RESET_BUILDINGS = -1;
 
 let classPaths = [];
-const PERIOD0PATH = 0;
-const PERIOD1PATH = 1;
-const PERIOD2PATH = 2;
-const PERIOD3PATH = 3;
-const PERIOD4PATH = 4;
-const PERIOD5PATH = 5;
-let selectedPath = PERIOD0PATH;
+let selectedPath = 0;
 let lines = null;
+let previousSearchedNode;
 
 const NORMAL_MAP_MODE = 0;
 const CURRENT_POS_MODE = 1;
@@ -50,8 +45,6 @@ let editMode = false;
 var currentLat;
 var currentLng;
 var closestNodeToCurrentPos = null;
-
-let nodes = {};
 let graph = {};
 
 let selectedNode = "Main Entrance";
@@ -68,6 +61,72 @@ let altNamesClassrooms = {
 // eslint-disable-next-line no-undef
 let socket = io("/");
 
+function createBuildingOutlines(locationOutlinesCoords) {
+    for (let category in locationOutlinesCoords) {
+        let locationOutlinesRow = {};
+        let color;
+        switch (category) {
+            case "bldgs":
+                color = "#5557f2";
+                break;
+            case "cafe":
+                color = "#50d455";
+                break;
+            case "other":
+                color = "#d7e336";
+                break;
+            case "stairs":
+                color = "#fc03df";
+                break;
+        }
+
+        for (var location in locationOutlinesCoords[category]) {
+            locationOutlinesRow[location] = new google.maps.Polygon({
+                paths: locationOutlinesCoords[category][location],
+                strokeColor: color,
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: color,
+                fillOpacity: 0.25,
+                map: map
+            });
+        }
+        locationOutlines[category] = locationOutlinesRow;
+    }
+}
+
+function loadNodesIntoMap(nodesList) {
+    // to prevent reloading of nodes
+    if (alreadyLoaded) return;
+    alreadyLoaded = true;
+  
+    for (let node in nodesList) {
+        // changes all rooms' isRoom flag to true
+        // everything from here to the next comment can be removed for user site
+        nodesList[node]["isRoom"] = false;
+        if (node.length > 3) {
+            nodesList[node]["isRoom"] = true;
+        }
+        
+
+        graph[node] = {};
+        // loads each node and its neighbors into the graph
+        for (let neighbor = 0; neighbor < nodesList[node]["neighbors"].length; neighbor++) {
+            graph[node][nodesList[node]["neighbors"][neighbor]] = google.maps.geometry.spherical.computeDistanceBetween( { lat: nodesList[node]["lat"], lng: nodesList[node]["lng"] }, { lat: nodesList[nodesList[node]["neighbors"][neighbor]]["lat"], lng: nodesList[nodesList[node]["neighbors"][neighbor]]["lng"] } );
+        }
+        if (nodesList[node].isRoom || intermediateNodesEnabled) {
+            createMarker(node);
+        }
+    }
+    // If there is a neighbor for a node, that neighbor's neighbor will be the node.
+    // Ex. A is a neighbor of B, but B is not defined as a neighbor of A
+    // These for loops will make B a neighbor of A
+    for (let node in graph) {
+        for (var neighbor in graph[node]) {
+            graph[neighbor][node] = graph[node][neighbor];
+        }
+    }
+}
 
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
@@ -114,8 +173,6 @@ function initMap() {
             // maps path from one period to the next
             // find a way so that paths don't just overlap and just cross each other
             createPeriodPaths();
-            showPath(PERIOD0PATH);
-
 
             if (debugLogs) {
                 console.log(shortestPath.distance);
@@ -125,10 +182,11 @@ function initMap() {
             }
         }
         /* Toggles Edit Mode, which lets you change the neighbors of a selected node */
-        else if (event.key == "CapsLock") {
+        else if (event.key === "CapsLock") {
             editMode = !editMode;
             updateNeighborVisibility();
         }
+
         /* Draws the shortest path from the selected starting marker to the selected ending marker */
         else if (event.key == "NumLock") {
             if (lines !== null) {
@@ -139,28 +197,78 @@ function initMap() {
         }
     });
     
-    /* Temporarily testing for different selectors/filters. These would be buttons, but more organized of course.  */
-    document.getElementById("showPaths").addEventListener('click', () => {
-        if (classPaths.length == 0) {
-            createPeriodPaths();
-        }
-        showAllPaths();
-        showPath(selectedPath);
-    });
-    createButtons();
+    document.getElementById("hidePaths").addEventListener('click', () => { hidePeriodPaths(); hiddenPaths = true})
+    document.getElementById("resetSearch").addEventListener('click', () => {
+        resetMap()
+        showOutlinesOfBuilding("", true)
+    })
 
-    // Loads in all nodes from nodes.json into memory
-    socket.emit("requestNodes");
+    document.getElementById("showNextPath").addEventListener('click', () => {
+        updateSelectedPathOpacity()
+        let userClasses = Object.keys(sessionStorage.getObject("userClasses"))
+        document.getElementById("periodPathName").innerHTML = `Path from Period ${userClasses[selectedPath]} to Period ${userClasses[selectedPath + 1]}`
+        // Uses the cached user classes to sync the period names and account for the possibility of having 0-5 periods and 1-6 periods.
+        
+        document.getElementById("fromClassroom").innerHTML = `From: ${classPaths[selectedPath][1].path[0]}`
+        document.getElementById("toClassroom").innerHTML = `To: ${classPaths[selectedPath][1].path[classPaths[selectedPath][1].path.length - 1]}`
+        // Uses the classPath list to determine the start and end location based on the generated node pathing algorithm
+
+        selectedPath += 1 
+        if (selectedPath === 5) selectedPath = 0
+        
+    });
     
-    if (locationOutlinesEnabled) {
-        socket.emit("requestOutlines");
-    }
-    if (buildingLabelsEnabled) {
-        socket.emit("requestLocationCoords");
+    document.getElementById("showPreviousPath").addEventListener('click', () => {
+        if (selectedPath === 0) selectedPath = 5
+        selectedPath -= 1 
+        
+        document.getElementById("toClassroom").innerHTML = `To: ${classPaths[selectedPath][1].path[0]}`
+        document.getElementById("fromClassroom").innerHTML = `From: ${classPaths[selectedPath][1].path[classPaths[selectedPath][1].path.length - 1]}`
+        // Uses the classPath list to determine the start and end location based on the generated node pathing algorithm
+        // End node determined by getting the pathing list (classPaths[selectedPath][1].path) and getting the last entry (final classroom)
+
+        let userClasses = Object.keys(sessionStorage.getObject("userClasses"))
+        document.getElementById("periodPathName").innerHTML = `Path from Period ${userClasses[selectedPath + 1]} to Period ${userClasses[selectedPath]}`
+        // Uses the cached user classes to sync the period names and account for the possibility of having 0-5 periods and 1-6 periods.
+        
+        updateSelectedPathOpacity();
+    });
+    
+    Object.values(document.getElementsByClassName("floor")).map(val => {
+        let floorNumber = val.id.split("Bldg")[0].split("floor")[1]
+        let buildingNumber = val.id.split("Bldg")[1]
+        val.addEventListener("click", () => {showMarkersOfBuildingAtFloor(buildingNumber, floorNumber)})
+    })
+    // FLOOR SELECTOR: Loops through every item in the floor selector. Gets building and floor number based on the button's ID through string manipulation
+    // createButtons();
+
+    if (localStorage.getItem("loadedMapInformation") === null) {
+        // If the map information is not cached yet, request for the data to be cached.
+        socket.emit("requestNodes");
+        
+        if (locationOutlinesEnabled) {
+            socket.emit("requestOutlines");
+        }
+        if (buildingLabelsEnabled) {
+            socket.emit("requestLocationCoords");
+        }
+        return localStorage.setItem("loadedMapInformation", true)
+        // Exits out of the code to prevent errors from occuring for the code below that runs when a cache exists
     }
 }
 
-function createButtons() {
+    createBuildingOutlines(localStorage.getObject("outlineData"))
+    createInfoMarkers(localStorage.getObject("locationCoordsData"))
+    loadNodesIntoMap(localStorage.getObject("nodeData"))
+    // Initializes building outlines, classroom buildings, and classroom nodes with cached data
+}
+
+// this is IIFE - i.e. runs immediately
+// (() => {
+//     window.initMap = initMap;
+// })();
+
+// function createButtons() {
     // document.getElementById("normalMode").addEventListener('click', () => { updateMapMode(NORMAL_MAP_MODE); });
     // document.getElementById("currentPosMode").addEventListener('click', () => { updateMapMode(CURRENT_POS_MODE); });
     // document.getElementById("searchMode").addEventListener('click', () => { updateMapMode(SEARCH_MODE); });
@@ -170,44 +278,7 @@ function createButtons() {
     // document.getElementById("currentLocationChooser").addEventListener('click', () => {
 
     // } );
-
-    document.getElementById("hidePaths").addEventListener('click', () => { hidePeriodPaths(); });
-    document.getElementById("button1").addEventListener('click', () => { showPath(PERIOD0PATH) });
-    document.getElementById("button2").addEventListener('click', () => { showPath(PERIOD1PATH) });
-    document.getElementById("button3").addEventListener('click', () => { showPath(PERIOD2PATH) });
-    document.getElementById("button4").addEventListener('click', () => { showPath(PERIOD3PATH) });
-    document.getElementById("button5").addEventListener('click', () => { showPath(PERIOD4PATH) });
-    document.getElementById("button6").addEventListener('click', () => { showPath(PERIOD5PATH) });
-    
-    document.getElementById("cafe4Button").addEventListener('click', () => { hideAllMarkers(); focusOnBuilding("Cafe 4") });
-    document.getElementById("cafe5Button").addEventListener('click', () => { hideAllMarkers(); focusOnBuilding("Cafe 5") });
-    document.getElementById("adminButton").addEventListener('click', () => { showMarkersOfBuilding(ADMIN) });
-    document.getElementById("bldg2button").addEventListener('click', () => { showMarkersOfBuilding(2) });
-    document.getElementById("bldg3button").addEventListener('click', () => { showMarkersOfBuilding(3) });
-    document.getElementById("bldg4button").addEventListener('click', () => { showMarkersOfBuilding(4) });
-    document.getElementById("bldg5button").addEventListener('click', () => { showMarkersOfBuilding(5) });
-    document.getElementById("bldg6button").addEventListener('click', () => { showMarkersOfBuilding(6) });
-    document.getElementById("bldg8button").addEventListener('click', () => { showMarkersOfBuilding(8) });
-    document.getElementById("gymButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Gym") });
-    document.getElementById("pavilionButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Pavilion") });
-    document.getElementById("pacButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("PAC") });
-    document.getElementById("stadiumButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Stadium") });
-    document.getElementById("fieldButton").addEventListener('click', () => { hideAllMarkers(); showMarkersOfOtherBuilding("Field") });
-
-    document.getElementById("floorOneBldg4").addEventListener('click', () => { showMarkersOfBuildingAtFloor(4, 1) });
-    document.getElementById("floorTwoBldg4").addEventListener('click', () => { showMarkersOfBuildingAtFloor(4, 2) });
-    document.getElementById("floorOneBldg5").addEventListener('click', () => { showMarkersOfBuildingAtFloor(5, 1) });
-    document.getElementById("floorTwoBldg5").addEventListener('click', () => { showMarkersOfBuildingAtFloor(5, 2) });
-    document.getElementById("floorOneBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 1) });
-    document.getElementById("floorTwoBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 2) });
-    document.getElementById("floorThreeBldg3").addEventListener('click', () => { showMarkersOfBuildingAtFloor(3, 3) });
-    document.getElementById("resetButton").addEventListener('click', () => { resetMap(); });
-
-    document.getElementById("classBldgButton").addEventListener('click', () => { showOutlinesOfBuilding("bldgs") });
-    document.getElementById("cafeButton").addEventListener('click', () => { showOutlinesOfBuilding("cafe") });
-    document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other") });
-    document.getElementById("resetOutlines").addEventListener('click', () => { showOutlinesOfBuilding("", true) });
-}
+// }
 
 function updateMapMode(mapMode) {
     currentMode = mapMode; 
@@ -226,45 +297,6 @@ function updateMapMode(mapMode) {
             hideAllMarkers();
             showRoomMarkers();
             break;
-    }
-}
-
-/* Takes parsed node json data from server.js socket and loads it into nodes and graph dataset */
-socket.on("loadNodes", (nodeData) => {
-    createNodes(nodeData);
-});
-
-function createNodes(nodeData) {
-    // to prevent reloading of nodes
-    if (alreadyLoaded) return;
-    alreadyLoaded = true;
-
-    nodes = nodeData;
-    for (var node in nodes) {
-        // changes all rooms' isRoom flag to true
-        // everything from here to the next comment can be removed for user site
-        nodes[node]["isRoom"] = false;
-        if (node.length > 3) {
-            nodes[node]["isRoom"] = true;
-        }
-        //
-
-        graph[node] = {};
-        // loads each node and its neighbors into the graph
-        for (var neighbor = 0; neighbor < nodes[node]["neighbors"].length; neighbor++) {
-            graph[node][nodes[node]["neighbors"][neighbor]] = google.maps.geometry.spherical.computeDistanceBetween( { lat: nodes[node]["lat"], lng: nodes[node]["lng"] }, { lat: nodes[nodes[node]["neighbors"][neighbor]]["lat"], lng: nodes[nodes[node]["neighbors"][neighbor]]["lng"] } );
-        }
-        if (nodes[node].isRoom || intermediateNodesEnabled) {
-            createMarker(node);
-        }
-    }
-    // If there is a neighbor for a node, that neighbor's neighbor will be the node.
-    // Ex. A is a neighbor of B, but B is not defined as a neighbor of A
-    // These for loops will make B a neighbor of A
-    for (var node in graph) {
-        for (var neighbor in graph[node]) {
-            graph[neighbor][node] = graph[node][neighbor];
-        }
     }
 }
 
@@ -291,7 +323,6 @@ function askLocationPermission() {
     }
 }
 
-// function 
 
 /*  Calculates the distance in meters between two points with the latitude and longitude of each
     https://www.movable-type.co.uk/scripts/latlong.html */
@@ -302,44 +333,6 @@ function distance(lat1, lon1, lat2, lon2) {
     const y = (φ2-φ1);
     const d = Math.sqrt(x*x + y*y) * R;
     return d;
-}
-
-socket.on("loadOutlines", (coordsData) => {
-    createBuildingOutlines(coordsData);
-});
-
-function createBuildingOutlines(locationOutlinesCoords) {
-    for (var category in locationOutlinesCoords) {
-        let locationOutlinesRow = {};
-        let color;
-        switch (category) {
-            case "bldgs":
-                color = "#5557f2";
-                break;
-            case "cafe":
-                color = "#50d455";
-                break;
-            case "other":
-                color = "#d7e336";
-                break;
-            case "stairs":
-                color = "#fc03df";
-                break;
-        }
-
-        for (var location in locationOutlinesCoords[category]) {
-            locationOutlinesRow[location] = new google.maps.Polygon({
-                paths: locationOutlinesCoords[category][location],
-                strokeColor: color,
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: color,
-                fillOpacity: 0.25,
-                map: map
-            });
-        }
-        locationOutlines[category] = locationOutlinesRow;
-    }
 }
 
 // part of creating filters for outlines
@@ -369,60 +362,47 @@ function showOutlinesOfBuilding(buildingType, reset) {
     map.setZoom(18);
 }
 
-socket.on("loadLocationCoords", (coordsData) => {
-    createInfoMarkers(coordsData);
-    // onSearchedItem("Collins, Jeff--5201")
+socket.on("loadNodes", (nodeData) => {
+    localStorage.setObject("nodeData", nodeData)
+    // Caches the outline data to reduce load on internal socket
+    loadNodesIntoMap(nodeData)
 });
+// Loads map nodes on socket request from internal server -- Ran when data is not cached
 
-function onSearchedItem(item) {
-    if (typeof(item.split("--")[1]) != "undefined") {
-        hideAllMarkers();
-        let roomNumber = item.split("--")[1];
-        for (var marker in markers) {
-            if (markers[marker].getLabel() == roomNumber) {
-                markers[marker].setMap(map);
-                map.setCenter(markers[marker].getPosition());
-                map.setZoom(19);
-            }
-        }
-        // function for checking if the room has a teacher and then hits the listener for the side info panel
-    }
-    else {
-        // the item is not a classroom. therefore, focus on the building.
-        // ex. the item that would be caught in this else statement
-        // would be gym or pavilion or pac. 
-    }
-}
+socket.on("loadOutlines", (coordsData) => {
+    localStorage.setObject("outlineData", coordsData)
+    // Caches the outline data to reduce load on internal socket
+    createBuildingOutlines(coordsData);
+});
+// Loads building outlines on socket request from internal server -- Ran when data is not cached
 
-socket.on("nodeSelected", room => {
-    markers.map(val => {
-        val.setMap(null)
-        // eslint-disable-next-line eqeqeq
-        if (val.getLabel() == room) {
-            let markerLat = val.getPosition().lat();
-            let markerLng = val.getPosition().lng();
-            map.setCenter({lat: markerLat, lng: markerLng})
-            map.setZoom(19);
-            val.setMap(map);
-            val.setAnimation(google.maps.Animation.BOUNCE);
-            val.setIcon(selectedNodeImage);
-        }
-    })
+socket.on("loadLocationCoords", (locationCoords) => {
+    localStorage.setObject("locationCoordsData", locationCoords)
+    // Caches the outline data to reduce load on internal socket
+    createInfoMarkers(locationCoords);
+});
+// Loads on socket request from internal server -- Ran when data is not cached
+
+socket.on("nodeSelected", searchResult => {
+    markers[searchResult.room].setAnimation(google.maps.Animation.BOUNCE);
+    markers[searchResult.room].setIcon(selectedNodeImage);
+    map.setCenter({lat: searchResult.result.latitude, lng: searchResult.result.longitude})
+    map.setZoom(19)
+    
+    if (previousSearchedNode === undefined) return previousSearchedNode = markers[searchResult.room]
+    
+    previousSearchedNode.setAnimation(null);
+    previousSearchedNode.setIcon(null);
+    previousSearchedNode = markers[searchResult.room]
+    // Stores the previous node to remove the animination when doing another search
+
+    // Sets the center of the map to the coordinates of the room
     // Triggers when user clicks on the Show Room as a result of the Search Result
 })
 
-socket.on("showSwimmingPool", () => {
-    markers.map(val => {
-        val.setMap(null);
-        if (val.getLabel() === "Swimming Pool") {
-            let markerLat = val.getPosition().lat();
-            let markerLng = val.getPosition().lng();
-            map.setCenter({lat: markerLat, lng: markerLng})
-            map.setZoom(20);
-            val.setMap(map);
-            val.setAnimation(google.maps.Animation.BOUNCE);
-            val.setIcon(selectedNodeImage);
-        }
-    })
-    // Egg of Easter.
-})
+window.onload = function () {
+    if (classPaths.length === 0) {
+        createPeriodPaths();
+    }
+    // Loads the classroom pathing file AFTER the entire page has been loaded. Function is reliant on all nodes on the map being loaded before determining the shortest path possible.
+}   

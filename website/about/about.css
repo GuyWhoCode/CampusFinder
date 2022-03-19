@@ -9,8 +9,14 @@ body {
 p {
     margin: 0;
 }
-#alignCenter {
+.pointerElm {
+    cursor: pointer;
+}
+#headerBar {
+    display: grid;
     text-align: center;
+    align-items: center;
+    grid-template-columns: 2% 17% 60%;
 }
 .pageElement {
     background-color: #464647;

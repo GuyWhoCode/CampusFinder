@@ -5,18 +5,10 @@ html, body {
     font-family: 'Roboto', sans-serif;
     background-color: #303030;
     color: #FFFFFF;
-    overflow: hidden;
-}
-/* debugMap, the entire div and its buttons, should be removed for user site */
-#debugMap {
-    display: grid;
-    grid-template-areas: 'left right';
-    /* grid-template-columns: repeat(2, 1fr); */
-    grid-template-rows: 80px;
+    /* overflow: hidden; */
 }
 #map {
     height: 90vh;
-    width: 1290px; /* remove this for user site*/
     color: #000000
 }
 #navbar {
@@ -38,7 +30,7 @@ html, body {
 #goBottom {
     position: absolute;
     bottom: 0;
-    left: 20%; 
+    left: 30%; 
 }
 #searchButton {
     background-color: #e9d283;
@@ -56,16 +48,6 @@ html, body {
 .navbarItem, .navbarItem:hover, .nav-link:focus {
     color: #FFFFFF;
     transition-duration: 0s;
-}
-#logo {
-    max-width: 3em;
-    display: flex;
-    float: right;
-    cursor: pointer;
-    margin: auto 0;
-}
-#searchButton {
-    display: none;
 }
 #searchBox {
     width: 9em;
@@ -109,19 +91,67 @@ html, body {
     flex-direction: column;
     text-align: end;
 }
-#goClass {
+#goClass, #menuToggle {
     display: block;
     margin: 0 auto;
 }
-#userInfo {
-  color: white;
+#menuIcon {
+    width: 36px;
 }
-#WHSIcon {
-    display: flex;
-    margin: auto;
+.menuOption {
+    display: grid;
+    grid-template-columns: 30% 70%;
+    background-color: #bebebe;
+    margin: 5% auto;
+    height: 8vh;
+    width: 100%;
+    align-items: center;
+    justify-items: center;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    transition: background-color 0.5s 0.3s;
+    cursor: pointer;
+    text-decoration: none;
+    color: #000000;
 }
-#WHSwebsite {
-    float: left;
+.menuOption:hover {
+    background-color: #8d8a8a;
+    text-decoration: none;
+    color: #000000;
+}
+.optionText {
+    margin: 0;
+}
+#menuSelector {
+    display: grid;
+    grid-template-rows: repeat(5, auto);
+}
+.mapDropdown, .pathSelector {
+    position: absolute;
+    z-index: 5;
+    bottom: 2vh;
+    background-color: #303030;
+    border-radius: 15px;
+}
+.leftBtnSelector:hover, .rightBtnSelector:hover, .mapDropdown, .pathSelector, #userInfo, #selectFloorBtn {
+    color: #FFFFFF;
+}
+#searchButton, .pathSelector, #buildingCarousel {
+    display: none;
+}
+.leftBtnSelector {
+    right: 15em;
+}
+.rightBtnSelector {
+    right: 5em;
+}
+#menuIcon:hover {
+    background-color: #756335;
+    border-radius: 30px;
+}
+.pointerElm {
+    cursor: pointer;
 }
 @media (min-width: 768px) {
     #searchButton {
@@ -136,10 +166,10 @@ html, body {
     #navbar {
         grid-template-columns: 20% auto 10%;
     }
-    #logo {
-        max-width: 4em;
+    #menuToggle {
+        margin-left: 5%;
     }
-    #WHSIcon {
-        margin: auto 0;
+    #menuIcon {
+        width: 48px;
     }
 }

@@ -1,12 +1,23 @@
 /* Part of Filters for class paths */
+Storage.prototype.setObject = function(key, value) {
+    this.setItem(key, JSON.stringify(value));
+}
+
+Storage.prototype.getObject = function(key) {
+    return JSON.parse(this.getItem(key));
+}
+
 function createPeriodPaths() {
+    if (sessionStorage.getObject("userClasses") === null) return;
+    // Exits the program when the user has not signed in yet
+    
     let rooms = Object.values(sessionStorage.getObject("userClasses")).map(val => val.split("--")[1]);
 
-    for (var period = 0; period < rooms.length - 1; period++) {
-        let shortestPath = findShortestPath(graph, rooms[period], rooms[period + 1]);
+    rooms.map((val, index) => {
+        let shortestPath = findShortestPath(graph, rooms[index], rooms[index + 1]);
         let path = [drawLines(shortestPath), shortestPath];
         classPaths.push(path);
-    }
+    })
 }
 
 /* Part of Filters for class paths */
@@ -24,15 +35,9 @@ function hidePeriodPaths() {
 }
 
 /* Part of Filters for class paths */
-function showPath(path) {
-    selectedPath = path;
-    updateSelectedPathOpacity();
-}
-
-/* Part of Filters for class paths */
 function updateSelectedPathOpacity() {
     for (var path = 0; path < classPaths.length; path++) {
-        if (path == selectedPath) {
+        if (path === selectedPath) {
             classPaths[path][0].setOptions({ strokeOpacity: 1 });
             showStairsOnPath(path);
         }
@@ -46,7 +51,7 @@ function showStairsOnPath(path) {
     let shortestPath = classPaths[path][1];
     let stairs;
     for (let node in shortestPath.path) {
-        if (shortestPath.path[node].charAt(0) == 'S') {
+        if (shortestPath.path[node].charAt(0) === 'S') {
             stairs = shortestPath.path[node];
             break;
         }
@@ -57,7 +62,7 @@ function showStairsOnPath(path) {
 function updateStairways(stairway) {
     let stairwayList = locationOutlines["stairs"];
     for (var stairwayEntry in stairwayList) {
-        if (stairwayEntry != stairway) {
+        if (stairwayEntry !== stairway) {
             stairwayList[stairwayEntry].setMap(null);
         }
         else {
@@ -74,13 +79,19 @@ function updateStairways(stairway) {
 
 /* Code sample from https://developers.google.com/maps/documentation/javascript/examples/polyline-simple */
 function drawLines(shortestPath, isCurrentPos) {
+    const nodes = localStorage.getObject("nodeData")
     let routeCoordinates = [];
+    
     if (isCurrentPos) {
         routeCoordinates.push({ lat: currentLat, lng: currentLng })
     }
     for (var i = 0; i < shortestPath.path.length; i++) {
         let node = shortestPath.path[i];
-        routeCoordinates.push({ lat: nodes[node]["lat"], lng: nodes[node]["lng"] });
+        if (nodes[node] === undefined) break;
+        // Edge case that prevents a random error in the console if a node is undefined
+
+        routeCoordinates.push({ lat: nodes[node].lat, lng: nodes[node].lng });
+
     }
     drawnPath = new google.maps.Polyline({
         path: routeCoordinates,

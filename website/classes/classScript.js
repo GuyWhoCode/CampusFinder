@@ -18,14 +18,14 @@ let saveClassesMobileBtn = document.getElementById("saveClassesMobileBtn")
 let confirmationModal = new bootstrap.Modal(document.getElementById('confirmationClassModal'))
 // eslint-disable-next-line no-undef
 let confirmClassMobile = new bootstrap.Modal(document.getElementById('confirmClassMobile'))
-let confirmationDescription = document.getElementById("confirmationDescript9ion")
+let confirmationDescription = document.getElementById("confirmationDescription")
 let confirmationClassMessage = document.getElementById("confirmationClassMessage")
 let deletedClasses = []
 let periodsConfirmed = []
 let confirmationList = {}
 let teachers = localStorage.getObject("teacherList")
 // Initializes autocomplete feature by referencing local storage of teacher list
-let debug = false
+let debug = true
 
 Object.values(document.getElementsByClassName("classSelector")).map((elm, index) => {
     teachers.map(val => {
@@ -344,9 +344,9 @@ if (sessionStorage.darkMode === "false") {
     confirmationScreen.style.backgroundColor = "#cfcdcd"
 }
 
-var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
 // eslint-disable-next-line no-unused-vars
-var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
     // eslint-disable-next-line no-undef
     return new bootstrap.Tooltip(tooltipTriggerEl)
 })
