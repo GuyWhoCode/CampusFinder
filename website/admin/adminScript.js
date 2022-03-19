@@ -1,81 +1,63 @@
 // eslint-disable-next-line no-undef
 let adminSocket = io()
-// eslint-disable-next-line no-undef
-let changedUserModal = new bootstrap.Modal(document.getElementById('changedUserModal'))
-Storage.prototype.setObject = function(key, value) {
-    this.setItem(key, JSON.stringify(value));
-}
-
-Storage.prototype.getObject = function(key) {
-    return JSON.parse(this.getItem(key));
-}
-let teachers = localStorage.getObject("teacherList");
-teachers.map(val => {
-    if (val.name !== undefined) {
+let teachers;
+adminSocket.emit("requestTeacher")
+adminSocket.on("teacherData", data => {
+    teachers = data
+    teachers.map(val => {
         let name = document.createElement("option")
         name.value = `${val.name} (${val.room})`
         document.getElementById("teacherNames").appendChild(name)
-    }
-    // Weeds out the database update identifier
-})
-
-if (sessionStorage.darkMode === "false") {
-    document.body.style.backgroundColor = "#FFFFFF"
-    document.body.style.color = "#000000"
-}
-
-let newTeacherData = {
-    "LastName": 'teachLastName', 
-    "FirstName": 'teachFirstName', 
-    "Rm": '4200', 
-    "Ext": '7699'
-}
-// adminSocket.emit("saveNewTeacher", newTeacherData)
-
-document.getElementById("addAdminForm").addEventListener("click", () => {
-    let adminEmail = document.getElementById("adminEmail").value
-    if (adminEmail === "" || adminEmail === " ") return;
-    adminSocket.emit("empowerUser", {
-        "email": adminEmail.trim().toLowerCase(),
-        "permission": true
     })
-    document.getElementById("outputType").innerHTML = "Success"
-    document.getElementById("outputMessage").innerHTML = "The email " + adminEmail.trim().toLowerCase() + " has been changed to allow changing permissions."
-    changedUserModal.show()
-    // Shows a confirmation that the designated user has been changed
-    
-    adminEmail = ""
-    // Resets the value of the input form to nothing
 })
+let teacherNamesList = document.getElementById("teacherAutocomplete")
+let searchBar = document.getElementById("searchTeacher")
+
+const findTeacherInfo = teacherName => {
+    let teacherInfo = ""
+    teachers.map(val => val.name === teacherName ? (teacherInfo = val) : undefined)
+    return teacherInfo
+}
+const flipName = name => name.split(",").reverse().join(" ").trim()
+
+var json = {
+  "LastName": "", 
+  "FirstName": "", 
+  "Rm": 0,
+  "Ext": 0}
+function ParseJSON() {
+    json.LastName = document.getElementById("lastName").value;
+    json.FirstName = document.getElementById("firstName").value;
+    json.Rm = document.getElementById("rm#").value;
+    json.Ext = document.getElementById("ext#").value;
+    console.log(json)
+}
+  
+function logSubmit(event) {
+  log.textContent = `Form Submitted! Time stamp: ${event.timeStamp}`;
+  event.preventDefault();
+  console.log("this works")
+}
+
+const form = document.getElementById('newTeacher');
+const log = document.getElementById('log');
+form.addEventListener('submit', logSubmit);
+form.addEventListener('submit', ParseJSON);
 
 
-document.getElementById("addAdminForm").addEventListener("submit", (event)=> {
+        
+        
+
+searchBar.addEventListener("submit", (event) => {
     event.preventDefault()
-    let adminEmail = document.getElementById("adminEmail").value
-    if (adminEmail === "" || adminEmail === " ") return;
-    adminSocket.emit("empowerUser", {
-        "email": adminEmail.trim().toLowerCase(),
-        "permission": true
-    })
-
-    document.getElementById("outputType").innerHTML = "Success"
-    document.getElementById("outputMessage").innerHTML = "The email " + adminEmail.trim().toLowerCase() + " has been changed to allow changing permissions."
-    changedUserModal.show()
-
-    document.getElementById("closeConfirmation").addEventListener("click", () => {
-        changedUserModal.hide()
-    })
-    // Shows a confirmation that the designated user has been changed
-    
-    adminEmail = ""
-    // Resets the value of the input form to nothing
-}) 
-
-
-adminSocket.on("requireProfile", () => {
-    document.getElementById("outputType").innerHTML = "Error"
-    document.getElementById("outputMessage").innerHTML = "There is no profile associated with that email. Have the person with that email sign into this website in the main page <a href='/home'>here</a>"
-    
-    changedUserModal.show()
-    // Returns an error when the requested user does not have a profile (has never logged into the website with a Google Account)
+    let teacherName = teacherNamesList.value.split("(")[0].trim()
+    let teacherInfo = findTeacherInfo(teacherName)
+    document.getElementById("selection").innerHTML = flipName(teacherName)
+    document.getElementById("roomNumber").innerHTML = "Room " + teacherInfo.room 
+    document.getElementById("department").innerHTML = "Teaches " + teacherInfo.dept 
+    document.getElementById("teacherImg").src = teacherInfo.image
+    teacherNamesList.value = ""
+})
+document.getElementById("home").addEventListener("click", () => {
+    window.location = "/home"
 })
