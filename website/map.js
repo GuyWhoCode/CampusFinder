@@ -16,6 +16,7 @@ Storage.prototype.getObject = function(key) {
 
 sessionStorage.setObject("userClasses", { 0: 'Collins, Jeff--5201', 1: 'Reyes, Pete--5200', 2: 'Charlin-Wade, Kathryn--5100', 3: 'Jin, Jason--3101', 4: 'Cerda, Becky--6100', 5: 'Kim, Marcia--2119', 6: 'Collins, Jeff--4210' })
 
+let alreadyLoaded;
 let map;
 let westHighCoords = { lat: 33.846586, lng: -118.367709 };
 let markers = [];
@@ -33,6 +34,17 @@ const PERIOD4PATH = 4;
 const PERIOD5PATH = 5;
 let selectedPath = PERIOD0PATH;
 let lines = null;
+
+const NORMAL_MAP_MODE = 0;
+const CURRENT_POS_MODE = 1;
+const SEARCH_MODE = 2;
+let currentMode = CURRENT_POS_MODE;
+let startChooser = true;
+
+let startingMarker = null;
+let endingMarker = null;
+
+let editMode = false;
 
 // For current position 
 var currentLat;
@@ -75,6 +87,12 @@ function initMap() {
         gestureHandling: "greedy",
     });
 
+    /* Adds marker on click
+        Click listener can be deleted for user site. */
+    map.addListener("click", (event) => {
+        createMarkerClick(event);
+    });
+
     // All of this keydown listener except for numLock can be deleted for user site
     document.getElementById("map").addEventListener("keydown", function(event) {
         // Prints nodes (coordinates) and graph (distances)
@@ -83,11 +101,16 @@ function initMap() {
             console.log(graph);
             // console.log(markersMap);
         }
+        else if (event.key == "Delete") {
+            deleteSelectedMarker();
+        }
+        else if (event.key == "Enter") {
+            var jsonData = JSON.stringify(nodes, null, "\t");
+            socket.emit("saveNodes", jsonData);
+            console.log("Saved JSON");
+        }
         /* Draws the shortest path from closestNodeToCurrentPos to Main Entrance */
         else if (event.key == "Control") {
-            // closest node to main entrance
-            // let shortestPath = findShortestPath(graph, "8104", "Main Entrance");
-
             // maps path from one period to the next
             // find a way so that paths don't just overlap and just cross each other
             createPeriodPaths();
@@ -106,10 +129,15 @@ function initMap() {
             editMode = !editMode;
             updateNeighborVisibility();
         }
+        /* Draws the shortest path from the selected starting marker to the selected ending marker */
         else if (event.key == "NumLock") {
+            if (lines !== null) {
+                lines.setMap(null);
+                lines = null;
+            }
+            lines = drawLines(findShortestPath(graph, startingMarker, endingMarker));
         }
     });
-    createCurrentPosMarker();
     
     /* Temporarily testing for different selectors/filters. These would be buttons, but more organized of course.  */
     document.getElementById("showPaths").addEventListener('click', () => {
@@ -119,6 +147,30 @@ function initMap() {
         showAllPaths();
         showPath(selectedPath);
     });
+    createButtons();
+
+    // Loads in all nodes from nodes.json into memory
+    socket.emit("requestNodes");
+    
+    if (locationOutlinesEnabled) {
+        socket.emit("requestOutlines");
+    }
+    if (buildingLabelsEnabled) {
+        socket.emit("requestLocationCoords");
+    }
+}
+
+function createButtons() {
+    // document.getElementById("normalMode").addEventListener('click', () => { updateMapMode(NORMAL_MAP_MODE); });
+    // document.getElementById("currentPosMode").addEventListener('click', () => { updateMapMode(CURRENT_POS_MODE); });
+    // document.getElementById("searchMode").addEventListener('click', () => { updateMapMode(SEARCH_MODE); });
+
+    // document.getElementById("startChooser").addEventListener('click', () => { startChooser = true; });
+    // document.getElementById("endChooser").addEventListener('click', () => { startChooser = false; });
+    // document.getElementById("currentLocationChooser").addEventListener('click', () => {
+
+    // } );
+
     document.getElementById("hidePaths").addEventListener('click', () => { hidePeriodPaths(); });
     document.getElementById("button1").addEventListener('click', () => { showPath(PERIOD0PATH) });
     document.getElementById("button2").addEventListener('click', () => { showPath(PERIOD1PATH) });
@@ -153,22 +205,40 @@ function initMap() {
 
     document.getElementById("classBldgButton").addEventListener('click', () => { showOutlinesOfBuilding("bldgs") });
     document.getElementById("cafeButton").addEventListener('click', () => { showOutlinesOfBuilding("cafe") });
-    document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other"); showStairway("S3"); });
+    document.getElementById("otherButton").addEventListener('click', () => { showOutlinesOfBuilding("other") });
     document.getElementById("resetOutlines").addEventListener('click', () => { showOutlinesOfBuilding("", true) });
+}
 
-    // Loads in all nodes from nodes.json into memory
-    socket.emit("requestNodes");
-    
-    if (locationOutlinesEnabled) {
-        socket.emit("requestOutlines");
-    }
-    if (buildingLabelsEnabled) {
-        socket.emit("requestLocationCoords");
+function updateMapMode(mapMode) {
+    currentMode = mapMode; 
+    switch (currentMode) {
+        case NORMAL_MAP_MODE:
+            hideAllMarkers();
+            showLocationMarkers();
+            showAllMarkers();
+            break;
+        case CURRENT_POS_MODE:
+            hideAllMarkers();
+            askLocationPermission();
+            // createCurrentPosMarker();
+            break;
+        case SEARCH_MODE:
+            hideAllMarkers();
+            showRoomMarkers();
+            break;
     }
 }
 
 /* Takes parsed node json data from server.js socket and loads it into nodes and graph dataset */
 socket.on("loadNodes", (nodeData) => {
+    createNodes(nodeData);
+});
+
+function createNodes(nodeData) {
+    // to prevent reloading of nodes
+    if (alreadyLoaded) return;
+    alreadyLoaded = true;
+
     nodes = nodeData;
     for (var node in nodes) {
         // changes all rooms' isRoom flag to true
@@ -196,29 +266,32 @@ socket.on("loadNodes", (nodeData) => {
             graph[neighbor][node] = graph[node][neighbor];
         }
     }
+}
 
+function askLocationPermission() {
     /* Code sample from https://developers.google.com/maps/documentation/javascript/geolocation
        Gets current Location and the node closest to the current location
     */
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          (position) => {
+        (position) => {
             currentLat = position.coords.latitude;
             currentLng = position.coords.longitude;
+            createCurrentPosMarker();
             findClosestNodeToCurrentPos();
-            // shortestPath
-            // drawLines()
-          },
-          () => {
-            alert("Error: The Geolocation service failed.");
-          }
-        );
-        
-      } else {
-        // Browser doesn't support Geolocation or user denied the app from getting location
+        },
+        () => {
+            alert("Error: The Geolocation service failed or location was not enabled.");
+        }
+    );
+    
+    } else {
+        // Browser doesn't support Geolocation
         alert("Error: Your browser doesn't support geolocation.");
-      }
-});
+    }
+}
+
+// function 
 
 /*  Calculates the distance in meters between two points with the latitude and longitude of each
     https://www.movable-type.co.uk/scripts/latlong.html */
@@ -323,14 +396,14 @@ function onSearchedItem(item) {
 
 socket.on("nodeSelected", room => {
     markers.map(val => {
-        val.setAnimation(null);
-        val.setIcon(null);
+        val.setMap(null)
         // eslint-disable-next-line eqeqeq
         if (val.getLabel() == room) {
             let markerLat = val.getPosition().lat();
             let markerLng = val.getPosition().lng();
             map.setCenter({lat: markerLat, lng: markerLng})
-            map.setZoom(19)
+            map.setZoom(19);
+            val.setMap(map);
             val.setAnimation(google.maps.Animation.BOUNCE);
             val.setIcon(selectedNodeImage);
         }
@@ -340,13 +413,13 @@ socket.on("nodeSelected", room => {
 
 socket.on("showSwimmingPool", () => {
     markers.map(val => {
-        val.setAnimation(null);
-        val.setIcon(null);
+        val.setMap(null);
         if (val.getLabel() === "Swimming Pool") {
             let markerLat = val.getPosition().lat();
             let markerLng = val.getPosition().lng();
             map.setCenter({lat: markerLat, lng: markerLng})
-            map.setZoom(20)
+            map.setZoom(20);
+            val.setMap(map);
             val.setAnimation(google.maps.Animation.BOUNCE);
             val.setIcon(selectedNodeImage);
         }

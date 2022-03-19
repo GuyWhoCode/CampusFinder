@@ -36,6 +36,14 @@ function createMarker(node) {
             marker.setAnimation(google.maps.Animation.BOUNCE);
             marker.setIcon(selectedNodeImage);
             selectedNode = marker.getLabel();
+            // for choosing if you are selecting the starting marker or the ending marker
+            // if (startChooser) {
+            //     startingMarker = selectedNode;
+            //     document.getElementById("startingMarker").innerHTML = startingMarker;
+            // } else {
+            //     endingMarker = selectedNode;
+            //     document.getElementById("endingMarker").innerHTML = endingMarker;
+            // }
         }
     });
 
@@ -153,6 +161,18 @@ function showAllMarkers() {
     }
 }
 
+function showLocationMarkers() {
+    for (var marker in locationMarkers) {
+        locationMarkers[marker].setMap(map);
+    }
+}
+
+function showRoomMarkers() {
+    for (var marker in markers) {
+        markers[marker].setMap(map);
+    }
+}
+
 function hideAllMarkers() {
     for (var marker in markers) {
         markers[marker].setMap(null);
@@ -165,11 +185,13 @@ function hideAllMarkers() {
 function createCurrentPosMarker() {
     // current position marker
     let currentMarker = new google.maps.Marker({
-        position: { lat: 33.846323, lng: -118.367719 },
+        position: { lat: currentLat, lng: currentLng },
         draggable: true,
-        label: "YOU ARE HERE",
+        label: "START",
         map,
     });
+    // map.setCenter({lat: currentLat, lng: currentLng})
+    map.setCenter( {lat: 33.845233, lng: -118.367850})
 
     // dragging the current position marker makes the (almost) shortest path from the current position to the selected node
     currentMarker.addListener("position_changed", () => {
@@ -257,11 +279,14 @@ function showMarkersOfBuildingAtFloor(buildingNumber, floorNumber) {
 }
 
 function showMarkersOfOtherBuilding(building) {
+    let buildingMarkers = []
     for (var marker in markers) {
         if (markers[marker].getLabel().split(" ")[0] == building) {
             markers[marker].setMap(map);
+            buildingMarkers.push(markers[marker]);
         }
     }
+    focusOnOtherBuildingWithMarkers(buildingMarkers[0], buildingMarkers[1]);
 }
 
 function focusOnMarkerAtClassroomBuilding(buildingNumber) {
@@ -285,6 +310,21 @@ function focusOnBuilding(building) {
             break;
         }
     }
+}
+
+function findCenter(m1Lat, m1Lng, m2Lat, m2Lng) {
+    let latBetweenMarkers = m1Lat - m2Lat;
+    let newLat = m1Lat - latBetweenMarkers/2;
+    let lngBetweenMarkers = m1Lng - m2Lng;
+    let newLng = m1Lng - lngBetweenMarkers/2;
+
+    return {lat: newLat, lng: newLng};
+}
+
+function focusOnOtherBuildingWithMarkers(m1, m2) {
+    let newCenter = findCenter(m1.getPosition().lat(), m1.getPosition().lng(), m2.getPosition().lat(), m2.getPosition().lng());
+    map.setCenter(newCenter);
+    map.setZoom(19)
 }
 
 function resetMap() {
