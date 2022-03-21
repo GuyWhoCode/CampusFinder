@@ -6,7 +6,6 @@ let intermediateNodesEnabled = false;
 let locationOutlinesEnabled = true;
 let buildingLabelsEnabled = true;
 let hiddenPaths = false;
-let editMode = false;
 
 Storage.prototype.setObject = function(key, value) {
     this.setItem(key, JSON.stringify(value));
@@ -16,7 +15,7 @@ Storage.prototype.getObject = function(key) {
     return JSON.parse(this.getItem(key));
 }
 
-let alreadyLoaded;
+let alreadyLoaded = false;
 let map;
 let westHighCoords = { lat: 33.846586, lng: -118.367709 };
 let markers = {};
@@ -255,7 +254,6 @@ function initMap() {
         return localStorage.setItem("loadedMapInformation", true)
         // Exits out of the code to prevent errors from occuring for the code below that runs when a cache exists
     }
-}
 
     createBuildingOutlines(localStorage.getObject("outlineData"))
     createInfoMarkers(localStorage.getObject("locationCoordsData"))
