@@ -5,10 +5,9 @@ html, body {
     font-family: 'Roboto', sans-serif;
     background-color: #303030;
     color: #FFFFFF;
-    /* overflow: hidden; */
 }
 #map {
-    height: 90vh;
+    height: 92vh;
     color: #000000
 }
 #navbar {

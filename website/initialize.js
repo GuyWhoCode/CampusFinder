@@ -10,7 +10,8 @@ Storage.prototype.getObject = function(key) {
 }
 
 let teachers;
-let debug = true;
+let debug = false;
+let timeSent = 0;
 let searchBar = document.getElementById("searchBar")
 let mainSearch = document.getElementById("mainSearch")
 let goClassSearch = document.getElementById("goClass")
@@ -80,7 +81,11 @@ mainSocket.on("teacherData", data => {
     // Initializes autocomplete feature by sending an internal request through a socket to the server for teacher names
 })
 
-mainSocket.on("showNodeSidebar", room => {
+mainSocket.on("showNodeSidebar", markerInfo => {
+    if (markerInfo.timeSent !== timeSent) return;
+    // Filters out incoming socket requests that don't match the time sent
+    let room = markerInfo.room
+    timeSent = 0;
     let teacherInfo = ""
     // eslint-disable-next-line eqeqeq
     teachers.map(val => val.room == room ? (teacherInfo = val) : undefined)
@@ -185,11 +190,16 @@ const searchForBuilding = () => {
     teacherImg.src = teacherInfo.image
     mainSearch.value = ""
     classSearchResult.show()
-    mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar"})
+    mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar", "timeSent": Date.now()})
     // Snaps the map view on the center of the classroom marker zoomed in
-
+  
+    timeSent = Date.now()
+    // Sets the time of the request sent to prevent multiple searched instances from appearing  
+  
     goClassSearch.addEventListener("click", () => {
-        mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar"})
+        mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar", "timeSent": Date.now()})
+        timeSent = Date.now()
+        // Sets the time of the request sent to prevent multiple searched instances from appearing  
     })
 }
 
@@ -204,6 +214,10 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
             searchForBuilding()
         }
     })
+  
+    document.getElementById('classPathMenu').className = "offcanvas offcanvas-top"
+    // Moves the canvas to the top of the screen for mobile view
+  
 } else {
     searchBar.addEventListener("submit", (event) => {
         event.preventDefault()

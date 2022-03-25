@@ -1,6 +1,5 @@
 // eslint-disable-next-line no-undef
 const mapSocket = io("/");
-const nodes = localStorage.getObject("nodeData")
 let previousClickedMarker;
 function createMarker(node) {
     // Node returns string of node name -- classroom and building name
@@ -18,144 +17,40 @@ function createMarker(node) {
 
     /* Makes the marker bounce on click */
     marker.addListener("click", () => {
-        // delete first part of if statement for user site
-        if (editMode) {
-            if (marker.getAnimation() != google.maps.Animation.BOUNCE) {
-                if (nodes[selectedNode]["neighbors"].includes(marker.getLabel())) {
-                    nodes[selectedNode]["neighbors"].map((val, index) => marker.getLabel() == val ? nodes[selectedNode]["neighbors"].splice(index, 1) : undefined)
-                }
-                else {
-                    nodes[selectedNode]["neighbors"].push(marker.getLabel())
-                }
-                updateNeighborVisibility();
-            }
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        marker.setIcon(selectedNodeImage);
+        selectedNode = marker.getLabel();
+        
+        mapSocket.emit("requestNodeInfo", {"room": node , "origin": "map", "timeSent": Date.now()})  
+        timeSent = Date.now()
+      
+        if (previousClickedMarker === undefined) {
+            return previousClickedMarker = marker
         }
-        else {
-            marker.setAnimation(google.maps.Animation.BOUNCE);
-            marker.setIcon(selectedNodeImage);
-            selectedNode = marker.getLabel();
+        previousClickedMarker.setAnimation(null);
+        previousClickedMarker.setIcon(null);
+        previousClickedMarker = marker
           
-            mapSocket.emit("requestNodeInfo", {"room": node , "origin": "map"})
-            
-            if (previousClickedMarker === undefined) {
-                return previousClickedMarker = marker
-            }
-            previousClickedMarker.setAnimation(null);
-            previousClickedMarker.setIcon(null);
-            previousClickedMarker = marker
-
-            // for choosing if you are selecting the starting marker or the ending marker
-            // if (startChooser) {
-            //     startingMarker = selectedNode;
-            //     document.getElementById("startingMarker").innerHTML = startingMarker;
-            // } else {
-            //     endingMarker = selectedNode;
-            //     document.getElementById("endingMarker").innerHTML = endingMarker;
-            // }
-        }
+        // for choosing if you are selecting the starting marker or the ending marker
+        // if (startChooser) {
+        //     startingMarker = selectedNode;
+        //     document.getElementById("startingMarker").innerHTML = startingMarker;
+        // } else {
+        //     endingMarker = selectedNode;
+        //     document.getElementById("endingMarker").innerHTML = endingMarker;
+        // }
         
     });
 
+    if (parseInt(node[1]) === 2 || parseInt(node[1]) === 3) marker.setMap(null)
+    // Hides markers for the additional floors of the Classroom Buildings
+  
     markers[node] = marker
     // Uses an object to prevent looping over the markers list when searching for a classroom or building
 }
 
-/* Delete this function for user site */
-function createMarkerClick(event) {
-    let marker = new google.maps.Marker({
-        position: event.latLng,
-        draggable: true,
-        label: document.getElementById("nameOfNode").value,
-        map,
-    });
-
-    /*  Makes the marker bounce on click 
-        If in edit mode, clicking on this marker will toggle whether or not the marker
-        is a neighbor of the selected node (selected node denoted by Don Cheadle)*/
-    marker.addListener("click", () => {
-        if (editMode) {
-            if (marker.getAnimation() != google.maps.Animation.BOUNCE) {
-                if (nodes[selectedNode]["neighbors"].includes(marker.getLabel())) {
-                    for (let i = 0; i < nodes[selectedNode]["neighbors"].length; i++) {
-                        if (marker.getLabel() == nodes[selectedNode]["neighbors"][i]) {
-                            nodes[selectedNode]["neighbors"].splice(i, 1);
-                        }
-                    }
-                }
-                else {
-                    nodes[selectedNode]["neighbors"].push(marker.getLabel())
-                }
-                updateNeighbors();
-            }
-        }
-        else {
-            for (var i = 0; i < markers.length; i++) {
-                markers[i].setAnimation(null);
-                markers[i].setIcon(null);
-            }
-            marker.setAnimation(google.maps.Animation.BOUNCE);
-            marker.setIcon(selectedNodeImage);
-            selectedNode = marker.getLabel();
-        }
-        document.getElementById("selectedNode").innerHTML = "Selected Node: " + selectedNode + " | Edit mode: " + editMode + " | " + nodes[selectedNode]["neighbors"];
-    });
-
-    /* Updates the marker's coordinates in the nodes dictionary when it is dragged */
-    marker.addListener("position_changed", (event) => {
-        if (marker.getLabel() in nodes) {
-            nodes[marker.getLabel()]["lat"] = marker.getPosition().lat();
-            nodes[marker.getLabel()]["lng"] = marker.getPosition().lng();
-        }
-    });
-
-    markers.push(marker);
-    nodes[document.getElementById("nameOfNode").value] = { lat: marker.getPosition().lat(), lng: marker.getPosition().lng(), neighbors: [], isRoom: false };
-}
-
-/*  Should be deleted for user site
-    Visually shows which nodes are neighbors of the selected node */
-function updateNeighborVisibility() {
-    for (var j = 0; j < markers.length; j++) {
-        if (nodes[selectedNode]["neighbors"].includes(markers[j].getLabel())) {
-            markers[j].setIcon(neighborNodeImage);
-        }
-        else if (markers[j].getLabel() == selectedNode) {
-            markers[j].setIcon(selectedNodeImage);
-        }
-        else {
-            markers[j].setIcon(null);
-        }
-        if (editMode == false && markers[j].getLabel() != selectedNode) {
-            markers[j].setIcon(null);
-        }
-    }
-}
-
-/* Delete this function for user site */
-/*  Deletes the selected marker from nodes and markers list and all mentions of it
-    in the neighbors list of other nodes */
-function deleteSelectedMarker() {
-    for (var i = 0; i < markers.length; i++) {
-        if (markers[i].getAnimation() == google.maps.Animation.BOUNCE) {
-            if (markers[i].getLabel() in nodes) {
-                delete nodes[markers[i].getLabel()];
-            }
-            for (var key in nodes) {
-                for (var j = 0; j < nodes[key]["neighbors"].length; j++) {
-                    if (nodes[key]["neighbors"][j] == markers[i].getLabel()) {
-                        nodes[key]["neighbors"].splice(j, 1);
-                    }
-                }
-            }
-            markers[i].setMap(null);
-            markers[i] = null;
-            markers.splice(i, 1);
-        }
-    }
-}
-
 function showAllMarkers() {
-    Object.values(markers).map(marker => marker.setMap(map))
+    Object.values(markers).map(marker => parseInt(marker.getLabel()[1]) === 2 || parseInt(marker.getLabel()[1]) === 3 ? marker.setMap(null) : marker.setMap(map))
     for (let marker in locationMarkers) {
         locationMarkers[marker].setMap(map);
     }
@@ -348,4 +243,9 @@ function resetMap() {
     showAllMarkers();
     map.setZoom(18);
     map.setCenter(westHighCoords);
+  
+    previousClickedMarker.setAnimation(null);
+    previousClickedMarker.setIcon(null);
+    previousClickedMarker = undefined
+    // Removes the searched marker icon
 }

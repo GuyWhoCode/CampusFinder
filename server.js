@@ -63,19 +63,6 @@ Object.values(nodeFile).map((roomInfo, index) => {
     // Adds rooms, not intermediate notes to the Search index of Flexsearch
 })
 
-// let buildingFile = JSON.parse(fileReader.readFileSync("./locationCoords.json", "utf8"))
-// let buildingName = Object.keys(buildingFile)
-// Object.values(buildingFile).map((info, index) => {
-//     searchIndex.add({
-//         id: totalIndex + index,
-//         latitude: info.lat,
-//         longitude: info.lng,
-//         room: buildingName[index]
-//     })
-//     // Adds rooms, not intermediate notes to the Search index of Flexsearch
-// })
-// More testing needs to be done to use
-
 const socket = require("socket.io")(server, { pingTimeout: 60000 })
 dbClient.connect(async () => {
     console.log("Connected to database!")
@@ -113,12 +100,12 @@ dbClient.connect(async () => {
                 if (searchIndex.search(nodeInfo.room, { index: "room", enrich: true})[0] === undefined) return;
                 
                 let searchResult = searchIndex.search(nodeInfo.room, { index: "room", enrich: true})[0].result[0].doc
-                return socket.emit("nodeSelected", {"room": nodeInfo.room, "result": searchResult})
+                return socket.emit("nodeSelected", {"room": nodeInfo.room, "result": searchResult, "timeSent": nodeInfo.timeSent})
                 // Node request from the sidebar creates a request to the map to display an animation showing where the classroom is
                 // Sidebar request comes from user-submitted classes sidebar
             }
-            socket.emit("showNodeSidebar", nodeInfo.room)
-            // Node request from clicking a map icon sends a request to the sidebar to display information 
+            socket.emit("showNodeSidebar", {"room": nodeInfo.room, "timeSent": nodeInfo.timeSent})
+            // Node request from clicking a map icon sends a request to the sidebar to display information
         })
         
         io.on("easterEgg", () => {

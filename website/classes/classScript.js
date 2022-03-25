@@ -25,7 +25,7 @@ let periodsConfirmed = []
 let confirmationList = {}
 let teachers = localStorage.getObject("teacherList")
 // Initializes autocomplete feature by referencing local storage of teacher list
-let debug = true
+let debug = false
 
 Object.values(document.getElementsByClassName("classSelector")).map((elm, index) => {
     teachers.map(val => {
@@ -108,14 +108,9 @@ const undoDelete = className => {
     })
     classSelector.appendChild(teacherName)
 
-    let submitClass = document.createElement('button')
-    submitClass.className = "submitClass premadeButton"
-    submitClass.innerHTML = "Submit Class"
-    classSelector.appendChild(submitClass)
-
-    submitClass.insertAdjacentHTML("afterend", '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-dash-circle-fill deleteClass" viewBox="0 0 16 16"> <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7z"/> </svg>')
+    teacherName.insertAdjacentHTML("afterend", '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-dash-circle-fill deleteClass" viewBox="0 0 16 16"> <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7z"/> </svg>')
     // Adds SVG image of delete button
-    classSelector.childNodes[4].addEventListener("click", () => {deleteClassELm(classSelector)})
+    classSelector.childNodes[3].addEventListener("click", () => {deleteClassELm(classSelector)})
 
     return classSelector
     // Creates a class selector element with the following components: Period name, form with text input, drop-down menu, submit button, and Delete Class button
@@ -152,6 +147,9 @@ const insertNewClass = elm => {
 
 const confirmClass = period => {
     let elmValue = document.getElementById(period).value
+    if (!elmValue.includes("(") && !elmValue.includes(")")) return;
+    // Exits out of the program if the input isn't valid
+    
     let teacherName = elmValue.split("(")[0].trim()
     // Format of drop-down name: lastName, firstName (XXXX)
     if (teacherName === "") return;
@@ -235,17 +233,13 @@ const confirmClass = period => {
         confirmationScreen.insertBefore(document.createElement("br"), document.getElementsByClassName("confirmPeriod Period" + periodsConfirmed[index+1])[0])
         // Desktop Version
 
-        confirmationClassListMobile.insertBefore(periodNameMobile, document.getElementsByClassName("confirmPeriod Period" + periodsConfirmed[index+1])[0])
-        confirmationClassListMobile.insertBefore(teacherElmMobile, document.getElementsByClassName("confirmPeriod Period" + periodsConfirmed[index+1])[0])
-        confirmationClassListMobile.insertBefore(document.createElement("br"), document.getElementsByClassName("confirmPeriod Period" + periodsConfirmed[index+1])[0])
+        confirmationClassListMobile.insertBefore(periodNameMobile, document.getElementsByClassName("confirmPeriod Period" + periodsConfirmed[index+1])[1])
+        confirmationClassListMobile.insertBefore(teacherElmMobile, document.getElementsByClassName("confirmPeriod Period" + periodsConfirmed[index+1])[1])
+        confirmationClassListMobile.insertBefore(document.createElement("br"), document.getElementsByClassName("confirmPeriod Period" + periodsConfirmed[index+1])[1])
         // Mobile Version
         // Gets the Period X container after at the found index (uses the number at the index, not the index number itself) as a reference point to insert
     }}) 
 }
-
-
-Object.values(document.getElementsByClassName("submitClass")).map((val, index) => val.addEventListener("click", () => {confirmClass("Period " + index)}))
-// Adds button click to Submit Class button
 
 Object.values(document.getElementsByClassName("searchTeacher")).map((val, index) => {
     if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf("like Mac") !== -1) {
@@ -253,14 +247,15 @@ Object.values(document.getElementsByClassName("searchTeacher")).map((val, index)
         // Adds keydown event listener for mobile that adds functionality to the Search button
     } else {
         val.addEventListener("submit", event => {event.preventDefault(), confirmClass("Period " + index)})
+        val.addEventListener("change", event => {confirmClass("Period " + index)})
     }
 })
 // Adds ability to hit enter on Class autocomplete forms
 
-Object.values(document.getElementsByClassName("submitClass premadeButton")).map(val => val.insertAdjacentHTML("afterend", '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-dash-circle-fill deleteClass" viewBox="0 0 16 16"> <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7z"/> </svg>'))
+Object.values(document.getElementsByClassName("searchTeacher")).map(val => val.insertAdjacentHTML("afterend", '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-dash-circle-fill deleteClass" viewBox="0 0 16 16"> <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-7z"/> </svg>'))
 // Adds scalable delete button image
 
-Object.values(document.getElementsByClassName("classSelector")).map(val => val.childNodes[8].addEventListener("click", () => {deleteClassELm(val)}))
+Object.values(document.getElementsByClassName("classSelector")).map(val => val.childNodes[4].addEventListener("click", () => {deleteClassELm(val)}))
 // Adds button click to delete class image 
 
 document.getElementById("undoButton").addEventListener("click", () => {
@@ -321,9 +316,7 @@ saveClassesMobileBtn.addEventListener("click", () => {
 })
 
 
-document.getElementById('confirmationClassModal').addEventListener("hidden.bs.modal", () => {
-    window.location = "/home"
-})
+document.getElementById('confirmationClassModal').addEventListener("hidden.bs.modal", () => Object.values(confirmationList).length >= 3 ? window.location = "/home" : undefined)
 // Redirects the user home after the confirmation class modal is closed
 
 if (!debug) {

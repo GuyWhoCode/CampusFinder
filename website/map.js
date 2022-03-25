@@ -6,6 +6,7 @@ let intermediateNodesEnabled = false;
 let locationOutlinesEnabled = true;
 let buildingLabelsEnabled = true;
 let hiddenPaths = false;
+let editMode = false;
 
 Storage.prototype.setObject = function(key, value) {
     this.setItem(key, JSON.stringify(value));
@@ -38,8 +39,6 @@ let startChooser = true;
 let startingMarker = null;
 let endingMarker = null;
 
-let editMode = false;
-
 // For current position 
 var currentLat;
 var currentLng;
@@ -56,7 +55,7 @@ let altNamesClassrooms = {
     "baseballField": [],
     "tennisCourt": []
 }
-
+let nodes;
 // eslint-disable-next-line no-undef
 let socket = io("/");
 
@@ -99,6 +98,9 @@ function loadNodesIntoMap(nodesList) {
     if (alreadyLoaded) return;
     alreadyLoaded = true;
   
+    nodes = nodesList;
+    // Sets nodes as a global variable to prevent loading issues
+  
     for (let node in nodesList) {
         // changes all rooms' isRoom flag to true
         // everything from here to the next comment can be removed for user site
@@ -127,7 +129,7 @@ function loadNodesIntoMap(nodesList) {
     }
 }
 
-function initMap() {
+async function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: westHighCoords,
         zoom: 18,
@@ -213,12 +215,13 @@ function initMap() {
         // Uses the classPath list to determine the start and end location based on the generated node pathing algorithm
 
         selectedPath += 1 
-        if (selectedPath === 5) selectedPath = 0
+        if (selectedPath === userClasses.length - 1) selectedPath = 0
         
     });
     
     document.getElementById("showPreviousPath").addEventListener('click', () => {
-        if (selectedPath === 0) selectedPath = 5
+        let userClasses = Object.keys(sessionStorage.getObject("userClasses"))
+        if (selectedPath === 0) selectedPath = userClasses.length - 1
         selectedPath -= 1 
         
         document.getElementById("toClassroom").innerHTML = `To: ${classPaths[selectedPath][1].path[0]}`
@@ -226,7 +229,6 @@ function initMap() {
         // Uses the classPath list to determine the start and end location based on the generated node pathing algorithm
         // End node determined by getting the pathing list (classPaths[selectedPath][1].path) and getting the last entry (final classroom)
 
-        let userClasses = Object.keys(sessionStorage.getObject("userClasses"))
         document.getElementById("periodPathName").innerHTML = `Path from Period ${userClasses[selectedPath + 1]} to Period ${userClasses[selectedPath]}`
         // Uses the cached user classes to sync the period names and account for the possibility of having 0-5 periods and 1-6 periods.
         
@@ -239,18 +241,13 @@ function initMap() {
         val.addEventListener("click", () => {showMarkersOfBuildingAtFloor(buildingNumber, floorNumber)})
     })
     // FLOOR SELECTOR: Loops through every item in the floor selector. Gets building and floor number based on the button's ID through string manipulation
-    // createButtons();
 
     if (localStorage.getItem("loadedMapInformation") === null) {
         // If the map information is not cached yet, request for the data to be cached.
-        socket.emit("requestNodes");
+        await socket.emit("requestNodes");
+        socket.emit("requestOutlines");
+        socket.emit("requestLocationCoords");
         
-        if (locationOutlinesEnabled) {
-            socket.emit("requestOutlines");
-        }
-        if (buildingLabelsEnabled) {
-            socket.emit("requestLocationCoords");
-        }
         return localStorage.setItem("loadedMapInformation", true)
         // Exits out of the code to prevent errors from occuring for the code below that runs when a cache exists
     }
@@ -260,23 +257,6 @@ function initMap() {
     loadNodesIntoMap(localStorage.getObject("nodeData"))
     // Initializes building outlines, classroom buildings, and classroom nodes with cached data
 }
-
-// this is IIFE - i.e. runs immediately
-// (() => {
-//     window.initMap = initMap;
-// })();
-
-// function createButtons() {
-    // document.getElementById("normalMode").addEventListener('click', () => { updateMapMode(NORMAL_MAP_MODE); });
-    // document.getElementById("currentPosMode").addEventListener('click', () => { updateMapMode(CURRENT_POS_MODE); });
-    // document.getElementById("searchMode").addEventListener('click', () => { updateMapMode(SEARCH_MODE); });
-
-    // document.getElementById("startChooser").addEventListener('click', () => { startChooser = true; });
-    // document.getElementById("endChooser").addEventListener('click', () => { startChooser = false; });
-    // document.getElementById("currentLocationChooser").addEventListener('click', () => {
-
-    // } );
-// }
 
 function updateMapMode(mapMode) {
     currentMode = mapMode; 
@@ -360,28 +340,32 @@ function showOutlinesOfBuilding(buildingType, reset) {
     map.setZoom(18);
 }
 
-socket.on("loadNodes", (nodeData) => {
-    localStorage.setObject("nodeData", nodeData)
+socket.on("loadNodes", async (nodeData) => {  
+    await loadNodesIntoMap(nodeData)
+    await localStorage.setObject("nodeData", nodeData)
     // Caches the outline data to reduce load on internal socket
-    loadNodesIntoMap(nodeData)
 });
 // Loads map nodes on socket request from internal server -- Ran when data is not cached
 
-socket.on("loadOutlines", (coordsData) => {
-    localStorage.setObject("outlineData", coordsData)
-    // Caches the outline data to reduce load on internal socket
-    createBuildingOutlines(coordsData);
+socket.on("loadOutlines", async (coordsData) => {
+    await createBuildingOutlines(coordsData);
+    await localStorage.setObject("outlineData", coordsData)
+    // Caches the outline data to reduce load on internal socket  
 });
 // Loads building outlines on socket request from internal server -- Ran when data is not cached
 
-socket.on("loadLocationCoords", (locationCoords) => {
-    localStorage.setObject("locationCoordsData", locationCoords)
-    // Caches the outline data to reduce load on internal socket
-    createInfoMarkers(locationCoords);
+socket.on("loadLocationCoords", async (locationCoords) => {
+    await createInfoMarkers(locationCoords);
+  
+    await localStorage.setObject("locationCoordsData", locationCoords)
+    // Caches the outline data to reduce load on internal socket  
 });
 // Loads on socket request from internal server -- Ran when data is not cached
 
 socket.on("nodeSelected", searchResult => {
+    if (searchResult.timeSent !== timeSent) return;
+    // Exits out of the program if the incoming socket request doesn't match the sent time of the search
+    timeSent = 0
     markers[searchResult.room].setAnimation(google.maps.Animation.BOUNCE);
     markers[searchResult.room].setIcon(selectedNodeImage);
     map.setCenter({lat: searchResult.result.latitude, lng: searchResult.result.longitude})
