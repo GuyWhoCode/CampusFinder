@@ -12,6 +12,7 @@ Storage.prototype.getObject = function(key) {
 let teachers;
 let debug = false;
 let timeSent = 0;
+let searchedRoom = "";
 let searchBar = document.getElementById("searchBar")
 let mainSearch = document.getElementById("mainSearch")
 let goClassSearch = document.getElementById("goClass")
@@ -20,7 +21,6 @@ let roomNumber = document.getElementById("roomNumber")
 let teacherImg = document.getElementById("teacherImg")
 let buildingCarousel = document.getElementById("buildingCarousel")
 let infoBoxPreview = document.getElementById("infoBoxPreview")
-let goClass = document.getElementById("goClass")
 const classroomBuildings = ["Cafeteria 4", "Cafeteria 5", "Administration", "Building 2", "Building 3", "Building 4", "Building 5", "Building 6", "Building 8", "Gym", "Pavillion", "Performing Arts Center (PAC)", "Stadium", "Field", "All Buildings", "All Cafeterias", "Other"]
 // eslint-disable-next-line no-undef
 let classSearchResult = new bootstrap.Offcanvas(document.getElementById("classSearchResult"))
@@ -31,22 +31,6 @@ let classDenialModal = new bootstrap.Modal(document.getElementById('classDenialM
 // eslint-disable-next-line no-undef
 let classPathMenu = new bootstrap.Offcanvas(document.getElementById('classPathMenu'))
 
-// const buildingOptions = {
-//     "Cafeteria 4": focusOnBuilding(locationMarkers, map, "Cafe 4"),
-//     "Cafeteria 5": focusOnBuilding(locationMarkers, map, "Cafe 5"), 
-//     "Administration": showMarkersOfBuilding(ADMIN), 
-//     "Building 2": showMarkersOfBuilding(2), 
-//     "Building 3": showMarkersOfBuilding(3), 
-//     "Building 4": showMarkersOfBuilding(4), 
-//     "Building 5": showMarkersOfBuilding(5), 
-//     "Building 6": showMarkersOfBuilding(6), 
-//     "Building 8": showMarkersOfBuilding(8), 
-//     "Gym": showMarkersOfOtherBuilding(markers, map, "Gym"), 
-//     "Pavillion": showMarkersOfOtherBuilding(markers, map, "Pavilion"), 
-//     "Performing Arts Center (PAC)": showMarkersOfOtherBuilding(markers, map, "PAC"), 
-//     "Stadium": showMarkersOfOtherBuilding(markers, map, "Stadium"), 
-//     "Field": showMarkersOfOtherBuilding(markers, map, "Field")
-// }
 // eslint-disable-next-line no-undef
 let betaInformationModal = new bootstrap.Modal(document.getElementById('betaInformationModal'))
 betaInformationModal.show()
@@ -71,34 +55,6 @@ const initializeTeacherAutocomplete = teacherData => {
 
 }
 
-mainSocket.emit("requestTeacher", localStorage.getObject("teacherList"))
-mainSocket.on("teacherData", data => {
-    teachers = data
-    localStorage.setObject("teacherList", data)
-    // Sets persistent storage in the browser to lower the amount of requests to the database
-    
-    initializeTeacherAutocomplete(data)
-    // Initializes autocomplete feature by sending an internal request through a socket to the server for teacher names
-})
-
-mainSocket.on("showNodeSidebar", markerInfo => {
-    if (markerInfo.timeSent !== timeSent) return;
-    // Filters out incoming socket requests that don't match the time sent
-    let room = markerInfo.room
-    timeSent = 0;
-    let teacherInfo = ""
-    // eslint-disable-next-line eqeqeq
-    teachers.map(val => val.room == room ? (teacherInfo = val) : undefined)
-    // Automatically type converts val.room (int) to match the type of room (string)
-
-    teacherSelection.innerHTML = flipName(teacherInfo.name)
-    roomNumber.innerHTML = "Room " + teacherInfo.room 
-    teacherImg.src = teacherInfo.image
-    goClassSearch.style.display = "none"
-    classSearchResult.show()
-})
-
-
 const flipName = name => name.split(",").reverse().join(" ").trim()
 const findTeacherInfo = teacherName => {
     let teacherInfo = ""
@@ -110,6 +66,7 @@ const searchForBuilding = () => {
     let searchValue = mainSearch.value
     if (searchValue.toLowerCase().trim() === "swimming pool") {
         mainSearch.value = ""
+        resetSearch()
         return mainSocket.emit("easterEgg")
         // Egg of the Easter
     }
@@ -118,8 +75,10 @@ const searchForBuilding = () => {
         mainSearch.value = ""
         buildingCarousel.style.display = "block"
         infoBoxPreview.style.display = "none"
-        goClass.style.display = "none"
+        goClassSearch.style.display = "none"
         classSearchResult.show()
+      
+        resetSearch()
         switch (searchValue) {
             case "Cafeteria 4": 
                 focusOnBuilding(locationMarkers, map, "Cafe 4")
@@ -178,10 +137,6 @@ const searchForBuilding = () => {
         // Case when the building is searched
     }
 
-    // if (buildingOptions[searchValue] !== undefined) {
-    //     return buildingOptions[searchValue]
-    //     // Case when the building is searched in module form
-    // }
     let teacherName = searchValue.split("(")[0].trim()
     let teacherInfo = findTeacherInfo(teacherName)
     if (teacherName === "" || teacherInfo === "") return;
@@ -190,15 +145,19 @@ const searchForBuilding = () => {
     teacherImg.src = teacherInfo.image
     mainSearch.value = ""
     classSearchResult.show()
-    mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar", "timeSent": Date.now()})
-    // Snaps the map view on the center of the classroom marker zoomed in
-  
     timeSent = Date.now()
     // Sets the time of the request sent to prevent multiple searched instances from appearing  
+    
+    resetSearch()
+    mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar", "timeSent": timeSent})
+    // Snaps the map view on the center of the classroom marker zoomed in
   
+    searchedRoom = teacherInfo.room
+    goClassSearch.style.display = "block"
+    
     goClassSearch.addEventListener("click", () => {
-        mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar", "timeSent": Date.now()})
         timeSent = Date.now()
+        mainSocket.emit("requestNodeInfo", {"room": searchedRoom, "origin": "sidebar", "timeSent": timeSent})
         // Sets the time of the request sent to prevent multiple searched instances from appearing  
     })
 }
@@ -216,6 +175,7 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
     })
   
     document.getElementById('classPathMenu').className = "offcanvas offcanvas-top"
+    document.getElementById('classSearchResult').className = "offcanvas offcanvas-top"
     // Moves the canvas to the top of the screen for mobile view
   
 } else {
@@ -297,5 +257,34 @@ document.getElementById('classPathMenu').addEventListener("hide.bs.offcanvas", (
 document.getElementById('classSearchResult').addEventListener("hide.bs.offcanvas", () => {
     buildingCarousel.style.display = "none"
     infoBoxPreview.style.display = "block"
-    goClass.style.display = "block"
+    goClassSearch.style.display = "block"
+})
+
+mainSocket.emit("requestTeacher", localStorage.getObject("teacherList"))
+mainSocket.on("teacherData", data => {
+    teachers = data
+    localStorage.setObject("teacherList", teachers)
+    // Sets persistent storage in the browser to lower the amount of requests to the database
+    
+    initializeTeacherAutocomplete(data)
+    // Initializes autocomplete feature by sending an internal request through a socket to the server for teacher names
+})
+
+mainSocket.on("showNodeSidebar", markerInfo => {
+    if (Math.abs(markerInfo.timeSent - timeSent) > 5) return;
+    // Filters out incoming socket requests that don't match the time sent with a threshold of 5 milliseconds
+    let room = markerInfo.room
+    timeSent = 0;
+    let teacherInfo = ""
+    // eslint-disable-next-line eqeqeq
+    teachers.map(val => val.room == room ? (teacherInfo = val) : undefined)
+    // Automatically type converts val.room (int) to match the type of room (string)
+
+    teacherSelection.innerHTML = flipName(teacherInfo.name)
+    roomNumber.innerHTML = "Room " + teacherInfo.room 
+    teacherImg.src = teacherInfo.image
+    goClassSearch.style.display = "block"
+    searchedRoom = teacherInfo.room 
+    classSearchResult.show()
+    
 })

@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-undef
 const mapSocket = io("/");
 let previousClickedMarker;
+let currentMarker;
 function createMarker(node) {
     // Node returns string of node name -- classroom and building name
     
@@ -17,6 +18,7 @@ function createMarker(node) {
 
     /* Makes the marker bounce on click */
     marker.addListener("click", () => {
+        resetSearch()  
         marker.setAnimation(google.maps.Animation.BOUNCE);
         marker.setIcon(selectedNodeImage);
         selectedNode = marker.getLabel();
@@ -75,31 +77,22 @@ function hideAllMarkers() {
     }
 }
 
-function createCurrentPosMarker() {
+function createCurrentPosMarker(currentLat, currentLng) {
     // current position marker
-    let currentMarker = new google.maps.Marker({
+    if (currentMarker !== undefined) {
+        return currentMarker.setPosition({ lat: currentLat, lng: currentLng })
+    }
+    // Updates the current position marker to be at the new location
+    
+    currentMarker = new google.maps.Marker({
         position: { lat: currentLat, lng: currentLng },
-        draggable: true,
-        label: "START",
+        draggable: false,
         map,
     });
-    // map.setCenter({lat: currentLat, lng: currentLng})
-    map.setCenter( {lat: 33.845233, lng: -118.367850})
-
-    // dragging the current position marker makes the (almost) shortest path from the current position to the selected node
-    currentMarker.addListener("position_changed", () => {
-        currentLat = currentMarker.getPosition().lat();
-        currentLng = currentMarker.getPosition().lng();
-        findClosestNodeToCurrentPos();
-        if (lines !== null) {
-            lines.setMap(null);
-            lines = null;
-        }
-        lines = drawLines(findShortestPath(graph, closestNodeToCurrentPos, selectedNode), true);
-    });
+    currentMarker.setIcon("https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/current%20POS%20Icon.png?v=1648750135231");
 }
 
-function findClosestNodeToCurrentPos() {
+function findClosestNodeToCurrentPos(currentLat, currentLng) {
     let shortestDist = Infinity;
     for (var node in nodes) {
         var dist = distance(nodes[node]["lat"], nodes[node]["lng"], currentLat, currentLng);
@@ -239,13 +232,23 @@ function focusOnOtherBuildingWithMarkers(m1, m2) {
     map.setZoom(19)
 }
 
+function resetSearch() {
+    if (previousClickedMarker !== undefined) {
+        previousClickedMarker.setAnimation(null);
+        previousClickedMarker.setIcon(null);
+        previousClickedMarker = undefined
+        // Removes the clicked marker icon
+    } else if (previousSearchedNode !== undefined) {
+        previousSearchedNode.setAnimation(null);
+        previousSearchedNode.setIcon(null);
+        previousSearchedNode = undefined
+        // Removes the searched marker icon
+    }    
+}
+
 function resetMap() {
     showAllMarkers();
     map.setZoom(18);
     map.setCenter(westHighCoords);
-  
-    previousClickedMarker.setAnimation(null);
-    previousClickedMarker.setIcon(null);
-    previousClickedMarker = undefined
-    // Removes the searched marker icon
+    resetSearch()
 }

@@ -152,6 +152,19 @@ html, body {
 .pointerElm {
     cursor: pointer;
 }
+.btn-close {
+    background-image: none !important; 
+    display: contents;
+}
+#recenterCurrent {
+    position: absolute;
+    z-index: 5;
+    background-color: #303030;
+    border-radius: 15px;
+    bottom: 11vh;
+    right: 16em;
+    color: #FFFFFF;
+}
 @media (min-width: 768px) {
     #searchButton {
         display: block;
@@ -170,5 +183,8 @@ html, body {
     }
     #menuIcon {
         width: 48px;
+    }
+    #recenterCurrent {
+        bottom: 9vh;
     }
 }

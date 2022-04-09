@@ -36,17 +36,17 @@ const SEARCH_MODE = 2;
 let currentMode = CURRENT_POS_MODE;
 let startChooser = true;
 
-let startingMarker = null;
-let endingMarker = null;
+let startingMarker;
+let endingMarker;
 
-// For current position 
-var currentLat;
-var currentLng;
-var closestNodeToCurrentPos = null;
+var closestNodeToCurrentPos;
 let graph = {};
+let locationDisabled = false;
+let currentLat;
+let currentLng;
 
 let selectedNode = "Main Entrance";
-let selectedNodeImage = "./Don-Cheadle (2).png"; // maybe change these icons to ones more appropriate
+let selectedNodeImage = "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/campus_finder_icon-YannisL.png?v=1648267618575";
 let neighborNodeImage = "./parking_lot_maps.png";
 
 let altNamesClassrooms = {
@@ -147,57 +147,24 @@ async function initMap() {
         gestureHandling: "greedy",
     });
 
-    /* Adds marker on click
-        Click listener can be deleted for user site. */
-    map.addListener("click", (event) => {
-        createMarkerClick(event);
-    });
-
     // All of this keydown listener except for numLock can be deleted for user site
     document.getElementById("map").addEventListener("keydown", function(event) {
-        // Prints nodes (coordinates) and graph (distances)
-        if (event.key === "Shift") {
-            console.log(nodes);
-            console.log(graph);
-            // console.log(markersMap);
-        }
-        else if (event.key == "Delete") {
-            deleteSelectedMarker();
-        }
-        else if (event.key == "Enter") {
-            var jsonData = JSON.stringify(nodes, null, "\t");
-            socket.emit("saveNodes", jsonData);
-            console.log("Saved JSON");
-        }
-        /* Draws the shortest path from closestNodeToCurrentPos to Main Entrance */
-        else if (event.key == "Control") {
-            // maps path from one period to the next
-            // find a way so that paths don't just overlap and just cross each other
-            createPeriodPaths();
-
-            if (debugLogs) {
-                console.log(shortestPath.distance);
-                for (let i = 0; i < shortestPath.path.length; i++) {
-                    console.log(shortestPath.path[i]);
-                }
-            }
-        }
         /* Toggles Edit Mode, which lets you change the neighbors of a selected node */
-        else if (event.key === "CapsLock") {
+        if (event.key === "CapsLock") {
             editMode = !editMode;
             updateNeighborVisibility();
         }
-
-        /* Draws the shortest path from the selected starting marker to the selected ending marker */
-        else if (event.key == "NumLock") {
-            if (lines !== null) {
-                lines.setMap(null);
-                lines = null;
-            }
-            lines = drawLines(findShortestPath(graph, startingMarker, endingMarker));
-        }
     });
     
+    document.getElementById("recenterCurrent").addEventListener('click', () => {
+        if (currentLat >= 33.843603 && currentLat <= 33.849826 && currentLng >= -118.373926 && currentLng <= -118.363444) {
+            map.setCenter({lat: currentLat, lng: currentLng})
+            return map.setZoom(19)
+        }
+        // Set boundaries to make sure that current position center isn't outside of school boundaries
+        alert("Your current position could not be re-centered. (Are you outside of school?)")
+    })
+  
     document.getElementById("hidePaths").addEventListener('click', () => { hidePeriodPaths(); hiddenPaths = true})
     document.getElementById("resetSearch").addEventListener('click', () => {
         resetMap()
@@ -223,7 +190,9 @@ async function initMap() {
         let userClasses = Object.keys(sessionStorage.getObject("userClasses"))
         if (selectedPath === 0) selectedPath = userClasses.length - 1
         selectedPath -= 1 
-        
+      
+        if (classPaths[selectedPath][1].path[0] === undefined) return;
+        // Added an edge case that exits out of the previous path if the classroom is undefined
         document.getElementById("toClassroom").innerHTML = `To: ${classPaths[selectedPath][1].path[0]}`
         document.getElementById("fromClassroom").innerHTML = `From: ${classPaths[selectedPath][1].path[classPaths[selectedPath][1].path.length - 1]}`
         // Uses the classPath list to determine the start and end location based on the generated node pathing algorithm
@@ -258,25 +227,6 @@ async function initMap() {
     // Initializes building outlines, classroom buildings, and classroom nodes with cached data
 }
 
-function updateMapMode(mapMode) {
-    currentMode = mapMode; 
-    switch (currentMode) {
-        case NORMAL_MAP_MODE:
-            hideAllMarkers();
-            showLocationMarkers();
-            showAllMarkers();
-            break;
-        case CURRENT_POS_MODE:
-            hideAllMarkers();
-            askLocationPermission();
-            // createCurrentPosMarker();
-            break;
-        case SEARCH_MODE:
-            hideAllMarkers();
-            showRoomMarkers();
-            break;
-    }
-}
 
 function askLocationPermission() {
     /* Code sample from https://developers.google.com/maps/documentation/javascript/geolocation
@@ -285,19 +235,21 @@ function askLocationPermission() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
         (position) => {
-            currentLat = position.coords.latitude;
-            currentLng = position.coords.longitude;
-            createCurrentPosMarker();
-            findClosestNodeToCurrentPos();
+              currentLat = position.coords.latitude;
+              currentLng = position.coords.longitude;
+          
+              createCurrentPosMarker(currentLat, currentLng);
+              findClosestNodeToCurrentPos(currentLat, currentLng);
         },
-        () => {
-            alert("Error: The Geolocation service failed or location was not enabled.");
-        }
-    );
+            (error) => {
+                !locationDisabled ? (alert(`ERROR(${error.code}): ${error.message}`), locationDisabled = true) : undefined
+                // https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition
+            }
+        );
     
     } else {
         // Browser doesn't support Geolocation
-        alert("Error: Your browser doesn't support geolocation.");
+        !locationDisabled ? (alert("Error: Your browser doesn't support geolocation."), locationDisabled = true) : undefined
     }
 }
 
@@ -366,6 +318,9 @@ socket.on("nodeSelected", searchResult => {
     if (searchResult.timeSent !== timeSent) return;
     // Exits out of the program if the incoming socket request doesn't match the sent time of the search
     timeSent = 0
+    if (searchResult.room.toString()[1] === "2" || searchResult.room.toString()[1] === "3") markers[searchResult.room].setMap(map);
+    // Shows 2nd and 3rd floor markers on marker clicked
+
     markers[searchResult.room].setAnimation(google.maps.Animation.BOUNCE);
     markers[searchResult.room].setIcon(selectedNodeImage);
     map.setCenter({lat: searchResult.result.latitude, lng: searchResult.result.longitude})
@@ -375,6 +330,9 @@ socket.on("nodeSelected", searchResult => {
     
     previousSearchedNode.setAnimation(null);
     previousSearchedNode.setIcon(null);
+    if (previousSearchedNode.getLabel()[1] === "2" || previousSearchedNode.getLabel()[1] === "3") previousSearchedNode.setMap(null);  
+    // Hides 2nd and 3rd floor marker when clicking on a new marker
+
     previousSearchedNode = markers[searchResult.room]
     // Stores the previous node to remove the animination when doing another search
 
@@ -386,5 +344,8 @@ window.onload = function () {
     if (classPaths.length === 0) {
         createPeriodPaths();
     }
-    // Loads the classroom pathing file AFTER the entire page has been loaded. Function is reliant on all nodes on the map being loaded before determining the shortest path possible.
+    // Loads the classroom pathing file AFTER the entire page has been loaded. Function is reliant on all nodes on the map being loaded before determining the shortest path possible.  
+  
+    setInterval(askLocationPermission, 2000)
+    // Updates current position marker
 }   
