@@ -79,9 +79,7 @@ function hideAllMarkers() {
 
 function createCurrentPosMarker(currentLat, currentLng) {
     // current position marker
-    if (currentMarker !== undefined) {
-        return currentMarker.setPosition({ lat: currentLat, lng: currentLng })
-    }
+    if (currentMarker !== undefined) return currentMarker.setPosition({ lat: currentLat, lng: currentLng })
     // Updates the current position marker to be at the new location
     
     currentMarker = new google.maps.Marker({

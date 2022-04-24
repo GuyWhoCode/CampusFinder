@@ -96,7 +96,7 @@ function drawLines(shortestPath, isCurrentPos) {
     drawnPath = new google.maps.Polyline({
         path: routeCoordinates,
         geodesic: true,
-        strokeColor: "#FF0000",
+        strokeColor: "#1A5276",
         strokeOpacity: 1,
         strokeWeight: 4,
       });

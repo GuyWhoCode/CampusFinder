@@ -165,6 +165,28 @@ html, body {
     right: 16em;
     color: #FFFFFF;
 }
+.pathOptionBtn, .sidebarBtnClass {
+    background-color: #e9d283;
+    border-radius: 15px;
+    border: 0px;
+    font-size: 1.5em;
+    margin-top: 10%;
+}
+.pathOptionBtn:hover {
+    background-color: #c7b370;
+}
+#pathOptionsList {
+    display: grid;
+    justify-content: space-evenly;
+}
+#classBtns {
+    display: grid;
+    grid-template-columns: 50% 20%;
+    align-items: center;
+    justify-content: center;
+    margin: auto 0;
+    justify-items: center;
+}
 @media (min-width: 768px) {
     #searchButton {
         display: block;

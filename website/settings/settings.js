@@ -62,15 +62,15 @@ document.getElementById("deleteAccountBtn").addEventListener("click", () => {
     
 
 
-// if (sessionStorage.getItem("email") === null) {
-//     window.location = "/home"
-//     // If the user is not logged in, redirect them to the main screen.
-// } else {
-//     settings["userEmail"] = sessionStorage.getItem("email")
-//     darkMode = sessionStorage.darkMode
-//     darkMode === "false" ?  showLightMode() : showDarkMode()
-//     // Initializes user dark mode preferences
-// }
+if (sessionStorage.getItem("email") === null) {
+    window.location = "/home"
+    // If the user is not logged in, redirect them to the main screen.
+} else {
+    settings["userEmail"] = sessionStorage.getItem("email")
+    darkMode = sessionStorage.darkMode
+    darkMode === "false" ?  showLightMode() : showDarkMode()
+    // Initializes user dark mode preferences
+}
 
 let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
 // eslint-disable-next-line no-unused-vars

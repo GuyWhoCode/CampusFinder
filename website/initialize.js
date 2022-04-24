@@ -21,6 +21,7 @@ let roomNumber = document.getElementById("roomNumber")
 let teacherImg = document.getElementById("teacherImg")
 let buildingCarousel = document.getElementById("buildingCarousel")
 let infoBoxPreview = document.getElementById("infoBoxPreview")
+let shareRoomLocation = document.getElementById("shareRoomLocation")
 const classroomBuildings = ["Cafeteria 4", "Cafeteria 5", "Administration", "Building 2", "Building 3", "Building 4", "Building 5", "Building 6", "Building 8", "Gym", "Pavillion", "Performing Arts Center (PAC)", "Stadium", "Field", "All Buildings", "All Cafeterias", "Other"]
 // eslint-disable-next-line no-undef
 let classSearchResult = new bootstrap.Offcanvas(document.getElementById("classSearchResult"))
@@ -55,11 +56,51 @@ const initializeTeacherAutocomplete = teacherData => {
 
 }
 
+const createBuildingCarousel = pictures => {
+    let carouselContainers = document.getElementById("carouselContainers")
+    carouselContainers.innerHTML = ""
+    // Resets child nodes
+    pictures.forEach((picSrc, index) => {
+        let carouselItem = document.createElement("div")
+        index === 0 ? carouselItem.className = "carousel-item active" : carouselItem.className = "carousel-item"
+        // Must set the first carousel item to active, all other carousel items must not be active
+
+        let carouselPic = document.createElement("img")
+        carouselPic.src = picSrc
+        carouselPic.className = "d-block carouselImg"
+
+        carouselItem.appendChild(carouselPic)
+        carouselContainers.appendChild(carouselItem)
+    });
+}
+
 const flipName = name => name.split(",").reverse().join(" ").trim()
-const findTeacherInfo = teacherName => {
+const searchForTeacher = teacherQuery => {
     let teacherInfo = ""
-    teachers.map(val => val.name === teacherName ? (teacherInfo = val) : undefined)
-    return teacherInfo
+    teachers.map(val => val.name === teacherQuery || val.room === parseInt(teacherQuery) ? (teacherInfo = val) : undefined)
+    if (teacherQuery === "" || teacherInfo === "") return;
+
+    teacherSelection.innerHTML = flipName(teacherInfo.name)
+    roomNumber.innerHTML = "Room " + teacherInfo.room 
+    teacherImg.src = teacherInfo.image
+    mainSearch.value = ""
+    classSearchResult.show()
+    timeSent = Date.now()
+    // Sets the time of the request sent to prevent multiple searched instances from appearing  
+    
+    resetSearch() 
+    // Resets previous marker searches -- marker manager
+    mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar", "timeSent": timeSent})
+    // Snaps the map view on the center of the classroom marker zoomed in
+  
+    searchedRoom = teacherInfo.room
+    goClassSearch.style.display = "block"
+    
+    goClassSearch.addEventListener("click", () => {
+        timeSent = Date.now()
+        mainSocket.emit("requestNodeInfo", {"room": searchedRoom, "origin": "sidebar", "timeSent": timeSent})
+        // Sets the time of the request sent to prevent multiple searched instances from appearing  
+    })
 }
 
 const searchForBuilding = () => {
@@ -82,42 +123,53 @@ const searchForBuilding = () => {
         switch (searchValue) {
             case "Cafeteria 4": 
                 focusOnBuilding(locationMarkers, map, "Cafe 4")
+                createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/cafe41.png?v=1650467065876", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/cafe42.png?v=1650467510886", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/cafe43.png?v=1650467514786"])
                 break;
             case "Cafeteria 5": 
                 focusOnBuilding(locationMarkers, map, "Cafe 5")
+                createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/cafe5.png?v=1650387598863"])
                 break;
             case "Administration": 
                 showMarkersOfBuilding(ADMIN)
                 break;
             case "Building 2": 
                 showMarkersOfBuilding(2)
+                createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/lib2.png?v=1650387538125", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/lib1.png?v=1650387533381"])
                 break; 
             case "Building 3": 
                 showMarkersOfBuilding(3)
+                createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/31.png?v=1650467873968"])
                 break; 
             case "Building 4": 
                 showMarkersOfBuilding(4)
+                createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/43.png?v=1650467626833", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/41.png?v=1650467541469", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/42.png?v=1650467879521"])
                 break; 
             case "Building 5": 
                 showMarkersOfBuilding(5)
+                createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/bldg5_1.png?v=1650387639459", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/bldg5_2.png?v=1650387643476"])
                 break; 
             case "Building 6": 
                 showMarkersOfBuilding(6)
+                createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/61.png?v=1650467520196"])
                 break; 
             case "Building 8": 
                 showMarkersOfBuilding(8)
+                createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/81.png?v=1650401904176", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/82.png?v=1650401909161", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/83.png?v=1650401925229"])
                 break; 
             case "Gym": 
                 showMarkersOfOtherBuilding(markers, map, "Gym")
                 break;
             case "Pavillion": 
                 showMarkersOfOtherBuilding(markers, map, "Pavilion")
+                createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/pavillion1.png?v=1650387463416", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/pavillion2.png?v=1650387490465"])
                 break;
             case "Performing Arts Center (PAC)": 
                 showMarkersOfOtherBuilding(markers, map, "PAC")
+                createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/pac1.png?v=1650387499393", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/pac2.png?v=1650387517686"])
                 break;
             case "Stadium": 
                 showMarkersOfOtherBuilding(markers, map, "Stadium")
+                createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/stadium2.png?v=1650467034478", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/stadium1.png?v=1650467028587"])
                 break;
             case "Field": 
                 showMarkersOfOtherBuilding(markers, map, "Field")
@@ -131,35 +183,13 @@ const searchForBuilding = () => {
             case "Other": 
                 showOutlinesOfBuilding("other")
                 break;
-        
         }
         return;
         // Case when the building is searched
     }
 
     let teacherName = searchValue.split("(")[0].trim()
-    let teacherInfo = findTeacherInfo(teacherName)
-    if (teacherName === "" || teacherInfo === "") return;
-    teacherSelection.innerHTML = flipName(teacherName)
-    roomNumber.innerHTML = "Room " + teacherInfo.room 
-    teacherImg.src = teacherInfo.image
-    mainSearch.value = ""
-    classSearchResult.show()
-    timeSent = Date.now()
-    // Sets the time of the request sent to prevent multiple searched instances from appearing  
-    
-    resetSearch()
-    mainSocket.emit("requestNodeInfo", {"room": teacherInfo.room , "origin": "sidebar", "timeSent": timeSent})
-    // Snaps the map view on the center of the classroom marker zoomed in
-  
-    searchedRoom = teacherInfo.room
-    goClassSearch.style.display = "block"
-    
-    goClassSearch.addEventListener("click", () => {
-        timeSent = Date.now()
-        mainSocket.emit("requestNodeInfo", {"room": searchedRoom, "origin": "sidebar", "timeSent": timeSent})
-        // Sets the time of the request sent to prevent multiple searched instances from appearing  
-    })
+    searchForTeacher(teacherName)
 }
 
 
@@ -185,6 +215,7 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
     })
 }
 // Added to adjust for the mobile view of making the Search button work
+
 
 Object.values(document.getElementsByClassName("changeClasses")).map(val => val.addEventListener("click", () => sessionStorage.getItem("email") !== null ? window.location = "/class" : classDenialModal.show()))
 // Returns an error modal when the user attempts to change their class without logging in first
@@ -260,6 +291,12 @@ document.getElementById('classSearchResult').addEventListener("hide.bs.offcanvas
     goClassSearch.style.display = "block"
 })
 
+shareRoomLocation.addEventListener("click", async () => {
+    let link = "https://campus-finder.glitch.me/?room=" + roomNumber.innerHTML.split("Room ")[1]
+    await navigator.clipboard.writeText(link)
+    await alert("Sharable link copied!")
+})
+
 mainSocket.emit("requestTeacher", localStorage.getObject("teacherList"))
 mainSocket.on("teacherData", data => {
     teachers = data
@@ -288,3 +325,21 @@ mainSocket.on("showNodeSidebar", markerInfo => {
     classSearchResult.show()
     
 })
+
+
+let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+// eslint-disable-next-line no-unused-vars
+let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    // eslint-disable-next-line no-undef
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+// Initializes Bootstrap tooltips
+
+window.onload = function () {
+    const parsedUrl = new URL(window.location.href)
+    let roomNumber = parsedUrl.searchParams.get("room")
+    if (roomNumber !== null) {
+        searchForTeacher(roomNumber)
+    }
+    // Loads the room based on the parsed URL: https://campus-finder.glitch.me/?room=2119
+}   

@@ -161,7 +161,7 @@
         </div>
         <div class="offcanvas-body">
             <div id="buildingCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false">
-                <div class="carousel-inner">
+                <div class="carousel-inner" id="carouselContainers">
                     <div class="carousel-item active">
                         <img src="./img1.jpeg" class="d-block w-75 carouselImg" alt="Img1">
                     </div>
@@ -191,7 +191,15 @@
                 </div>
             </div>
             <!-- Teacher Image, Room #, and Name -->
-            <button type="button" class="btn btn-info" id="goClass">Show Room</button>
+
+            <div id="classBtns">
+                <button type="button" class="btn sidebarBtnClass" id="goClass">Show Room</button>
+                <button class="btn sidebarBtnClass" id="shareRoomLocation"> 
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32px" fill="#000000" class="bi bi-share" viewBox="0 0 16 16" data-bs-toggle="tooltip" data-bs-placement="top" title="Share Room Location">
+                        <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
     <!-- Bootstrap Search Result for Classes Sidebar -->
@@ -211,9 +219,11 @@
             <p class="fs-1" id="fromClassroom">From: XXXX</p>
             <p class="fs-1" id="toClassroom">To: XXXX</p>
             <p class="fs-1" id="periodPathName">Path from Period X to Period X</p>
-            <p class="fs-1">Note: The Path is highlighted in Red.</p>
-            <button id="showAllPaths">Show All Paths</button>
-            <button id="hidePaths">Hide Paths</button>
+            <p class="fs-1">Note: The Path is highlighted in Blue.</p>
+            <div id="pathOptionsList">
+                <button id="showAllPaths" class="pathOptionBtn">Show All Paths</button>
+                <button id="hidePaths" class="pathOptionBtn">Hide Paths</button>
+            </div>
         </div>
     </div>
     <!-- Class Path Bootstrap Sidebar -->

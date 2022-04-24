@@ -14,6 +14,7 @@ Customizable Map locator specifically made for school campuses.
 - Socket.io
 - Firebase
 - Bootstrap
+- Flexsearch
 
 ## Dev Dependencies
 - ESLint

@@ -47,7 +47,6 @@ const searchIndex = new Document({
     }
 })
 // Initializes Flexsearch search index
-let totalIndex = 0;
 let nodeFile = JSON.parse(fileReader.readFileSync("./nodes.json", "utf8"))
 let roomNames = Object.keys(nodeFile)
 Object.values(nodeFile).map((roomInfo, index) => {
@@ -58,7 +57,6 @@ Object.values(nodeFile).map((roomInfo, index) => {
             longitude: roomInfo.lng,
             room: roomNames[index]
         })
-        totalIndex += 1
     }
     // Adds rooms, not intermediate notes to the Search index of Flexsearch
 })
