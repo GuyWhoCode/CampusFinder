@@ -32,10 +32,6 @@ let classDenialModal = new bootstrap.Modal(document.getElementById('classDenialM
 // eslint-disable-next-line no-undef
 let classPathMenu = new bootstrap.Offcanvas(document.getElementById('classPathMenu'))
 
-// eslint-disable-next-line no-undef
-let betaInformationModal = new bootstrap.Modal(document.getElementById('betaInformationModal'))
-betaInformationModal.show()
-// TEMP
 
 const initializeTeacherAutocomplete = teacherData => {
     teacherData.map(val => {

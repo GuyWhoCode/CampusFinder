@@ -50,8 +50,6 @@
             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark" id="quickLinks">
                 <li><a class="dropdown-item" data-bs-toggle="offcanvas" href="#classesSidebar" role="button" aria-controls="classesSidebar">My Classes</a></li>
                 <li><a class="dropdown-item" href="/settings">Preferences</a></li>
-                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#betaInformationModal" href="">Beta Information</a></li>
-                <!-- TEMP for Beta Information -->
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item pointerElm" id="loginElm">Login with Google</a></li>
             </ul>
@@ -276,46 +274,6 @@
         </div>
     </div>
     <!-- Confirmation Bootstrap Modal before logging in -->
-
-
-    <div class="modal fade" tabindex="-1" aria-labelledby="betaInformationModal" aria-hidden="true" id="betaInformationModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Beta Information</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                        <svg xmlns="https://www.w3.org/2000/svg" width="32px" fill="#000000" class="bi bi-x-lg" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z"/>
-                            <path fill-rule="evenodd" d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Hello (hopefully) voluntary beta tester. Welcome to Campus Finder, an application that helps students navigate their way through campus. This application is a year-long project for the Engineering, Design, and Development (EDD), a class of eight students total!
-                    <br>
-                    <br>
-                    To return to this page later, simply click on the User icon in the top right and select "Beta Information." Beta Tester Tasks:
-                    <br>
-                    <ol>
-                        <li>Search for a teacher with the search bar and see if their room location is relatively accurate</li>
-                        <li>Search for a building at West and ensure that its location is accurate and that it works.</li>
-                        <li>Login with Google and input your classes.</li>
-                        <li>Check if the path outlined in the Google map is reasonable.</li>
-                    </ol>
-                    
-                    <br>
-                    Thanks,
-                    <br>
-                    The Campus Finder Team: Jason A., Ian D., and Jay M.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- TEMP Temporary message telling beta testers what to do -->
-
 
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=INSERTKEY&libraries=geometry&callback=initMap"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
