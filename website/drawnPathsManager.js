@@ -104,3 +104,13 @@ function drawLines(shortestPath, isCurrentPos) {
       drawnPath.setMap(map);
       return drawnPath;
 }
+
+function drawLineFromCurrentPosToMarker(marker) {
+    if (closestNodeToCurrentPos != null) {
+      let shortestPath = findShortestPath(graph, closestNodeToCurrentPos, marker);
+      if (selectedNodeLine != null) selectedNodeLine.setMap(null);
+
+      selectedNodeLine = drawLines(shortestPath, true);
+    }
+}
+

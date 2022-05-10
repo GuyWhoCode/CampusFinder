@@ -10,6 +10,21 @@ html, body {
     height: 92vh;
     color: #000000
 }
+#legend {
+  font-family: Arial, sans-serif;
+  background: #fff;
+  padding: 10px;
+  margin: 10px;
+  border: 3px solid #000;
+}
+
+#legend h5 {
+  margin-top: 0;
+}
+
+#legend img {
+  vertical-align: middle;
+}
 #navbar {
     margin: 0;
     padding: 0;
@@ -102,7 +117,7 @@ html, body {
     grid-template-columns: 30% 70%;
     background-color: #bebebe;
     margin: 5% auto;
-    height: 8vh;
+    height: 15vh;
     width: 100%;
     align-items: center;
     justify-items: center;

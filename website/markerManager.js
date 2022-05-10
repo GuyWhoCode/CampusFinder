@@ -22,26 +22,24 @@ function createMarker(node) {
         marker.setAnimation(google.maps.Animation.BOUNCE);
         marker.setIcon(selectedNodeImage);
         selectedNode = marker.getLabel();
-        
+        if (parseInt(node[1]) === 2 || parseInt(node[1]) === 3) marker.setMap(map)
+        // Hides markers for the additional floors of the Classroom Buildings  
+      
         mapSocket.emit("requestNodeInfo", {"room": node , "origin": "map", "timeSent": Date.now()})  
         timeSent = Date.now()
+      
+        let markerName = marker.getLabel();
+        drawLineFromCurrentPosToMarker(markerName);
       
         if (previousClickedMarker === undefined) {
             return previousClickedMarker = marker
         }
         previousClickedMarker.setAnimation(null);
         previousClickedMarker.setIcon(null);
+        if (parseInt(node[1]) === 2 || parseInt(node[1]) === 3) previousClickedMarker.setMap(null)
+        // Hides markers for the additional floors of the Classroom Buildings 
+      
         previousClickedMarker = marker
-          
-        // for choosing if you are selecting the starting marker or the ending marker
-        // if (startChooser) {
-        //     startingMarker = selectedNode;
-        //     document.getElementById("startingMarker").innerHTML = startingMarker;
-        // } else {
-        //     endingMarker = selectedNode;
-        //     document.getElementById("endingMarker").innerHTML = endingMarker;
-        // }
-        
     });
 
     if (parseInt(node[1]) === 2 || parseInt(node[1]) === 3) marker.setMap(null)
@@ -52,7 +50,7 @@ function createMarker(node) {
 }
 
 function showAllMarkers() {
-    Object.values(markers).map(marker => parseInt(marker.getLabel()[1]) === 2 || parseInt(marker.getLabel()[1]) === 3 ? marker.setMap(null) : marker.setMap(map))
+    Object.values(markers).map(marker => parseInt(marker.getLabel()[1]) === 2 || parseInt(marker.getLabel()[1]) === 3 || marker.getLabel() == "Swimming Pool" ? marker.setMap(null) : marker.setMap(map))
     for (let marker in locationMarkers) {
         locationMarkers[marker].setMap(map);
     }
@@ -108,16 +106,6 @@ function createInfoMarkers(locationCoords) {
             label: location,
             map
         });
-        let infoWindow = new google.maps.InfoWindow({
-            content: "<h6>" + location + "</h6>",
-        });
-        marker.addListener("click", () => {
-            infoWindow.open({
-                anchor: marker,
-                map,
-                shouldFocus: false,
-            });
-          });
         locationMarkers.push(marker);
     }
 }
@@ -163,14 +151,8 @@ function showMarkersOfBuildingAtFloor(buildingNumber, floorNumber) {
     })
 }
 
-// let showMarkersOfOtherBuilding = (markerList, mapInstance, building) => {
-//     hideAllMarkers();
-//     Object.values(markerList).map(marker => {
-//         if (marker.getLabel().split(" ")[0] === building) {
-//             marker.setMap(mapInstance);
-//         }
-//     })
 function showMarkersOfOtherBuilding(building) {
+    hideAllMarkers();
     let buildingMarkers = []
     for (var marker in markers) {
         if (markers[marker].getLabel().split(" ")[0] == building) {
@@ -185,22 +167,12 @@ function focusOnMarkerAtClassroomBuilding(buildingNumber) {
     for (var buildingCenterMarker in locationMarkers) {
         let markerLabelLength = locationMarkers[buildingCenterMarker].getLabel().length;
         if (locationMarkers[buildingCenterMarker].getLabel().charAt(0) === 'B' &&
-            locationMarkers[buildingCenterMarker].getLabel().charAt(markerLabelLength - 1) === buildingNumber || buildingNumber === -1) {
+            locationMarkers[buildingCenterMarker].getLabel().charAt(markerLabelLength - 1) == buildingNumber || buildingNumber === -1) {
             map.setCenter(locationMarkers[buildingCenterMarker].getPosition());
             map.setZoom(19);
             break;
         }
     }
-    // markerLocations, mapInstance,
-    // for (var buildingCenterMarker in markerLocations) {
-    //     let markerLabelLength = markerLocations[buildingCenterMarker].getLabel().length;
-    //     if (markerLocations[buildingCenterMarker].getLabel().charAt(0) === 'B' &&
-    //         markerLocations[buildingCenterMarker].getLabel().charAt(markerLabelLength - 1) === buildingNumber || buildingNumber === -1) {
-    //         mapInstance.setCenter(markerLocations[buildingCenterMarker].getPosition());
-    //         mapInstance.setZoom(19);
-    //         break;
-    //     }
-    // }
 }
 
 let focusOnBuilding = (markerLocations, mapInstance, building) => {
@@ -245,6 +217,7 @@ function resetSearch() {
 }
 
 function resetMap() {
+    if (selectedNodeLine !== null) selectedNodeLine.setMap(null);
     showAllMarkers();
     map.setZoom(18);
     map.setCenter(westHighCoords);

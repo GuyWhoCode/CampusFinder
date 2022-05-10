@@ -40,6 +40,7 @@ let startingMarker;
 let endingMarker;
 
 var closestNodeToCurrentPos;
+var selectedNodeLine = null;
 let graph = {};
 let locationDisabled = false;
 let currentLat;
@@ -127,6 +128,8 @@ function loadNodesIntoMap(nodesList) {
             graph[neighbor][node] = graph[node][neighbor];
         }
     }
+  
+    markers["Swimming Pool"].setMap(null)
 }
 
 async function initMap() {
@@ -142,6 +145,9 @@ async function initMap() {
             },
             strictBounds: false,
         },
+        mapTypeControl: false,
+        streetViewControl: false,
+        rotateControl: false,
         mapTypeId: 'satellite',
         tilt: 0,
         gestureHandling: "greedy",
@@ -157,15 +163,15 @@ async function initMap() {
     });
     
     document.getElementById("recenterCurrent").addEventListener('click', () => {
-        if (currentLat >= 33.843603 && currentLat <= 33.849826 && currentLng >= -118.373926 && currentLng <= -118.363444) {
+        // if (currentLat >= 33.843603 && currentLat <= 33.849826 && currentLng >= -118.373926 && currentLng <= -118.363444) {
             map.setCenter({lat: currentLat, lng: currentLng})
             return map.setZoom(19)
-        }
-        // Set boundaries to make sure that current position center isn't outside of school boundaries
+        // }
         alert("Your current position could not be re-centered. (Are you outside of school?)")
     })
   
     document.getElementById("hidePaths").addEventListener('click', () => { hidePeriodPaths(); hiddenPaths = true})
+    document.getElementById("showAllPaths").addEventListener('click', () => { showAllPaths(); hiddenPaths = false})
     document.getElementById("resetSearch").addEventListener('click', () => {
         resetMap()
         showOutlinesOfBuilding("", true)
@@ -220,6 +226,8 @@ async function initMap() {
         return localStorage.setItem("loadedMapInformation", true)
         // Exits out of the code to prevent errors from occuring for the code below that runs when a cache exists
     }
+    
+    initLegend()
 
     createBuildingOutlines(localStorage.getObject("outlineData"))
     createInfoMarkers(localStorage.getObject("locationCoordsData"))
@@ -227,6 +235,19 @@ async function initMap() {
     // Initializes building outlines, classroom buildings, and classroom nodes with cached data
 }
 
+
+function initLegend() {
+  const legend = document.getElementById("legend");
+
+  const name = "Stairway";
+  const icon = "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/stairsIcon.png?v=1651850209540";
+  const div = document.createElement("div");
+
+  div.innerHTML = '<img src="' + icon + '"> ' + name;
+  legend.appendChild(div);
+
+  map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legend);
+}
 
 function askLocationPermission() {
     /* Code sample from https://developers.google.com/maps/documentation/javascript/geolocation
@@ -315,24 +336,26 @@ socket.on("loadLocationCoords", async (locationCoords) => {
 // Loads on socket request from internal server -- Ran when data is not cached
 
 socket.on("nodeSelected", searchResult => {
-    if (searchResult.timeSent !== timeSent) return;
+    if (Math.abs(searchResult.timeSent - timeSent) > 5) return;
     // Exits out of the program if the incoming socket request doesn't match the sent time of the search
-    timeSent = 0
-    if (searchResult.room.toString()[1] === "2" || searchResult.room.toString()[1] === "3") markers[searchResult.room].setMap(map);
-    // Shows 2nd and 3rd floor markers on marker clicked
 
+    timeSent = 0
+    if (searchResult.room.toString()[1] === "2" || searchResult.room.toString()[1] === "3" || searchResult.room == "Swimming Pool") markers[searchResult.room].setMap(map);
+  
     markers[searchResult.room].setAnimation(google.maps.Animation.BOUNCE);
     markers[searchResult.room].setIcon(selectedNodeImage);
     map.setCenter({lat: searchResult.result.latitude, lng: searchResult.result.longitude})
     map.setZoom(19)
+  
+    let selectedMarker = markers[searchResult.room].getLabel();
+    drawLineFromCurrentPosToMarker(selectedMarker);
     
     if (previousSearchedNode === undefined) return previousSearchedNode = markers[searchResult.room]
     
     previousSearchedNode.setAnimation(null);
     previousSearchedNode.setIcon(null);
     if (previousSearchedNode.getLabel()[1] === "2" || previousSearchedNode.getLabel()[1] === "3") previousSearchedNode.setMap(null);  
-    // Hides 2nd and 3rd floor marker when clicking on a new marker
-
+  
     previousSearchedNode = markers[searchResult.room]
     // Stores the previous node to remove the animination when doing another search
 
@@ -348,4 +371,11 @@ window.onload = function () {
   
     setInterval(askLocationPermission, 2000)
     // Updates current position marker
+  
+    const parsedUrl = new URL(window.location.href)
+    let roomNumber = parsedUrl.searchParams.get("room")
+    if (roomNumber !== null) {
+        searchForTeacher(roomNumber)
+    }
+    // Loads the room based on the parsed URL: https://campus-finder.glitch.me/?room=2119
 }   

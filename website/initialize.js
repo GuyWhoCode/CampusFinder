@@ -10,7 +10,7 @@ Storage.prototype.getObject = function(key) {
 }
 
 let teachers;
-let debug = false;
+let debug = true;
 let timeSent = 0;
 let searchedRoom = "";
 let searchBar = document.getElementById("searchBar")
@@ -22,6 +22,7 @@ let teacherImg = document.getElementById("teacherImg")
 let buildingCarousel = document.getElementById("buildingCarousel")
 let infoBoxPreview = document.getElementById("infoBoxPreview")
 let shareRoomLocation = document.getElementById("shareRoomLocation")
+let accessAdminPage = document.getElementById("accessAdminPage")
 const classroomBuildings = ["Cafeteria 4", "Cafeteria 5", "Administration", "Building 2", "Building 3", "Building 4", "Building 5", "Building 6", "Building 8", "Gym", "Pavillion", "Performing Arts Center (PAC)", "Stadium", "Field", "All Buildings", "All Cafeterias", "Other"]
 // eslint-disable-next-line no-undef
 let classSearchResult = new bootstrap.Offcanvas(document.getElementById("classSearchResult"))
@@ -31,7 +32,8 @@ let mainMenuSidebar = new bootstrap.Offcanvas(document.getElementById("menuSideb
 let classDenialModal = new bootstrap.Modal(document.getElementById('classDenialModal'))
 // eslint-disable-next-line no-undef
 let classPathMenu = new bootstrap.Offcanvas(document.getElementById('classPathMenu'))
-
+// eslint-disable-next-line no-undef
+let otherClassMarkerHideModal = new bootstrap.Modal(document.getElementById('otherClassMarkerHideModal'))
 
 const initializeTeacherAutocomplete = teacherData => {
     teacherData.map(val => {
@@ -153,22 +155,22 @@ const searchForBuilding = () => {
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/81.png?v=1650401904176", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/82.png?v=1650401909161", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/83.png?v=1650401925229"])
                 break; 
             case "Gym": 
-                showMarkersOfOtherBuilding(markers, map, "Gym")
+                showMarkersOfOtherBuilding("Gym")
                 break;
             case "Pavillion": 
-                showMarkersOfOtherBuilding(markers, map, "Pavilion")
+                showMarkersOfOtherBuilding("Pavilion")
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/pavillion1.png?v=1650387463416", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/pavillion2.png?v=1650387490465"])
                 break;
             case "Performing Arts Center (PAC)": 
-                showMarkersOfOtherBuilding(markers, map, "PAC")
+                showMarkersOfOtherBuilding("PAC")
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/pac1.png?v=1650387499393", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/pac2.png?v=1650387517686"])
                 break;
             case "Stadium": 
-                showMarkersOfOtherBuilding(markers, map, "Stadium")
+                showMarkersOfOtherBuilding("Stadium")
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/stadium2.png?v=1650467034478", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/stadium1.png?v=1650467028587"])
                 break;
             case "Field": 
-                showMarkersOfOtherBuilding(markers, map, "Field")
+                showMarkersOfOtherBuilding("Field")
                 break;
             case "All Buildings": 
                 showOutlinesOfBuilding("bldgs")
@@ -186,6 +188,20 @@ const searchForBuilding = () => {
 
     let teacherName = searchValue.split("(")[0].trim()
     searchForTeacher(teacherName)
+}
+
+
+const showClassMarkers = () => {
+    let userClasses = Object.values(sessionStorage.getObject("userClasses"))
+    userClasses.map(val => {
+      let searchedMarker = markers[val.split("--")[1]]
+        if (searchedMarker !== undefined) searchedMarker.setMap(map)
+    })
+  
+    document.getElementById('classPathMenu').addEventListener("hidden.bs.offcanvas", () => {
+        showAllMarkers()
+    })
+  
 }
 
 
@@ -248,8 +264,16 @@ document.getElementById("menuToggle").addEventListener("click", () => {
     mainMenuSidebar.show()
 })
 
+document.getElementById("settingsLink").addEventListener("click", () => {
+    if (sessionStorage.getItem("email") === null) return classDenialModal.show()
+    window.location = "/settings"
+})
+
 document.getElementById("classPathMenuToggle").addEventListener("click", () => {
     if (sessionStorage.getItem("email") !== null || debug) {
+        hideAllMarkers()
+        showClassMarkers()
+        
         mainMenuSidebar.hide()
         classPathMenu.show()
         
@@ -293,6 +317,12 @@ shareRoomLocation.addEventListener("click", async () => {
     await alert("Sharable link copied!")
 })
 
+accessAdminPage.addEventListener("click", () => {
+    if (sessionStorage.getItem("id") === undefined) return classDenialModal.show()
+    window.location = "/admin/" + sessionStorage.getItem("id")
+})
+
+
 mainSocket.emit("requestTeacher", localStorage.getObject("teacherList"))
 mainSocket.on("teacherData", data => {
     teachers = data
@@ -330,12 +360,3 @@ let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl)
 })
 // Initializes Bootstrap tooltips
-
-window.onload = function () {
-    const parsedUrl = new URL(window.location.href)
-    let roomNumber = parsedUrl.searchParams.get("room")
-    if (roomNumber !== null) {
-        searchForTeacher(roomNumber)
-    }
-    // Loads the room based on the parsed URL: https://campus-finder.glitch.me/?room=2119
-}   

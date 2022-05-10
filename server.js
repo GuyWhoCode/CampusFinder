@@ -1,13 +1,11 @@
 // Local Development environment: http://localhost:3000
-require("dotenv").config()
 const mongoClient = require('mongodb').MongoClient
-const dbClient = new mongoClient(process.env.uri);
+const dbClient = new mongoClient("mongodb+srv://" + process.env.dbInfo + "?retryWrites=true&w=majority");
 const fileReader = require("graceful-fs")
-const fs = require("fs")
 
 const express = require("express");
 const app = express();
-const server = app.listen(3000, function() {
+const server = app.listen(process.env.PORT, function() {
     // Process.env.PORT on Glitch for server.js
     console.log("Your app is listening on port " + server.address().port);
     // Enter command in Terminal on Windows: npx nodemon server.js
@@ -20,10 +18,6 @@ app.get("/", function(request, response) {
 
 app.get("/home", function(request, response) {
     response.sendFile(__dirname + "/website/main.html");
-});
-
-app.get("/admin", function(request, response) {
-    response.sendFile(__dirname + "/website/admin/admin.html");
 });
 
 app.get("/about", function(request, response) {
@@ -64,16 +58,22 @@ Object.values(nodeFile).map((roomInfo, index) => {
 const socket = require("socket.io")(server, { pingTimeout: 60000 })
 dbClient.connect(async () => {
     console.log("Connected to database!")
+  
+    app.get("/admin/:userID", async (request, response) => {
+        const ObjectId = require('mongodb').ObjectId; 
+      
+        let userDB = dbClient.db("campusInfo").collection("users")
+        let userInfo = await userDB.find({"_id": new ObjectId(request.params.userID) }).toArray()
+        //  Obtains the userID based on parsed directory and checks in database whether person has admin permissions
+        
+        if (userInfo[0].admin) return response.sendFile(__dirname + "/website/admin/admin.html");
+      
+        response.status(405).send("Error Code 405. You do not have permission to view this page!\n")
+    });
+    
+  
     socket.on('connection', io => {
         console.log("I have a connection to the website!")
-        io.on("saveNodes", (nodes) => {
-            fs.writeFile("nodes.json", nodes, function(err) {
-                if (err) {
-                    console.log(err);
-                }
-            });
-        })
-		// saves nodes to nodes.json
       
         io.on("requestNodes", () => {
             let nodes = fileReader.readFileSync("./nodes.json", "utf8")
@@ -103,7 +103,7 @@ dbClient.connect(async () => {
                 // Sidebar request comes from user-submitted classes sidebar
             }
             socket.emit("showNodeSidebar", {"room": nodeInfo.room, "timeSent": nodeInfo.timeSent})
-            // Node request from clicking a map icon sends a request to the sidebar to display information
+            // Node request from clicking a map icon sends a request to the sidebar to display information 
         })
         
         io.on("easterEgg", () => {
