@@ -1,5 +1,5 @@
-// eslint-disable-next-line no-undef
-let mainSocket = io("/");
+let mainSocket = window.internalMainSocket;
+// References global socket connection created in markerManager
 
 Storage.prototype.setObject = function(key, value) {
     this.setItem(key, JSON.stringify(value));
@@ -269,11 +269,20 @@ document.getElementById("settingsLink").addEventListener("click", () => {
     window.location = "/settings"
 })
 
+document.getElementById("acceptHideOtherMarkers").addEventListener("click", () => {
+    hideAllMarkers()
+    showClassMarkers()
+    mainSocket.emit("changeMarkersHiddenPopUp", sessionStorage.getItem("email"))
+})
+
 document.getElementById("classPathMenuToggle").addEventListener("click", () => {
     if (sessionStorage.getItem("email") !== null || debug) {
-        hideAllMarkers()
-        showClassMarkers()
-        
+        if (localStorage.getItem("markerPopUp") === null) {
+            otherClassMarkerHideModal.show()
+            localStorage.setItem("markerPopUp", true)
+        }
+        // Use local storage to be able to prompt once but not being able to prompt again
+
         mainMenuSidebar.hide()
         classPathMenu.show()
         

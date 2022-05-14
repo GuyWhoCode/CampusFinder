@@ -36,7 +36,9 @@ var json = {
   "LastName": "", 
   "FirstName": "", 
   "Rm": 0,
-  "Ext": 0}
+  "Ext": 0
+}
+
 function ParseJSON(event) {
     event.preventDefault()
     json.LastName = document.getElementById("lastName").value;
@@ -48,7 +50,6 @@ function ParseJSON(event) {
 }
   
 const form = document.getElementById('newTeacher');
-const log = document.getElementById('log');
 form.addEventListener('submit', ParseJSON);
 
 

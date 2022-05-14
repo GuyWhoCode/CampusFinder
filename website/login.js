@@ -1,6 +1,6 @@
-// eslint-disable-next-line no-undef
-let socket = io("/");
-let darkMode = true
+let socket = window.internalMainSocket;
+// References global socket connection created in markerManager
+
 let classListElm = document.getElementById("classListElm")
 let quickLinks = document.getElementById("quickLinks")
 let userInfoElm = document.getElementById("userInfo")
@@ -40,7 +40,6 @@ const initializeClassList = classes => {
 socket.on("userData", data => {
     sessionStorage.setObject("userClasses", data.periods)
     if (!data.darkModeOn) {
-        darkMode = false
         document.getElementById("navbar").style.backgroundColor = "#e9d283"
         document.getElementById("searchButton").style.backgroundColor = "#554826"
         document.getElementById("searchButton").style.color = "#FFFFFF"
@@ -59,6 +58,7 @@ socket.on("userData", data => {
         // Light Mode initialization
     }
     sessionStorage.darkMode = data.darkModeOn
+    sessionStorage.id = data._id
 
     if (data.periods === undefined || data.periods === {} || Object.values(data.periods).length === 0) {
         return classListElm.innerHTML = "Add classes with the Change Classes button below!"

@@ -1,11 +1,12 @@
 // Local Development environment: http://localhost:3000
+require("dotenv").config()
 const mongoClient = require('mongodb').MongoClient
-const dbClient = new mongoClient("mongodb+srv://" + process.env.dbInfo + "?retryWrites=true&w=majority");
+const dbClient = new mongoClient(process.env.uri);
 const fileReader = require("graceful-fs")
 
 const express = require("express");
 const app = express();
-const server = app.listen(process.env.PORT, function() {
+const server = app.listen(3000, function() {
     // Process.env.PORT on Glitch for server.js
     console.log("Your app is listening on port " + server.address().port);
     // Enter command in Terminal on Windows: npx nodemon server.js
@@ -55,10 +56,16 @@ Object.values(nodeFile).map((roomInfo, index) => {
     // Adds rooms, not intermediate notes to the Search index of Flexsearch
 })
 
+// const msToMonth = time => (((time/1000)/60)/60)/24/30
+// const findDBAge = () => {
+
+// }
+
+
 const socket = require("socket.io")(server, { pingTimeout: 60000 })
 dbClient.connect(async () => {
     console.log("Connected to database!")
-  
+
     app.get("/admin/:userID", async (request, response) => {
         const ObjectId = require('mongodb').ObjectId; 
       
@@ -69,12 +76,13 @@ dbClient.connect(async () => {
         if (userInfo[0].admin) return response.sendFile(__dirname + "/website/admin/admin.html");
       
         response.status(405).send("Error Code 405. You do not have permission to view this page!\n")
+        // Returns error message if authentication failed.
     });
     
   
-    socket.on('connection', io => {
+    socket.on('connection', async (io) => {
         console.log("I have a connection to the website!")
-      
+
         io.on("requestNodes", () => {
             let nodes = fileReader.readFileSync("./nodes.json", "utf8")
             socket.emit("loadNodes", JSON.parse(nodes))
@@ -139,11 +147,11 @@ dbClient.connect(async () => {
             userDB.updateOne({"email": userEmail}, 
                 {$set: {
                     "email": userEmail,
-                    "url": userInfo[0].url,
                     "admin": userInfo[0].admin,
                     "darkModeOn": userInfo[0].darkModeOn,
                     "periods": selection,
                     "accountCreated": userInfo[0].accountCreated,
+                    "markersHiddenOnClassPath": userInfo[0].markersHiddenOnClassPath
                 }})
             // Updates the user profile with the periods from the class selection
         })
@@ -154,11 +162,11 @@ dbClient.connect(async () => {
             if (doesUserExist.length === 0) {
                 userDB.insertOne({
                     "email": user.email,
-                    "url": user.photoURL,
                     "admin": false,
                     "darkModeOn": true,
                     "periods": {},
-                    "accountCreated": Date.now()
+                    "accountCreated": Date.now(),
+                    "markersHiddenOnClassPath": false
                 })
                 // If a user entry has not been created, create a new user entry into the database
                 socket.emit("userData", undefined)
@@ -173,7 +181,7 @@ dbClient.connect(async () => {
                 "identifier": "teacherUpdated",
                 "lastUpdated": Date.now()
             }})
-            // Updates the database identifier to account for new teacher changes
+            // Updates the database identifier to account for new teacher changes, causing local caches to update
 
             let existingRoomEntry = await teacherDB.find({"room": parseInt(data.Rm)}).toArray()
             if (existingRoomEntry.length !== 0) {
@@ -201,11 +209,11 @@ dbClient.connect(async () => {
             userDB.updateOne({"email": userSettings.userEmail}, 
                 {$set: {
                     "email": userProfile[0].email,
-                    "url": userProfile[0].url,
                     "admin": userProfile[0].admin,
                     "darkModeOn": userSettings.darkMode,
                     "periods": userProfile[0].periods,
-                    "accountCreated": userProfile[0].accountCreated
+                    "accountCreated": userProfile[0].accountCreated,
+                    "markersHiddenOnClassPath": userProfile[0].markersHiddenOnClassPath
                 }
             })
             // Saves settings from preferences page in database
@@ -219,11 +227,11 @@ dbClient.connect(async () => {
             userDB.updateOne({"email": userInfo.email}, 
                 {$set: {
                     "email": doesUserExist[0].email,
-                    "url": doesUserExist[0].url,
                     "admin": userInfo.permission,
                     "darkModeOn": doesUserExist[0].darkModeOn,
                     "periods": doesUserExist[0].periods,
-                    "accountCreated": doesUserExist[0].accountCreated
+                    "accountCreated": doesUserExist[0].accountCreated,
+                    "markersHiddenOnClassPath": doesUserExist[0].markersHiddenOnClassPath
                 }
             })
             // Empowers the user by updating the change privileges to the admin page
@@ -233,6 +241,22 @@ dbClient.connect(async () => {
             let userDB = dbClient.db("campusInfo").collection("users")
             userDB.deleteOne({"email": userEmail})
             // Deletes a user's profile from the database
+        })
+
+        io.on("changeMarkersHiddenPopUp", async (userEmail) => {
+            let userDB = dbClient.db("campusInfo").collection("users")
+            let userInfo = await userDB.find({"email": userEmail}).toArray()
+            userDB.updateOne({"email": userEmail}, 
+                {$set: {
+                    "email": userEmail,
+                    "admin": userInfo[0].admin,
+                    "darkModeOn": userInfo[0].darkModeOn,
+                    "periods": userInfo[0].periods,
+                    "accountCreated": userInfo[0].accountCreated,
+                    "markersHiddenOnClassPath": true
+                }
+            })
+
         })
     })
 })

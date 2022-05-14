@@ -57,8 +57,8 @@ let altNamesClassrooms = {
     "tennisCourt": []
 }
 let nodes;
-// eslint-disable-next-line no-undef
-let socket = io("/");
+let socket = window.internalMainSocket;
+// References global socket connection created in markerManager
 
 function createBuildingOutlines(locationOutlinesCoords) {
     for (let category in locationOutlinesCoords) {

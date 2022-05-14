@@ -1,5 +1,6 @@
-// eslint-disable-next-line no-undef
-const mapSocket = io("/");
+var internalMainSocket = io("/");
+// Initializes a single socket connection for the main page as a global variable to be used for other files 
+
 let previousClickedMarker;
 let currentMarker;
 function createMarker(node) {
@@ -25,7 +26,7 @@ function createMarker(node) {
         if (parseInt(node[1]) === 2 || parseInt(node[1]) === 3) marker.setMap(map)
         // Hides markers for the additional floors of the Classroom Buildings  
       
-        mapSocket.emit("requestNodeInfo", {"room": node , "origin": "map", "timeSent": Date.now()})  
+        internalMainSocket.emit("requestNodeInfo", {"room": node , "origin": "map", "timeSent": Date.now()})  
         timeSent = Date.now()
       
         let markerName = marker.getLabel();
