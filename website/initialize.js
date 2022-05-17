@@ -129,6 +129,7 @@ const searchForBuilding = () => {
                 break;
             case "Administration": 
                 showMarkersOfBuilding(ADMIN)
+                createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/bldg2_1.png?v=1652805237026", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/bldg2_2.png?v=1652805231452"])
                 break;
             case "Building 2": 
                 showMarkersOfBuilding(2)
@@ -156,6 +157,7 @@ const searchForBuilding = () => {
                 break; 
             case "Gym": 
                 showMarkersOfOtherBuilding("Gym")
+                createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/bldg7_1.png?v=1652805216094", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/bldg7_2.png?v=1652805209011"])
                 break;
             case "Pavillion": 
                 showMarkersOfOtherBuilding("Pavilion")
@@ -171,6 +173,7 @@ const searchForBuilding = () => {
                 break;
             case "Field": 
                 showMarkersOfOtherBuilding("Field")
+                createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/field_1.png?v=1652805198348", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/field_2.png?v=1652805192726"])
                 break;
             case "All Buildings": 
                 showOutlinesOfBuilding("bldgs")
@@ -195,7 +198,7 @@ const showClassMarkers = () => {
     hideAllMarkers()
     let userClasses = Object.values(sessionStorage.getObject("userClasses"))
     userClasses.map(val => {
-      let searchedMarker = markers[val.split("--")[1]]
+        let searchedMarker = markers[val.split("--")[1]]
         if (searchedMarker !== undefined) searchedMarker.setMap(map)
     })
   

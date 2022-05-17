@@ -72,7 +72,7 @@ html, body {
     font-size: 0.8rem;
 }
 #buildingCarousel {
-    width: 25vw;
+    width: 100%;
     margin: 0 auto;
     background-color: gray;
 }
