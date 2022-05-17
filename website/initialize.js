@@ -192,6 +192,7 @@ const searchForBuilding = () => {
 
 
 const showClassMarkers = () => {
+    hideAllMarkers()
     let userClasses = Object.values(sessionStorage.getObject("userClasses"))
     userClasses.map(val => {
       let searchedMarker = markers[val.split("--")[1]]
@@ -270,9 +271,9 @@ document.getElementById("settingsLink").addEventListener("click", () => {
 })
 
 document.getElementById("acceptHideOtherMarkers").addEventListener("click", () => {
-    hideAllMarkers()
     showClassMarkers()
     mainSocket.emit("changeMarkersHiddenPopUp", sessionStorage.getItem("email"))
+    sessionStorage.setItem("showOnlyClassMarkers", "true")
 })
 
 document.getElementById("classPathMenuToggle").addEventListener("click", () => {
@@ -282,6 +283,9 @@ document.getElementById("classPathMenuToggle").addEventListener("click", () => {
             localStorage.setItem("markerPopUp", true)
         }
         // Use local storage to be able to prompt once but not being able to prompt again
+
+        if (sessionStorage.getItem("showOnlyClassMarkers") === "true") showClassMarkers()
+        
 
         mainMenuSidebar.hide()
         classPathMenu.show()

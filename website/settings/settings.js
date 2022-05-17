@@ -2,8 +2,10 @@
 const settingsSocket = io("/")
 let chooseLight = document.getElementById("chooseLight") 
 let chooseDark = document.getElementById("chooseDark")
+let chooseHiddenClassMarkers = document.getElementById("chooseHiddenClassMarkers")
 let settings = {}
 let darkMode = true
+let hideClassMarkers = false
 
 const showDarkMode = () => {
     chooseDark.checked = true
@@ -26,10 +28,12 @@ document.getElementById("updatePreferences").addEventListener("click", () => {
     let confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'))
     confirmationModal.show()
     settings.darkMode = darkMode
+    settings.hideClassMarkers = chooseHiddenClassMarkers.checked
     settingsSocket.emit("changedSettings", settings)
     // Send internal socket to client-side
     
     sessionStorage.darkMode = darkMode
+    sessionStorage.showOnlyClassMarkers = chooseHiddenClassMarkers.checked
     // Saves the changed settings locally and applies it accordingly
 })
 
@@ -70,6 +74,9 @@ if (sessionStorage.getItem("email") === null) {
     darkMode = sessionStorage.darkMode
     darkMode === "false" ?  showLightMode() : showDarkMode()
     // Initializes user dark mode preferences
+
+    hideClassMarkers = sessionStorage.showOnlyClassMarkers
+    if (hideClassMarkers === "true") chooseHiddenClassMarkers.checked = true
 }
 
 let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

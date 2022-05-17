@@ -51,7 +51,7 @@ function createMarker(node) {
 }
 
 function showAllMarkers() {
-    Object.values(markers).map(marker => parseInt(marker.getLabel()[1]) === 2 || parseInt(marker.getLabel()[1]) === 3 || marker.getLabel() == "Swimming Pool" ? marker.setMap(null) : marker.setMap(map))
+    Object.values(markers).forEach(marker => parseInt(marker.getLabel()[1]) === 2 || parseInt(marker.getLabel()[1]) === 3 || marker.getLabel() == "Swimming Pool" ? marker.setMap(null) : marker.setMap(map))
     for (let marker in locationMarkers) {
         locationMarkers[marker].setMap(map);
     }
@@ -70,7 +70,7 @@ function showRoomMarkers() {
 }
 
 function hideAllMarkers() {
-    Object.values(markers).map(marker => marker.setMap(null))
+    Object.values(markers).forEach(marker => marker.setMap(null))
     for (var marker in locationMarkers) {
         locationMarkers[marker].setMap(null);
     }
@@ -119,7 +119,7 @@ let showMarkersOfBuilding = buildingNumber => {
     hideAllMarkers();
     focusOnMarkerAtClassroomBuilding(buildingNumber);
     if ((buildingNumber >= 2 && buildingNumber <= 6) || buildingNumber == 8) {
-        Object.values(markers).map(marker => {
+        Object.values(markers).forEach(marker => {
             if (marker.getLabel().charAt(0) == buildingNumber) {
                 marker.setMap(map);
             }
@@ -138,7 +138,7 @@ let showMarkersOfBuilding = buildingNumber => {
 function showMarkersOfBuildingAtFloor(buildingNumber, floorNumber) {
     hideAllMarkers();
     focusOnMarkerAtClassroomBuilding(buildingNumber);
-    Object.values(markers).map(marker => {
+    Object.values(markers).forEach(marker => {
         let markerBuildingNumber = marker.getLabel().charAt(0);
         let markerFloorNumber = marker.getLabel().charAt(1);
 

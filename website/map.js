@@ -210,7 +210,7 @@ async function initMap() {
         updateSelectedPathOpacity();
     });
     
-    Object.values(document.getElementsByClassName("floor")).map(val => {
+    Object.values(document.getElementsByClassName("floor")).forEach(val => {
         let floorNumber = val.id.split("Bldg")[0].split("floor")[1]
         let buildingNumber = val.id.split("Bldg")[1]
         val.addEventListener("click", () => {showMarkersOfBuildingAtFloor(buildingNumber, floorNumber)})

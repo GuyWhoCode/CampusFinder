@@ -10,6 +10,17 @@ let teachers;
 const adminSocket = io("/")
 let teacherNamesList = document.getElementById("teacherAutocomplete")
 let searchBar = document.getElementById("searchTeacher")
+let showcaseUploadedImage = document.getElementById("showcaseUploadedImage")
+let json = {
+    "LastName": "", 
+    "FirstName": "", 
+    "Rm": 0,
+    "Ext": 0,
+    "Img": ""
+}
+
+const flipName = name => name.split(",").reverse().join(" ").trim()
+const hideElm = elm => elm.style.display = "none"
 
 const initializeTeacherAutocomplete = teacherData => {
     teachers = teacherData
@@ -30,14 +41,6 @@ const findTeacherInfo = teacherName => {
     teachers.map(val => val.name === teacherName ? (teacherInfo = val) : undefined)
     return teacherInfo
 }
-const flipName = name => name.split(",").reverse().join(" ").trim()
-
-var json = {
-  "LastName": "", 
-  "FirstName": "", 
-  "Rm": 0,
-  "Ext": 0
-}
 
 function ParseJSON(event) {
     event.preventDefault()
@@ -45,8 +48,12 @@ function ParseJSON(event) {
     json.FirstName = document.getElementById("firstName").value;
     json.Rm = document.getElementById("rm#").value;
     json.Ext = document.getElementById("ext#").value;
-    console.log(json)
-    // adminSocket.emit("saveNewTeacher", json)
+    json.Img = document.getElementById("showcaseUploadedImage").src;
+    adminSocket.emit("saveNewTeacher", json)
+
+    showcaseUploadedImage.src = ""
+    hideElm("showcaseUploadedImage")
+
 }
   
 const form = document.getElementById('newTeacher');

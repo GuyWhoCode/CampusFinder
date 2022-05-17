@@ -84,3 +84,7 @@ h1{
   align-items: center;
   grid-template-columns: 2% 17% 60%;
 }
+#showcaseUploadedImage {
+  display: none;
+  margin: 0 auto;
+}

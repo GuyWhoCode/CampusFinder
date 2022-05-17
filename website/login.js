@@ -59,6 +59,7 @@ socket.on("userData", data => {
     }
     sessionStorage.darkMode = data.darkModeOn
     sessionStorage.id = data._id
+    sessionStorage.showOnlyClassMarkers = data.markersHiddenOnClassPath
 
     if (data.periods === undefined || data.periods === {} || Object.values(data.periods).length === 0) {
         return classListElm.innerHTML = "Add classes with the Change Classes button below!"

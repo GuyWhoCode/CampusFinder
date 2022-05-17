@@ -17,9 +17,9 @@
 
     <section id="themeChooser">
         <section>
-            <div class="form-check form-switch">
+            <div class="form-check form-switch addPreference">
                 <input class="form-check-input" type="checkbox" role="switch" id="chooseDark" checked>
-                <label class="form-check-label fs-4" for="flexSwitchCheckDefault">Dark Mode</label>
+                <label class="form-check-label fs-4 preferenceText" for="flexSwitchCheckDefault">Dark Mode</label>
             </div>
             <div class="hoverSelect" style="background-color: #65a1fb;">
                 <div id="darkPreview" class="preview">
@@ -37,9 +37,9 @@
         
 
         <section>
-            <div class="form-check form-switch">
+            <div class="form-check form-switch addPreference">
                 <input class="form-check-input" type="checkbox" role="switch" id="chooseLight">
-                <label class="form-check-label fs-4" for="flexSwitchCheckDefault">Light Mode</label>
+                <label class="form-check-label fs-4 preferenceText" for="flexSwitchCheckDefault">Light Mode</label>
             </div>
             <div class="hoverSelect">
                 <div id="lightPreview" class="preview">
@@ -54,6 +54,12 @@
             </div>
         </section>
     </section>
+    <br>
+    
+    <div class="form-check form-switch form-switch-md addPreference">
+        <label class="form-check-label fs-4" for="flexSwitchCheckDefault">Hide Other Markers When Viewing Class Path</label>
+        <input class="form-check-input preferenceText" type="checkbox" role="switch" id="chooseHiddenClassMarkers">
+    </div>
 
     <br>
     <button type="button" class="btn btn-danger" id="deleteAccountBtn">Delete Account</button>

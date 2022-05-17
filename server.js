@@ -56,10 +56,30 @@ Object.values(nodeFile).map((roomInfo, index) => {
     // Adds rooms, not intermediate notes to the Search index of Flexsearch
 })
 
-// const msToMonth = time => (((time/1000)/60)/60)/24/30
-// const findDBAge = () => {
+const msToMonth = time => (((time/1000)/60)/60)/24/30
+const updateUserDB = async () => {
+    const dbPurgeMonthInterval = 6 
+    let userDB = dbClient.db("campusInfo").collection("users")
+    let userStats = await userDB.find({"identifier": "userDBStats"}).toArray()
 
-// }
+    let currentTime = Date.now()
+    let dbTimeDifference = msToMonth(currentTime - userStats[0].lastUpdated)
+    if (dbTimeDifference <= dbPurgeMonthInterval) return;
+    // Exits when it's not time to purge the database -- currently set at every 6 months
+
+    let allUsers = await userDB.find({}).toArray()
+    allUsers.forEach(val => {
+        if (val.email !== undefined) {
+            // Prevents throwing an error when encountering the identifier document
+            if (msToMonth(currentTime - val.accountCreated) >= dbPurgeMonthInterval) {
+                userDB.deleteOne({"email": val.email})
+            }
+        }
+    })
+
+    // Automatically purges user profiles at a specified time interval to prevent the user database from taking too much space
+    // Acts as a data management system
+}
 
 
 const socket = require("socket.io")(server, { pingTimeout: 60000 })
@@ -82,6 +102,8 @@ dbClient.connect(async () => {
   
     socket.on('connection', async (io) => {
         console.log("I have a connection to the website!")
+
+        // updateUserDB()
 
         io.on("requestNodes", () => {
             let nodes = fileReader.readFileSync("./nodes.json", "utf8")
@@ -142,16 +164,9 @@ dbClient.connect(async () => {
             delete selection.userEmail
 
             let userDB = dbClient.db("campusInfo").collection("users")
-            let userInfo = await userDB.find({"email": userEmail}).toArray()
-            if (userInfo.length === 0) return;
             userDB.updateOne({"email": userEmail}, 
                 {$set: {
-                    "email": userEmail,
-                    "admin": userInfo[0].admin,
-                    "darkModeOn": userInfo[0].darkModeOn,
-                    "periods": selection,
-                    "accountCreated": userInfo[0].accountCreated,
-                    "markersHiddenOnClassPath": userInfo[0].markersHiddenOnClassPath
+                    "periods": selection
                 }})
             // Updates the user profile with the periods from the class selection
         })
@@ -178,7 +193,6 @@ dbClient.connect(async () => {
         io.on("saveNewTeacher", async (data) => {
             let teacherDB = dbClient.db("campusInfo").collection("teacherInfo")
             teacherDB.updateOne({"identifier": "teacherUpdated"}, {$set: {
-                "identifier": "teacherUpdated",
                 "lastUpdated": Date.now()
             }})
             // Updates the database identifier to account for new teacher changes, causing local caches to update
@@ -188,8 +202,8 @@ dbClient.connect(async () => {
                 return teacherDB.updateOne({"room": existingRoomEntry[0].room}, {$set: {
                     "name": `${data.LastName}, ${data.FirstName}`,
                     "room": existingRoomEntry[0].room, 
-                    "extn": parseInt(data.Ext)
-                    // "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989517/dda2e0f8-dfd5-11e9-bf31-0a312aeb55d8/optimizations/2048"
+                    "extn": parseInt(data.Ext),
+                    "image": data.Img
                 }})
                 // Updates an existing teacher entry by changing the teacher associated with a classroom number
             }
@@ -197,26 +211,22 @@ dbClient.connect(async () => {
             teacherDB.insertOne({
                 "name": `${data.LastName}, ${data.FirstName}`,
                 "room": parseInt(data.Rm), 
-                "extn": parseInt(data.Ext)
-                // "image": "https://campussuite-storage.s3.amazonaws.com/prod/484005/2752018e-59b7-11e6-943a-22000bd8490f/1989517/dda2e0f8-dfd5-11e9-bf31-0a312aeb55d8/optimizations/2048"
+                "extn": parseInt(data.Ext),
+                "image": data.Img
             })
 
         })
         
         io.on("changedSettings", async (userSettings) => {
             let userDB = dbClient.db("campusInfo").collection("users")
-            let userProfile = await userDB.find({"email": userSettings.userEmail}).toArray()
             userDB.updateOne({"email": userSettings.userEmail}, 
                 {$set: {
-                    "email": userProfile[0].email,
-                    "admin": userProfile[0].admin,
                     "darkModeOn": userSettings.darkMode,
-                    "periods": userProfile[0].periods,
-                    "accountCreated": userProfile[0].accountCreated,
-                    "markersHiddenOnClassPath": userProfile[0].markersHiddenOnClassPath
+                    "markersHiddenOnClassPath": userSettings.hideClassMarkers
                 }
             })
-            // Saves settings from preferences page in database
+            // Updates the appropriate preferences: Dark Mode and hiding markers besides the class markers
+
         })
         
         io.on("empowerUser", async(userInfo) => {
@@ -226,12 +236,7 @@ dbClient.connect(async () => {
 
             userDB.updateOne({"email": userInfo.email}, 
                 {$set: {
-                    "email": doesUserExist[0].email,
-                    "admin": userInfo.permission,
-                    "darkModeOn": doesUserExist[0].darkModeOn,
-                    "periods": doesUserExist[0].periods,
-                    "accountCreated": doesUserExist[0].accountCreated,
-                    "markersHiddenOnClassPath": doesUserExist[0].markersHiddenOnClassPath
+                    "admin": userInfo.permission
                 }
             })
             // Empowers the user by updating the change privileges to the admin page
@@ -245,18 +250,12 @@ dbClient.connect(async () => {
 
         io.on("changeMarkersHiddenPopUp", async (userEmail) => {
             let userDB = dbClient.db("campusInfo").collection("users")
-            let userInfo = await userDB.find({"email": userEmail}).toArray()
             userDB.updateOne({"email": userEmail}, 
                 {$set: {
-                    "email": userEmail,
-                    "admin": userInfo[0].admin,
-                    "darkModeOn": userInfo[0].darkModeOn,
-                    "periods": userInfo[0].periods,
-                    "accountCreated": userInfo[0].accountCreated,
                     "markersHiddenOnClassPath": true
                 }
             })
-
+            // Triggers from initial pop-up asking user whether to enable hiding all other markers besides their classes
         })
     })
 })
