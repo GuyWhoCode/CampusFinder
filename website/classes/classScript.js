@@ -80,6 +80,9 @@ const undoDelete = className => {
     let classSelector = document.createElement("div")
     classSelector.className = "classSelector"
 
+    if (sessionStorage.darkMode === "false") classSelector.style.backgroundColor = "#cfcdcd"
+    // Adds light mode to previously deleted class entries
+
     let periodName = document.createElement("p")
     periodName.className = 'period fs-4'
     periodName.innerHTML = className

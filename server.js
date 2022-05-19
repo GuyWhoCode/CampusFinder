@@ -57,6 +57,7 @@ Object.values(nodeFile).map((roomInfo, index) => {
 })
 
 const msToMonth = time => (((time/1000)/60)/60)/24/30
+// let counter = 0
 const updateUserDB = async () => {
     const dbPurgeMonthInterval = 6 
     let userDB = dbClient.db("campusInfo").collection("users")
@@ -71,7 +72,7 @@ const updateUserDB = async () => {
     allUsers.forEach(val => {
         if (val.email !== undefined) {
             // Prevents throwing an error when encountering the identifier document
-            if (msToMonth(currentTime - val.accountCreated) >= dbPurgeMonthInterval) {
+            if (msToMonth(currentTime - val.accountCreated) >= dbPurgeMonthInterval && !val.admin) {
                 userDB.deleteOne({"email": val.email})
             }
         }
@@ -103,7 +104,12 @@ dbClient.connect(async () => {
     socket.on('connection', async (io) => {
         console.log("I have a connection to the website!")
 
-        // updateUserDB()
+        // counter ++
+        // if (counter % 3 === 0) updateUserDB()
+        // Checks for DB updates every 3rd connection
+
+        // if (counter >= 102) counter = 0
+        // Resets the counter to prev
 
         io.on("requestNodes", () => {
             let nodes = fileReader.readFileSync("./nodes.json", "utf8")
@@ -231,9 +237,6 @@ dbClient.connect(async () => {
         
         io.on("empowerUser", async(userInfo) => {
             let userDB = dbClient.db("campusInfo").collection("users")
-            let doesUserExist = await userDB.find({"email": userInfo.email}).toArray()
-            if (doesUserExist.length === 0) return socket.emit("requireProfile")
-
             userDB.updateOne({"email": userInfo.email}, 
                 {$set: {
                     "admin": userInfo.permission
@@ -246,6 +249,14 @@ dbClient.connect(async () => {
             let userDB = dbClient.db("campusInfo").collection("users")
             userDB.deleteOne({"email": userEmail})
             // Deletes a user's profile from the database
+        })
+
+        io.on("requestCurrentUserPerms", async (userEmail) => {
+            let userDB = dbClient.db("campusInfo").collection("users")
+            let doesUserExist = await userDB.find({"email": userEmail}).toArray()
+            if (doesUserExist.length === 0) return socket.emit("requireProfile")
+            socket.emit("confirmedUserFound", doesUserExist[0].admin)
+            // Returns the current saved permissions in the database for the selected user
         })
 
         io.on("changeMarkersHiddenPopUp", async (userEmail) => {

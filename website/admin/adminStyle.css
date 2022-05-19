@@ -56,7 +56,6 @@ h1{
       'menu header header header header header'
       "footer footer footer footer footer footer";
     gap: 20px;
-    background-color: #8f8f8f;
     padding: 20px;
   }
 
@@ -65,7 +64,7 @@ h1{
     text-align: center;
     padding: 20px 0;
     font-size: 30px;
-    
+    border-radius: 15px;
   }
 #Documentationbox{
   height: 40vh;
