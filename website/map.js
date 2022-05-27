@@ -375,7 +375,7 @@ window.onload = function () {
     const parsedUrl = new URL(window.location.href)
     let roomNumber = parsedUrl.searchParams.get("room")
     if (roomNumber !== null) {
-        searchForTeacher(roomNumber)
+        searchForBuilding(roomNumber)
     }
     // Loads the room based on the parsed URL: https://campus-finder.glitch.me/?room=2119
 }   

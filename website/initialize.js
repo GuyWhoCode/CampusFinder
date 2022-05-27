@@ -9,8 +9,9 @@ Storage.prototype.getObject = function(key) {
     return JSON.parse(this.getItem(key));
 }
 
-let teachers;
-let debug = true;
+let teachers = {};
+let buildingSearched = false;
+let buildingName = "";
 let timeSent = 0;
 let searchedRoom = "";
 let searchBar = document.getElementById("searchBar")
@@ -24,6 +25,7 @@ let infoBoxPreview = document.getElementById("infoBoxPreview")
 let shareRoomLocation = document.getElementById("shareRoomLocation")
 let accessAdminPage = document.getElementById("accessAdminPage")
 const classroomBuildings = ["Cafeteria 4", "Cafeteria 5", "Administration", "Building 2", "Building 3", "Building 4", "Building 5", "Building 6", "Building 8", "Gym", "Pavillion", "Performing Arts Center (PAC)", "Stadium", "Field", "All Buildings", "All Cafeterias", "Other"]
+const urlClassroomBuilding = ["cafe4", "cafe5", "admin", "bldg2", "bldg3", "bldg4", "bldg5", "bldg6", "bldg8", "gym", "pavillion", "pac", "stadium", "field"]
 // eslint-disable-next-line no-undef
 let classSearchResult = new bootstrap.Offcanvas(document.getElementById("classSearchResult"))
 // eslint-disable-next-line no-undef
@@ -34,6 +36,12 @@ let classDenialModal = new bootstrap.Modal(document.getElementById('classDenialM
 let classPathMenu = new bootstrap.Offcanvas(document.getElementById('classPathMenu'))
 // eslint-disable-next-line no-undef
 let otherClassMarkerHideModal = new bootstrap.Modal(document.getElementById('otherClassMarkerHideModal'))
+
+
+const showElmBlock = elm => elm.style.display = "block"
+const hideElm = elm => elm.style.display = "none"
+const capitalizeWord = selectedWord => selectedWord.split(" ")[0].charAt(0).toUpperCase() + 
+selectedWord.split(" ")[0].split("").slice(1, selectedWord.split(" ")[0].length).join("")
 
 const initializeTeacherAutocomplete = teacherData => {
     teacherData.map(val => {
@@ -101,8 +109,11 @@ const searchForTeacher = teacherQuery => {
     })
 }
 
-const searchForBuilding = () => {
-    let searchValue = mainSearch.value
+const searchForBuilding = searchValue => {
+    buildingSearched = false
+    buildingName = ""
+    showElmBlock(shareRoomLocation)
+
     if (searchValue.toLowerCase().trim() === "swimming pool") {
         mainSearch.value = ""
         resetSearch()
@@ -110,7 +121,7 @@ const searchForBuilding = () => {
         // Egg of the Easter
     }
     
-    if (classroomBuildings.map(val => val === searchValue).filter(val => val === true).length === 1) {
+    if (classroomBuildings.indexOf(searchValue) !== -1 || urlClassroomBuilding.indexOf(searchValue) !== -1) {
         mainSearch.value = ""
         buildingCarousel.style.display = "block"
         infoBoxPreview.style.display = "none"
@@ -118,79 +129,115 @@ const searchForBuilding = () => {
         classSearchResult.show()
       
         resetSearch()
+        buildingSearched = true
+
+
         switch (searchValue) {
+            case "cafe4": 
             case "Cafeteria 4": 
                 focusOnBuilding(locationMarkers, map, "Cafe 4")
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/cafe41.png?v=1650467065876", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/cafe42.png?v=1650467510886", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/cafe43.png?v=1650467514786"])
+                buildingName = "cafe4"
                 break;
+            case "cafe5":
             case "Cafeteria 5": 
                 focusOnBuilding(locationMarkers, map, "Cafe 5")
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/cafe5.png?v=1650387598863"])
+                buildingName = "cafe5"
                 break;
+            case "admin": 
             case "Administration": 
                 showMarkersOfBuilding(ADMIN)
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/bldg2_1.png?v=1652805237026", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/bldg2_2.png?v=1652805231452"])
+                buildingName = "admin"
                 break;
+            case "bldg2":
             case "Building 2": 
                 showMarkersOfBuilding(2)
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/lib2.png?v=1650387538125", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/lib1.png?v=1650387533381"])
-                break; 
+                buildingName = "bldg2"
+                break;
+            case "bldg3":
             case "Building 3": 
                 showMarkersOfBuilding(3)
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/31.png?v=1650467873968"])
+                buildingName = "bldg3"
                 break; 
+            case "bldg4":
             case "Building 4": 
                 showMarkersOfBuilding(4)
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/43.png?v=1650467626833", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/41.png?v=1650467541469", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/42.png?v=1650467879521"])
+                buildingName = "bldg4"
                 break; 
+            case "bldg5":
             case "Building 5": 
                 showMarkersOfBuilding(5)
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/bldg5_1.png?v=1650387639459", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/bldg5_2.png?v=1650387643476"])
+                buildingName = "bldg5"
                 break; 
+            case "bldg6":
             case "Building 6": 
                 showMarkersOfBuilding(6)
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/61.png?v=1650467520196"])
+                buildingName = "bldg6"
                 break; 
+            case "bldg8":
             case "Building 8": 
                 showMarkersOfBuilding(8)
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/81.png?v=1650401904176", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/82.png?v=1650401909161", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/83.png?v=1650401925229"])
+                buildingName = "bldg8"
                 break; 
+            case "gym":
             case "Gym": 
                 showMarkersOfOtherBuilding("Gym")
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/bldg7_1.png?v=1652805216094", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/bldg7_2.png?v=1652805209011"])
+                buildingName = "gym"
                 break;
+            case "pavillion":
             case "Pavillion": 
                 showMarkersOfOtherBuilding("Pavilion")
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/pavillion1.png?v=1650387463416", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/pavillion2.png?v=1650387490465"])
+                buildingName = "pavillion"
                 break;
+            case "pac":
             case "Performing Arts Center (PAC)": 
                 showMarkersOfOtherBuilding("PAC")
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/pac1.png?v=1650387499393", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/pac2.png?v=1650387517686"])
+                buildingName = "pac"
                 break;
+            case "stadium":
             case "Stadium": 
                 showMarkersOfOtherBuilding("Stadium")
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/stadium2.png?v=1650467034478", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/stadium1.png?v=1650467028587"])
+                buildingName = "stadium"
                 break;
+            case "field":
             case "Field": 
                 showMarkersOfOtherBuilding("Field")
                 createBuildingCarousel(["https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/field_1.png?v=1652805198348", "https://cdn.glitch.global/87fd7b5d-4f64-4f0b-9f0c-3709d0922659/field_2.png?v=1652805192726"])
+                buildingName = "field"
                 break;
             case "All Buildings": 
                 showOutlinesOfBuilding("bldgs")
+                hideElm(shareRoomLocation)
                 break;
             case "All Cafeterias": 
                 showOutlinesOfBuilding("cafe")
+                hideElm(shareRoomLocation)
                 break;
             case "Other": 
                 showOutlinesOfBuilding("other")
+                hideElm(shareRoomLocation)
                 break;
         }
         return;
         // Case when the building is searched
     }
 
-    let teacherName = searchValue.split("(")[0].trim()
-    searchForTeacher(teacherName)
+    if (searchValue.includes("(")) searchValue = searchValue.split("(")[0].trim()
+    // Used when the user searches from the search bar, excludes search values from the URL
+
+    searchForTeacher(searchValue)
 }
 
 
@@ -216,7 +263,7 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
             mainSearch.blur()
             // Special attribute that hides the mobile keyboard by removing input focus 
 
-            searchForBuilding()
+            searchForBuilding(mainSearch.value)
         }
     })
   
@@ -227,7 +274,7 @@ if (navigator.userAgent.indexOf("Android") !== -1 || navigator.userAgent.indexOf
 } else {
     searchBar.addEventListener("submit", (event) => {
         event.preventDefault()
-        searchForBuilding()
+        searchForBuilding(mainSearch.value)
     })
 }
 // Added to adjust for the mobile view of making the Search button work
@@ -280,7 +327,7 @@ document.getElementById("acceptHideOtherMarkers").addEventListener("click", () =
 })
 
 document.getElementById("classPathMenuToggle").addEventListener("click", () => {
-    if (sessionStorage.getItem("email") !== null || debug) {
+    if (sessionStorage.getItem("email") !== null) {
         if (localStorage.getItem("markerPopUp") === null) {
             otherClassMarkerHideModal.show()
             localStorage.setItem("markerPopUp", true)
@@ -328,7 +375,10 @@ document.getElementById('classSearchResult').addEventListener("hide.bs.offcanvas
 })
 
 shareRoomLocation.addEventListener("click", async () => {
-    let link = "https://campus-finder.glitch.me/?room=" + roomNumber.innerHTML.split("Room ")[1]
+    let link = "https://campus-finder.glitch.me/?room="
+    buildingSearched ? link += buildingName : link += roomNumber.innerHTML.split("Room ")[1]
+    // Accounts for the possibility of a building being searched
+    
     await navigator.clipboard.writeText(link)
     await alert("Sharable link copied!")
 })
