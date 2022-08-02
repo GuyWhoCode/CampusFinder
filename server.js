@@ -82,6 +82,10 @@ const updateUserDB = async () => {
     // Acts as a data management system
 }
 
+const checkQueueDB = () => {
+    
+}
+
 
 const socket = require("socket.io")(server, { pingTimeout: 60000 })
 dbClient.connect(async () => {
@@ -252,8 +256,17 @@ dbClient.connect(async () => {
         })
 
         io.on("requestCurrentUserPerms", async (userEmail) => {
+            const emailRegex = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+            if (!emailRegex.test(userEmail)) return 
+            // Email verification regex from https://www.abstractapi.com/tools/email-regex-guide
+
             let userDB = dbClient.db("campusInfo").collection("users")
             let doesUserExist = await userDB.find({"email": userEmail}).toArray()
+
+            // TODO: Add a queue system to input emails
+                // Each time a new person logs in, check queue system DB to see if any entries need to be deleted
+                // Entries have time stamp and expire after 7 days
+
             if (doesUserExist.length === 0) return socket.emit("requireProfile")
             socket.emit("confirmedUserFound", doesUserExist[0].admin)
             // Returns the current saved permissions in the database for the selected user
